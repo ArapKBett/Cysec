@@ -1,0 +1,7 @@
+flask==3.0.0
+scapy==2.5.0
+cryptography==41.0.3
+python-dotenv==1.0.0
+gunicorn==21.2.0
+pyopenssl==23.2.0
+python-decouple==3.8
