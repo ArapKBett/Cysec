@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="dashboard">
+    <h1 class="mb-4">Dashboard</h1>
+    
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card tool-card h-100">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-network-wired me-2"></i>Network Sniffer</h5>
+                    <p class="card-text">Analyze real-time network traffic and detect suspicious activity.</p>
+                    <a href="/tools/sniffer" class="btn btn-primary">Launch Tool</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card tool-card h-100">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-lock me-2"></i>Password Auditor</h5>
+                    <p class="card-text">Check password strength and security against common breaches.</p>
+                    <a href="/tools/passwords" class="btn btn-primary">Launch Tool</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card tool-card h-100">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-shield-alt me-2"></i>Intrusion Detection</h5>
+                    <p class="card-text">Monitor system logs for potential security breaches.</p>
+                    <a href="/tools/ids" class="btn btn-primary">Launch Tool</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card tool-card h-100">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-search me-2"></i>Port Scanner</h5>
+                    <p class="card-text">Identify open ports and potential vulnerabilities.</p>
+                    <a href="/tools/scanner" class="btn btn-primary">Launch Tool</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card tool-card h-100">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-file-lock me-2"></i>File Crypto</h5>
+                    <p class="card-text">Secure files with AES-256 encryption/decryption.</p>
+                    <a href="/tools/crypto" class="btn btn-primary">Launch Tool</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
