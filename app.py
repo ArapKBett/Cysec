@@ -9,11 +9,15 @@ import os
 import secrets
 from config import Config
 
+# Initialize Flask app
 app = Flask(__name__)
 app.config.from_object(Config)
+
+# Set secret key for session management, using environment variable for security
+# Render will provide this via environment variables in the dashboard
 app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(16))
 
-# Global states
+# Global states to track tool status
 tool_states = {
     'sniffer': {'running': False, 'instance': None},
     'scanner': {'running': False, 'instance': None}
@@ -21,10 +25,12 @@ tool_states = {
 
 @app.route('/')
 def index():
+    # Render the main index page
     return render_template('index.html')
 
 @app.route('/tools/<tool>')
 def tool(tool):
+    # Serve specific tool pages or return 404 if tool is invalid
     if tool not in ['sniffer', 'passwords', 'ids', 'scanner', 'crypto']:
         return render_template('404.html'), 404
     return render_template(f'tools/{tool}.html')
@@ -36,6 +42,8 @@ def sniffer_control():
         action = request.json.get('action')
         if action == 'start':
             interface = request.json.get('interface', 'eth0')
+            # Note: PacketSniffer may require root privileges or specific libraries (e.g., libpcap)
+            # Render's containerized environment may restrict this; test thoroughly
             tool_states['sniffer']['instance'] = PacketSniffer(interface)
             thread = threading.Thread(target=tool_states['sniffer']['instance'].start)
             thread.start()
@@ -59,8 +67,10 @@ def check_password():
 def start_scan():
     target = request.json.get('target')
     port_range = request.json.get('range', '1-1024')
+    # Note: PortScanner may face restrictions in Render due to network policies
+    # Test and consider disabling if it fails in production
     tool_states['scanner']['instance'] = PortScanner(target, port_range)
-    thread = threading.Thread(target=tool_states['scanner']['instance].run)
+    thread = threading.Thread(target=tool_states['scanner']['instance'].run)
     thread.start()
     return jsonify({'status': 'scanning'})
 
@@ -77,6 +87,8 @@ def encrypt():
         return jsonify({'error': 'No file uploaded'}), 400
     file = request.files['file']
     crypto = FileCrypto()
+    # Note: Ensure Render's temporary disk storage supports file operations
+    # For large files, consider external storage (e.g., AWS S3)
     key, encrypted_path = crypto.encrypt(file)
     return jsonify({'key': key.decode(), 'filename': encrypted_path})
 
@@ -90,5 +102,6 @@ def decrypt():
     decrypted_path = crypto.decrypt(file, key.encode())
     return send_file(decrypted_path, as_attachment=True)
 
-if __name__ == '__main__':
-    app.run(ssl_context='adhoc' if app.config['DEBUG'] else None)
+# Removed the `if __name__ == '__main__':` block
+# Render uses `gunicorn` (specified in Procfile) to run the app, not Flask's development server
+# The `ssl_context='adhoc'` was for local debugging; Render provides HTTPS automatically
