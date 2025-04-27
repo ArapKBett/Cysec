@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}File Crypto{% endblock %}
+
+{% block content %}
+<div class="tool-interface">
+    <h2 class="mb-4"><i class="fas fa-file-lock me-2"></i>File Encryption/Decryption</h2>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Encrypt File</h5>
+                    <form id="encryptForm" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label class="form-label">Select File</label>
+                            <input type="file" class="form-control" name="file" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-lock me-2"></i>Encrypt
+                        </button>
+                    </form>
+                    <div id="encryptResult" class="mt-3"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Decrypt File</h5>
+                    <form id="decryptForm" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label class="form-label">Select File</label>
+                            <input type="file" class="form-control" name="file" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Decryption Key</label>
+                            <input type="text" class="form-control" name="key" required>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100">
+                            <i class="fas fa-unlock me-2"></i>Decrypt
+                        </button>
+                    </form>
+                    <div id="decryptResult" class="mt-3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const encryptForm = document.getElementById('encryptForm');
+    const decryptForm = document.getElementById('decryptForm');
+    const encryptResult = document.getElementById('encryptResult');
+    const decryptResult = document.getElementById('decryptResult');
+
+    // Handle Encryption
+    encryptForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        encryptResult.innerHTML = '<div class="spinner-border text-primary" role="status"></div>';
+        
+        try {
+            const formData = new FormData(encryptForm);
+            const response = await fetch('/encrypt', {
+                method: 'POST',
+                body: formData
+            });
+            
+            if(!response.ok) throw new Error('Encryption failed');
+            
+            const data = await response.json();
+            encryptResult.innerHTML = `
+                <div class="alert alert-success">
+                    <h5>File Encrypted Successfully!</h5>
+                    <p>Download Key: <code>${data.key}</code></p>
+                    <p>Encrypted File: ${data.filename}</p>
+                    <small class="text-danger">Save this key - it cannot be recovered!</small>
+                </div>
+            `;
+            encryptForm.reset();
+            
+        } catch (error) {
+            encryptResult.innerHTML = `
+                <div class="alert alert-danger">
+                    Encryption failed: ${error.message}
+                </div>
+            `;
+        }
+    });
+
+    // Handle Decryption
+    decryptForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        decryptResult.innerHTML = '<div class="spinner-border text-primary" role="status"></div>';
+        
+        try {
+            const formData = new FormData(decryptForm);
+            const response = await fetch('/decrypt', {
+                method: 'POST',
+                body: formData
+            });
+            
+            if(!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Decryption failed');
+            }
+            
+            // Handle file download
+            const blob = await response.blob();
+            const filename = response.headers.get('Content-Disposition')
+                            .split('filename=')[1]
+                            .replace(/"/g, '');
+            
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            
+            decryptResult.innerHTML = `
+                <div class="alert alert-success">
+                    File decrypted successfully! Download started automatically.
+                </div>
+            `;
+            decryptForm.reset();
+            
+        } catch (error) {
+            decryptResult.innerHTML = `
+                <div class="alert alert-danger">
+                    Decryption failed: ${error.message}
+                </div>
+            `;
+        }
+    });
+});
+</script>
+{% endblock %}
+{% endblock %}
