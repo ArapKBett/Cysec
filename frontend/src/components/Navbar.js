@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const Navbar = () => {
+const Navbar = ({ activeTab, setActiveTab }) => {
   const [connectionStatus, setConnectionStatus] = useState('SECURE');
   const [systemLoad, setSystemLoad] = useState(Math.floor(Math.random() * 100));
 
@@ -43,22 +43,26 @@ const Navbar = () => {
 
           {/* Navigation Links */}
           <div className="hidden md:flex space-x-8">
-            <NavLink href="#home" text="HOME" onClick={() => window.location.reload()} />
-            <NavLink href="#encrypt" text="ENCRYPT" onClick={() => {
-              // Find and click the encrypt tab
-              const encryptTab = document.querySelector('[data-tab="encrypt"]');
-              if (encryptTab) encryptTab.click();
-            }} />
-            <NavLink href="#decrypt" text="DECRYPT" onClick={() => {
-              // Find and click the decrypt tab
-              const decryptTab = document.querySelector('[data-tab="decrypt"]');
-              if (decryptTab) decryptTab.click();
-            }} />
-            <NavLink href="#network" text="NETWORK" onClick={() => {
-              // Find and click the network tab
-              const networkTab = document.querySelector('[data-tab="sniff"]');
-              if (networkTab) networkTab.click();
-            }} />
+            <NavLink
+              text="HOME"
+              active={activeTab === 'home'}
+              onClick={() => setActiveTab('home')}
+            />
+            <NavLink
+              text="ENCRYPT"
+              active={activeTab === 'encrypt'}
+              onClick={() => setActiveTab('encrypt')}
+            />
+            <NavLink
+              text="DECRYPT"
+              active={activeTab === 'decrypt'}
+              onClick={() => setActiveTab('decrypt')}
+            />
+            <NavLink
+              text="NETWORK"
+              active={activeTab === 'sniff'}
+              onClick={() => setActiveTab('sniff')}
+            />
           </div>
 
           {/* Status Panel */}
@@ -94,18 +98,24 @@ const Navbar = () => {
         {/* Mobile Menu Button */}
         <div className="md:hidden mt-4">
           <div className="flex justify-center space-x-6">
-            <NavLink href="#encrypt" text="ENCRYPT" mobile onClick={() => {
-              const encryptTab = document.querySelector('[data-tab="encrypt"]');
-              if (encryptTab) encryptTab.click();
-            }} />
-            <NavLink href="#decrypt" text="DECRYPT" mobile onClick={() => {
-              const decryptTab = document.querySelector('[data-tab="decrypt"]');
-              if (decryptTab) decryptTab.click();
-            }} />
-            <NavLink href="#network" text="NETWORK" mobile onClick={() => {
-              const networkTab = document.querySelector('[data-tab="sniff"]');
-              if (networkTab) networkTab.click();
-            }} />
+            <NavLink
+              text="ENCRYPT"
+              mobile
+              active={activeTab === 'encrypt'}
+              onClick={() => setActiveTab('encrypt')}
+            />
+            <NavLink
+              text="DECRYPT"
+              mobile
+              active={activeTab === 'decrypt'}
+              onClick={() => setActiveTab('decrypt')}
+            />
+            <NavLink
+              text="NETWORK"
+              mobile
+              active={activeTab === 'sniff'}
+              onClick={() => setActiveTab('sniff')}
+            />
           </div>
         </div>
       </div>
@@ -118,31 +128,21 @@ const Navbar = () => {
   );
 };
 
-const NavLink = ({ href, text, mobile = false, onClick }) => {
-  const handleClick = (e) => {
-    e.preventDefault();
-    if (onClick) {
-      onClick();
-    } else {
-      // Smooth scroll to section
-      const targetId = href.replace('#', '');
-      const element = document.getElementById(targetId);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
-      }
-    }
-  };
-
+const NavLink = ({ text, mobile = false, onClick, active = false }) => {
   return (
     <button
-      onClick={handleClick}
+      onClick={onClick}
       className={`
         relative font-cyber font-bold tracking-wider transition-all duration-200
         ${mobile ? 'text-sm' : 'text-base'}
-        text-cyber-light hover:text-cyber-blue
-        before:absolute before:bottom-0 before:left-0 before:w-0 before:h-0.5
+        ${active
+          ? 'text-cyber-blue border-b-2 border-cyber-blue'
+          : 'text-cyber-light hover:text-cyber-blue'
+        }
+        before:absolute before:bottom-0 before:left-0
         before:bg-cyber-blue before:transition-all before:duration-200
         hover:before:w-full
+        ${active ? 'before:w-full before:h-0.5' : 'before:w-0 before:h-0.5'}
         after:absolute after:inset-0 after:border after:border-transparent
         hover:after:border-cyber-blue/20 after:transition-all after:duration-200
         after:rounded

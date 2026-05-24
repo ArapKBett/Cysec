@@ -39,7 +39,7 @@ const App = () => {
   const [sniffDevice, setSniffDevice] = useState('wlan0');
   const [response, setResponse] = useState('');
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState('encrypt');
+  const [activeTab, setActiveTab] = useState('home');
   const [currentTime, setCurrentTime] = useState(new Date());
   const [apiStatus, setApiStatus] = useState('CHECKING...');
 
@@ -150,7 +150,7 @@ const App = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-cyber-black via-cyber-dark to-cyber-gray bg-circuit flex flex-col font-cyber text-gray-100">
-      <Navbar />
+      <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
 
       {/* Header with cyber aesthetic */}
       <div className="bg-cyber-dark/90 backdrop-blur-sm border-b border-cyber-light/30">
@@ -220,6 +220,90 @@ const App = () => {
             NETWORK SCAN
           </button>
         </div>
+
+        {/* Home/Dashboard Section */}
+        {activeTab === 'home' && (
+          <div className="bg-gradient-to-r from-cyber-gray/40 to-cyber-light/20 p-8 rounded-xl border border-cyber-green/30 shadow-2xl backdrop-blur-sm mb-8">
+            <h2 className="text-3xl font-bold mb-6 text-cyber-green text-center">
+              🚀 WELCOME TO CYBERVAULT
+            </h2>
+            <div className="grid md:grid-cols-3 gap-6 mb-8">
+              <div className="bg-cyber-dark/60 p-6 rounded-lg border border-cyber-blue/30">
+                <div className="flex items-center mb-4">
+                  <LockIcon />
+                  <h3 className="text-xl font-bold text-cyber-blue">FILE ENCRYPTION</h3>
+                </div>
+                <p className="text-cyber-light text-sm">
+                  Secure your files with military-grade AES encryption. Protect sensitive data from unauthorized access.
+                </p>
+                <button
+                  onClick={() => setActiveTab('encrypt')}
+                  className="mt-4 bg-cyber-blue text-cyber-black px-4 py-2 rounded font-bold hover:bg-blue-400 transition-colors"
+                >
+                  START ENCRYPTION
+                </button>
+              </div>
+              <div className="bg-cyber-dark/60 p-6 rounded-lg border border-cyber-green/30">
+                <div className="flex items-center mb-4">
+                  <UnlockIcon />
+                  <h3 className="text-xl font-bold text-cyber-green">FILE DECRYPTION</h3>
+                </div>
+                <p className="text-cyber-light text-sm">
+                  Decrypt your protected files safely. Restore access to your encrypted data with the correct key.
+                </p>
+                <button
+                  onClick={() => setActiveTab('decrypt')}
+                  className="mt-4 bg-cyber-green text-cyber-black px-4 py-2 rounded font-bold hover:bg-green-400 transition-colors"
+                >
+                  START DECRYPTION
+                </button>
+              </div>
+              <div className="bg-cyber-dark/60 p-6 rounded-lg border border-cyber-orange/30">
+                <div className="flex items-center mb-4">
+                  <NetworkIcon />
+                  <h3 className="text-xl font-bold text-cyber-orange">NETWORK ANALYSIS</h3>
+                </div>
+                <p className="text-cyber-light text-sm">
+                  Monitor network traffic and analyze packet data. Essential for security assessments and monitoring.
+                </p>
+                <button
+                  onClick={() => setActiveTab('sniff')}
+                  className="mt-4 bg-cyber-orange text-cyber-black px-4 py-2 rounded font-bold hover:bg-orange-400 transition-colors"
+                >
+                  START SCAN
+                </button>
+              </div>
+            </div>
+
+            {/* System Status Dashboard */}
+            <div className="bg-cyber-black/60 p-6 rounded-lg border border-cyber-light/20">
+              <h3 className="text-xl font-bold text-cyber-light mb-4">SYSTEM STATUS</h3>
+              <div className="grid md:grid-cols-4 gap-4 text-center">
+                <div className="bg-cyber-gray/30 p-4 rounded">
+                  <div className="text-2xl font-bold text-cyber-green">{currentTime.toLocaleTimeString()}</div>
+                  <div className="text-xs text-cyber-light">SYSTEM TIME</div>
+                </div>
+                <div className="bg-cyber-gray/30 p-4 rounded">
+                  <div className={`text-2xl font-bold ${
+                    apiStatus === 'OPERATIONAL' ? 'text-cyber-green' :
+                    apiStatus === 'DEGRADED' ? 'text-cyber-orange' : 'text-cyber-red'
+                  }`}>
+                    {apiStatus}
+                  </div>
+                  <div className="text-xs text-cyber-light">API STATUS</div>
+                </div>
+                <div className="bg-cyber-gray/30 p-4 rounded">
+                  <div className="text-2xl font-bold text-cyber-blue">v2.0.0</div>
+                  <div className="text-xs text-cyber-light">VERSION</div>
+                </div>
+                <div className="bg-cyber-gray/30 p-4 rounded">
+                  <div className="text-2xl font-bold text-cyber-orange">SECURE</div>
+                  <div className="text-xs text-cyber-light">ENCRYPTION</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Encryption Section */}
         {activeTab === 'encrypt' && (

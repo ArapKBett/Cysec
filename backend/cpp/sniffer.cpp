@@ -2,8 +2,8 @@
 #include <iostream>
 #include <string>
 
-void packet_handler(u_char *args, const struct pcap_pkthdr *header, const u_char *packet) {
-    std::cout << "Packet captured: " << header->len << " bytes at " 
+void packet_handler(u_char* /* args */, const struct pcap_pkthdr *header, const u_char* /* packet */) {
+    std::cout << "Packet captured: " << header->len << " bytes at "
               << header->ts.tv_sec << "s\n";
 }
 
