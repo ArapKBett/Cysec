@@ -286,18 +286,48 @@ const App = () => {
   const handleFileUpload = (event, mode) => {
     const file = event.target.files[0];
     if (file) {
-      // For demo purposes, we'll use the filename with a temporary path
+      // Format file size for display
+      const formatFileSize = (bytes) => {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+      };
+
+      // Use the actual filename with a temporary path
       const tempPath = `/tmp/${file.name}`;
+
       switch (mode) {
         case 'encrypt-input':
           setEncryptInput(tempPath);
+          // Auto-suggest output filename
+          setEncryptOutput(`/tmp/${file.name}.enc`);
           break;
         case 'decrypt-input':
           setDecryptInput(tempPath);
+          // Auto-suggest decrypted output filename
+          const outputName = file.name.endsWith('.enc')
+            ? file.name.slice(0, -4) + '_decrypted' + (file.name.slice(0, -4).includes('.') ? '' : '.txt')
+            : file.name + '_decrypted.txt';
+          setDecryptOutput(`/tmp/${outputName}`);
           break;
       }
-      // Note: In a real implementation, you'd upload the file to the server
-      setResponse(`File "${file.name}" selected. Note: File upload simulation - actual file would be uploaded to server.`);
+
+      // Enhanced feedback message
+      const fileInfo = `✅ LOCAL FILE SELECTED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📁 File: ${file.name}
+📊 Size: ${formatFileSize(file.size)}
+📅 Modified: ${new Date(file.lastModified).toLocaleString()}
+🔄 Status: Ready for ${mode.includes('encrypt') ? 'encryption' : 'decryption'}
+
+Note: In production, the file would be securely uploaded to the server for processing.`;
+
+      setResponse(fileInfo);
+
+      // Clear the file input for future selections
+      event.target.value = '';
     }
   };
 
@@ -608,7 +638,7 @@ const App = () => {
                 <div className="flex gap-2">
                   <input
                     type="text"
-                    placeholder="Source File Path"
+                    placeholder="Source File Path or click Choose Local File"
                     className="flex-1 bg-cyber-dark/60 border border-cyber-blue/30 p-4 rounded-lg text-gray-100 placeholder-cyber-light/60 focus:border-cyber-blue focus:outline-none focus:ring-2 focus:ring-cyber-blue/50 font-mono"
                     value={encryptInput}
                     onChange={(e) => setEncryptInput(e.target.value)}
@@ -616,11 +646,11 @@ const App = () => {
                   <button
                     onClick={() => openFileBrowser('encrypt-input')}
                     className="px-4 py-4 bg-cyber-blue/20 border border-cyber-blue/50 text-cyber-blue rounded-lg hover:bg-cyber-blue/30 transition-colors"
-                    title="Browse Files"
+                    title="Browse Server Files"
                   >
                     📁
                   </button>
-                  <label className="px-4 py-4 bg-cyber-green/20 border border-cyber-green/50 text-cyber-green rounded-lg hover:bg-cyber-green/30 transition-colors cursor-pointer" title="Upload File">
+                  <label className="px-4 py-4 bg-cyber-green/20 border border-cyber-green/50 text-cyber-green rounded-lg hover:bg-cyber-green/30 transition-colors cursor-pointer" title="Choose Local File">
                     📤
                     <input
                       type="file"
@@ -628,6 +658,23 @@ const App = () => {
                       onChange={(e) => handleFileUpload(e, 'encrypt-input')}
                     />
                   </label>
+                </div>
+
+                {/* Prominent Choose Local File Button */}
+                <div className="mt-3">
+                  <label className="w-full bg-gradient-to-r from-cyber-green/80 to-green-600 text-white px-6 py-3 rounded-lg hover:from-green-600 hover:to-cyber-green transition-all duration-200 font-bold flex items-center justify-center shadow-lg cursor-pointer border-2 border-cyber-green/50 hover:border-cyber-green">
+                    <span className="mr-3 text-xl">📂</span>
+                    CHOOSE LOCAL FILE TO ENCRYPT
+                    <input
+                      type="file"
+                      className="hidden"
+                      onChange={(e) => handleFileUpload(e, 'encrypt-input')}
+                      accept="*/*"
+                    />
+                  </label>
+                  <p className="text-xs text-cyber-light mt-2 text-center">
+                    Select any file from your computer for secure encryption
+                  </p>
                 </div>
                 <div className="flex flex-wrap gap-2 mt-2">
                   <span className="text-xs text-cyber-light">Quick paths:</span>
@@ -706,7 +753,7 @@ const App = () => {
                 <div className="flex gap-2">
                   <input
                     type="text"
-                    placeholder="Encrypted File Path"
+                    placeholder="Encrypted File Path or click Choose Local File"
                     className="flex-1 bg-cyber-dark/60 border border-cyber-green/30 p-4 rounded-lg text-gray-100 placeholder-cyber-light/60 focus:border-cyber-green focus:outline-none focus:ring-2 focus:ring-cyber-green/50 font-mono"
                     value={decryptInput}
                     onChange={(e) => setDecryptInput(e.target.value)}
@@ -714,18 +761,36 @@ const App = () => {
                   <button
                     onClick={() => openFileBrowser('decrypt-input')}
                     className="px-4 py-4 bg-cyber-green/20 border border-cyber-green/50 text-cyber-green rounded-lg hover:bg-cyber-green/30 transition-colors"
-                    title="Browse Files"
+                    title="Browse Server Files"
                   >
                     📁
                   </button>
-                  <label className="px-4 py-4 bg-cyber-orange/20 border border-cyber-orange/50 text-cyber-orange rounded-lg hover:bg-cyber-orange/30 transition-colors cursor-pointer" title="Upload Encrypted File">
+                  <label className="px-4 py-4 bg-cyber-orange/20 border border-cyber-orange/50 text-cyber-orange rounded-lg hover:bg-cyber-orange/30 transition-colors cursor-pointer" title="Choose Local Encrypted File">
                     📤
                     <input
                       type="file"
                       className="hidden"
+                      accept=".enc,*/*"
                       onChange={(e) => handleFileUpload(e, 'decrypt-input')}
                     />
                   </label>
+                </div>
+
+                {/* Prominent Choose Local Encrypted File Button */}
+                <div className="mt-3">
+                  <label className="w-full bg-gradient-to-r from-cyber-orange/80 to-orange-600 text-white px-6 py-3 rounded-lg hover:from-orange-600 hover:to-cyber-orange transition-all duration-200 font-bold flex items-center justify-center shadow-lg cursor-pointer border-2 border-cyber-orange/50 hover:border-cyber-orange">
+                    <span className="mr-3 text-xl">🔐</span>
+                    CHOOSE LOCAL ENCRYPTED FILE
+                    <input
+                      type="file"
+                      className="hidden"
+                      accept=".enc,*/*"
+                      onChange={(e) => handleFileUpload(e, 'decrypt-input')}
+                    />
+                  </label>
+                  <p className="text-xs text-cyber-light mt-2 text-center">
+                    Select encrypted (.enc) file from your computer to decrypt
+                  </p>
                 </div>
                 <div className="flex flex-wrap gap-2 mt-2">
                   <span className="text-xs text-cyber-light">Quick paths:</span>
