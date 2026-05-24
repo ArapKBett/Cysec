@@ -18,6 +18,9 @@ COPY backend/java/src ./src
 # Download dependencies (cached layer)
 RUN mvn dependency:go-offline -B
 
+# Copy React build into Spring Boot resources
+COPY --from=frontend-builder /build/build ./src/main/resources/static
+
 # Build application
 RUN mvn clean package -DskipTests -B && \
     mv target/*.jar app.jar
@@ -108,11 +111,10 @@ RUN addgroup -g 1001 -S cybervault && \
 RUN mkdir -p /app/backend/c /app/backend/cpp /app/static /app/logs /app/temp && \
     chown -R cybervault:cybervault /app
 
-# Copy compiled binaries from builder stages
+# Copy compiled binaries and JAR from builder stages
 COPY --from=native-builder --chown=cybervault:cybervault /build/encrypt /app/backend/c/
 COPY --from=native-builder --chown=cybervault:cybervault /build/sniffer /app/backend/cpp/
 COPY --from=backend-builder --chown=cybervault:cybervault /build/app.jar /app/
-COPY --from=frontend-builder --chown=cybervault:cybervault /build/build /app/static/
 
 # Set executable permissions
 RUN chmod +x /app/backend/c/encrypt /app/backend/cpp/sniffer
@@ -122,7 +124,7 @@ USER cybervault:cybervault
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-    CMD curl -f http://localhost:8080/cybervault/actuator/health || exit 1
+    CMD curl -f http://localhost:8080/actuator/health || exit 1
 
 # Expose port
 EXPOSE 8080
