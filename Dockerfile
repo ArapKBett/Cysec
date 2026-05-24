@@ -50,18 +50,19 @@ RUN mvn clean package -DskipTests -B && \
 # Stage 3: Build C/C++ Components
 FROM alpine:3.18 AS native-builder
 
-# Install build dependencies including static libraries
+# Install build dependencies with available Alpine packages
 RUN apk add --no-cache \
     gcc \
     g++ \
     musl-dev \
+    musl-utils \
     openssl-dev \
     openssl-libs-static \
     libpcap-dev \
-    libpcap-static \
     linux-headers \
     make \
-    pkgconfig
+    pkgconfig \
+    binutils
 
 WORKDIR /build
 
@@ -69,21 +70,13 @@ WORKDIR /build
 COPY backend/c/encrypt.c ./
 COPY backend/cpp/sniffer.cpp ./
 
-# Compile with optimized static linking for Alpine musl
-RUN gcc -o encrypt encrypt.c \
-    -static \
-    -lssl -lcrypto \
-    -O3 -D_FORTIFY_SOURCE=2 \
-    -fstack-protector-strong \
-    -fPIC -DPIC && \
-    g++ -o sniffer sniffer.cpp \
-    -static \
-    -lpcap \
-    -O3 -D_FORTIFY_SOURCE=2 \
-    -fstack-protector-strong \
-    -fPIC -DPIC \
-    -DPCAP_DONT_INCLUDE_PCAP_BPF_H \
-    -DNO_DBUS -DNO_RDMA
+# Compile with Alpine-compatible linking (correct order)
+RUN gcc -static -O3 -D_FORTIFY_SOURCE=2 -fstack-protector-strong \
+    -o encrypt encrypt.c -lssl -lcrypto && \
+    g++ -O3 -D_FORTIFY_SOURCE=2 -fstack-protector-strong \
+    -DPCAP_DONT_INCLUDE_PCAP_BPF_H -DNO_DBUS -DNO_RDMA \
+    -static-libgcc -static-libstdc++ \
+    -o sniffer sniffer.cpp -lpcap
 
 # Stage 4: Production Runtime
 FROM eclipse-temurin:17-jre-alpine
@@ -99,19 +92,19 @@ LABEL maintainer="Arap Bett <arap.bett@cybervault.com>" \
       org.opencontainers.image.vendor="CyberVault Security" \
       org.opencontainers.image.licenses="MIT"
 
-# Install runtime dependencies only
+# Install runtime dependencies for Alpine
 RUN apk add --no-cache \
     libssl3 \
     libcrypto3 \
     libpcap \
-    libstdc++ \
-    libgcc \
     musl \
     dumb-init \
     curl \
     iproute2 \
     net-tools \
-    && rm -rf /var/cache/apk/*
+    ca-certificates \
+    && rm -rf /var/cache/apk/* \
+    && update-ca-certificates
 
 # Create application directory
 WORKDIR /app
