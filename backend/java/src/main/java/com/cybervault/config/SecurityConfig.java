@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -21,7 +20,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .csrf(csrf -> csrf.disable()) // Disable for API usage
+            .csrf(csrf -> csrf.disable()) // Disable CSRF for API usage
             .authorizeHttpRequests(authz -> authz
                 // Allow static resources
                 .requestMatchers("/", "/index.html", "/static/**", "/favicon.ico",
@@ -30,21 +29,15 @@ public class SecurityConfig {
                 // Allow API endpoints
                 .requestMatchers("/api/**").permitAll()
 
-                // Allow actuator health endpoint
+                // Allow actuator endpoints
                 .requestMatchers("/actuator/health", "/actuator/info").permitAll()
 
                 // Allow all other requests for now (can be restricted later)
                 .anyRequest().permitAll()
             )
-            .headers(headers -> headers
+            .headers(headers -> headers.defaultsDisabled()
                 .frameOptions().deny()
-                .contentTypeOptions().and()
-                .referrerPolicy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)
-                .httpStrictTransportSecurity(hsts -> hsts
-                    .maxAgeInSeconds(31536000)
-                    .includeSubdomains(true)
-                    .preload(true)
-                )
+                .contentTypeOptions()
             );
 
         return http.build();
