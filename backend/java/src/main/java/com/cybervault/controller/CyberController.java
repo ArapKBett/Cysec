@@ -222,10 +222,174 @@ public class CyberController {
         response.put("services", Map.of(
             "encryption", "available",
             "decryption", "available",
-            "network_scan", "available"
+            "network_scan", "available",
+            "file_browser", "available"
         ));
 
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/files/browse")
+    public ResponseEntity<Map<String, Object>> browseFiles(
+            @RequestParam(required = false, defaultValue = "/tmp")
+            @Pattern(regexp = "^[a-zA-Z0-9._/\\-~]+$", message = "Invalid file path") String path) {
+
+        logger.info("File browser request for path: {}", sanitizeLogInput(path));
+
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            Path dirPath = Paths.get(path).normalize();
+
+            // Security check - prevent directory traversal
+            if (!dirPath.isAbsolute()) {
+                dirPath = Paths.get("/").resolve(dirPath).normalize();
+            }
+
+            String absolutePath = dirPath.toString();
+            if (absolutePath.contains("..")) {
+                response.put("success", false);
+                response.put("message", "Directory traversal not allowed");
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            if (!Files.exists(dirPath)) {
+                response.put("success", false);
+                response.put("message", "Directory does not exist: " + path);
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            if (!Files.isDirectory(dirPath)) {
+                response.put("success", false);
+                response.put("message", "Path is not a directory: " + path);
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            if (!Files.isReadable(dirPath)) {
+                response.put("success", false);
+                response.put("message", "Directory is not readable: " + path);
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            java.util.List<Map<String, Object>> files = new java.util.ArrayList<>();
+            java.util.List<Map<String, Object>> directories = new java.util.ArrayList<>();
+
+            // Add parent directory entry (except for root)
+            if (!dirPath.toString().equals("/")) {
+                Map<String, Object> parentEntry = new HashMap<>();
+                parentEntry.put("name", "..");
+                parentEntry.put("type", "directory");
+                parentEntry.put("path", dirPath.getParent().toString());
+                parentEntry.put("size", 0);
+                parentEntry.put("readable", true);
+                parentEntry.put("writable", false);
+                directories.add(parentEntry);
+            }
+
+            // List directory contents
+            try (var stream = Files.list(dirPath)) {
+                stream.forEach(entry -> {
+                    try {
+                        Map<String, Object> fileInfo = new HashMap<>();
+                        String fileName = entry.getFileName().toString();
+
+                        // Skip hidden files that start with . (except ..)
+                        if (fileName.startsWith(".") && !fileName.equals("..")) {
+                            return;
+                        }
+
+                        fileInfo.put("name", fileName);
+                        fileInfo.put("path", entry.toString());
+                        fileInfo.put("readable", Files.isReadable(entry));
+                        fileInfo.put("writable", Files.isWritable(entry));
+
+                        if (Files.isDirectory(entry)) {
+                            fileInfo.put("type", "directory");
+                            fileInfo.put("size", 0);
+                            directories.add(fileInfo);
+                        } else {
+                            fileInfo.put("type", "file");
+                            fileInfo.put("size", Files.size(entry));
+                            fileInfo.put("extension", getFileExtension(fileName));
+                            files.add(fileInfo);
+                        }
+                    } catch (Exception e) {
+                        // Skip files that can't be read
+                    }
+                });
+            }
+
+            // Sort directories and files by name
+            directories.sort((a, b) -> ((String)a.get("name")).compareToIgnoreCase((String)b.get("name")));
+            files.sort((a, b) -> ((String)a.get("name")).compareToIgnoreCase((String)b.get("name")));
+
+            response.put("success", true);
+            response.put("current_path", dirPath.toString());
+            response.put("parent_path", dirPath.getParent() != null ? dirPath.getParent().toString() : null);
+            response.put("directories", directories);
+            response.put("files", files);
+            response.put("total_items", directories.size() + files.size());
+            response.put("timestamp", System.currentTimeMillis());
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            logger.error("File browser failed for path: {} - Error: {}", sanitizeLogInput(path), e.getMessage());
+            response.put("success", false);
+            response.put("message", "Failed to browse directory: " + e.getMessage());
+            response.put("timestamp", System.currentTimeMillis());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    @GetMapping("/files/common-paths")
+    public ResponseEntity<Map<String, Object>> getCommonPaths() {
+        Map<String, Object> response = new HashMap<>();
+
+        java.util.List<Map<String, Object>> commonPaths = new java.util.ArrayList<>();
+
+        // Common directories that typically exist
+        String[] paths = {
+            "/tmp", "/home", "/var/log", "/etc", "/opt",
+            "/usr/local", "/var/tmp", "/root", "/mnt"
+        };
+
+        for (String pathStr : paths) {
+            Path path = Paths.get(pathStr);
+            if (Files.exists(path) && Files.isDirectory(path) && Files.isReadable(path)) {
+                Map<String, Object> pathInfo = new HashMap<>();
+                pathInfo.put("name", path.getFileName() != null ? path.getFileName().toString() : pathStr);
+                pathInfo.put("path", pathStr);
+                pathInfo.put("description", getPathDescription(pathStr));
+                commonPaths.add(pathInfo);
+            }
+        }
+
+        response.put("success", true);
+        response.put("common_paths", commonPaths);
+        response.put("timestamp", System.currentTimeMillis());
+
+        return ResponseEntity.ok(response);
+    }
+
+    private String getFileExtension(String fileName) {
+        int lastDotIndex = fileName.lastIndexOf('.');
+        return lastDotIndex > 0 ? fileName.substring(lastDotIndex + 1).toLowerCase() : "";
+    }
+
+    private String getPathDescription(String path) {
+        return switch (path) {
+            case "/tmp" -> "Temporary files directory";
+            case "/home" -> "User home directories";
+            case "/var/log" -> "System log files";
+            case "/etc" -> "System configuration files";
+            case "/opt" -> "Optional software packages";
+            case "/usr/local" -> "Local user programs";
+            case "/var/tmp" -> "Temporary files (persistent)";
+            case "/root" -> "Root user home directory";
+            case "/mnt" -> "Mount points for file systems";
+            default -> "System directory";
+        };
     }
 
     private String readProcessOutput(Process process) throws IOException {

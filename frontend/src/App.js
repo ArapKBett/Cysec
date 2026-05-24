@@ -55,6 +55,145 @@ const CommonPaths = {
   ]
 };
 
+// File Browser Component
+const FileBrowser = ({
+  isOpen,
+  onClose,
+  currentPath,
+  directories,
+  files,
+  onSelectFile,
+  onSelectDirectory,
+  onBrowsePath,
+  mode
+}) => {
+  if (!isOpen) return null;
+
+  const isOutputMode = mode.includes('output');
+
+  return (
+    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+      <div className="bg-cyber-dark border border-cyber-blue/50 rounded-lg p-6 max-w-4xl w-full max-h-[80vh] overflow-hidden">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-xl font-bold text-cyber-blue">
+            📁 Select {isOutputMode ? 'Output Location' : 'File'}
+          </h3>
+          <button
+            onClick={onClose}
+            className="text-cyber-red hover:text-red-400 text-2xl font-bold"
+          >
+            ✕
+          </button>
+        </div>
+
+        {/* Current Path */}
+        <div className="mb-4">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-cyber-light text-sm">Current Path:</span>
+            <code className="bg-cyber-black/60 px-2 py-1 rounded text-cyber-green text-sm">
+              {currentPath}
+            </code>
+          </div>
+
+          {/* Quick Path Navigation */}
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => onBrowsePath('/tmp')}
+              className="px-3 py-1 bg-cyber-blue/20 text-cyber-blue border border-cyber-blue/30 rounded text-sm hover:bg-cyber-blue/30"
+            >
+              /tmp
+            </button>
+            <button
+              onClick={() => onBrowsePath('/home')}
+              className="px-3 py-1 bg-cyber-green/20 text-cyber-green border border-cyber-green/30 rounded text-sm hover:bg-cyber-green/30"
+            >
+              /home
+            </button>
+            <button
+              onClick={() => onBrowsePath('/var')}
+              className="px-3 py-1 bg-cyber-orange/20 text-cyber-orange border border-cyber-orange/30 rounded text-sm hover:bg-cyber-orange/30"
+            >
+              /var
+            </button>
+          </div>
+        </div>
+
+        {/* File/Directory List */}
+        <div className="bg-cyber-black/40 border border-cyber-light/20 rounded max-h-96 overflow-y-auto">
+          {/* Directories */}
+          {directories.map((dir, index) => (
+            <div
+              key={`dir-${index}`}
+              onClick={() => onSelectDirectory(dir.path)}
+              className="flex items-center gap-3 p-3 border-b border-cyber-light/10 hover:bg-cyber-blue/10 cursor-pointer"
+            >
+              <span className="text-cyber-blue text-lg">📁</span>
+              <span className="text-cyber-light">{dir.name}</span>
+              {!dir.readable && <span className="text-cyber-red text-xs">🚫</span>}
+            </div>
+          ))}
+
+          {/* Files */}
+          {files.map((file, index) => (
+            <div
+              key={`file-${index}`}
+              onClick={() => onSelectFile(file.path)}
+              className="flex items-center justify-between p-3 border-b border-cyber-light/10 hover:bg-cyber-green/10 cursor-pointer"
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-cyber-green text-lg">📄</span>
+                <span className="text-cyber-light">{file.name}</span>
+                {file.extension && (
+                  <span className="text-cyber-orange text-xs bg-cyber-orange/20 px-2 py-1 rounded">
+                    .{file.extension}
+                  </span>
+                )}
+              </div>
+              <div className="text-xs text-cyber-light">
+                {(file.size / 1024).toFixed(1)} KB
+              </div>
+            </div>
+          ))}
+
+          {directories.length === 0 && files.length === 0 && (
+            <div className="p-8 text-center text-cyber-light">
+              📂 No files or directories found
+            </div>
+          )}
+        </div>
+
+        {/* Custom Path Input */}
+        {isOutputMode && (
+          <div className="mt-4">
+            <label className="block text-cyber-light text-sm mb-2">Or enter custom path:</label>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="/tmp/custom_output.enc"
+                className="flex-1 bg-cyber-dark/60 border border-cyber-blue/30 p-2 rounded text-gray-100 placeholder-cyber-light/60 focus:border-cyber-blue focus:outline-none text-sm font-mono"
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    onSelectFile(e.target.value);
+                  }
+                }}
+              />
+              <button
+                onClick={(e) => {
+                  const input = e.target.previousElementSibling;
+                  if (input.value) onSelectFile(input.value);
+                }}
+                className="px-4 py-2 bg-cyber-blue text-cyber-black rounded hover:bg-blue-400 text-sm font-bold"
+              >
+                Use Path
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
 const App = () => {
   const [encryptInput, setEncryptInput] = useState('/tmp/document.txt');
   const [encryptOutput, setEncryptOutput] = useState('/tmp/document.txt.enc');
@@ -68,6 +207,11 @@ const App = () => {
   const [activeTab, setActiveTab] = useState('home');
   const [currentTime, setCurrentTime] = useState(new Date());
   const [apiStatus, setApiStatus] = useState('CHECKING...');
+  const [showFileBrowser, setShowFileBrowser] = useState(false);
+  const [browserMode, setBrowserMode] = useState(''); // 'encrypt-input', 'encrypt-output', 'decrypt-input', 'decrypt-output'
+  const [currentPath, setCurrentPath] = useState('/tmp');
+  const [browserFiles, setBrowserFiles] = useState([]);
+  const [browserDirectories, setBrowserDirectories] = useState([]);
 
   // Update time every second for the cyber aesthetic
   useEffect(() => {
@@ -91,6 +235,71 @@ const App = () => {
     };
     checkApiStatus();
   }, []);
+
+  // File browser functions
+  const browseFiles = async (path = '/tmp') => {
+    try {
+      const res = await fetch(`/api/v1/cyber/files/browse?path=${encodeURIComponent(path)}`);
+      const data = await res.json();
+
+      if (data.success) {
+        setCurrentPath(data.current_path);
+        setBrowserDirectories(data.directories || []);
+        setBrowserFiles(data.files || []);
+      } else {
+        setResponse('Error browsing files: ' + data.message);
+      }
+    } catch (error) {
+      setResponse('Error browsing files: ' + error.message);
+    }
+  };
+
+  const openFileBrowser = (mode) => {
+    setBrowserMode(mode);
+    setShowFileBrowser(true);
+    browseFiles('/tmp');
+  };
+
+  const selectFile = (filePath) => {
+    switch (browserMode) {
+      case 'encrypt-input':
+        setEncryptInput(filePath);
+        break;
+      case 'encrypt-output':
+        setEncryptOutput(filePath);
+        break;
+      case 'decrypt-input':
+        setDecryptInput(filePath);
+        break;
+      case 'decrypt-output':
+        setDecryptOutput(filePath);
+        break;
+    }
+    setShowFileBrowser(false);
+  };
+
+  const selectDirectory = (dirPath) => {
+    if (dirPath === currentPath) return;
+    browseFiles(dirPath);
+  };
+
+  const handleFileUpload = (event, mode) => {
+    const file = event.target.files[0];
+    if (file) {
+      // For demo purposes, we'll use the filename with a temporary path
+      const tempPath = `/tmp/${file.name}`;
+      switch (mode) {
+        case 'encrypt-input':
+          setEncryptInput(tempPath);
+          break;
+        case 'decrypt-input':
+          setDecryptInput(tempPath);
+          break;
+      }
+      // Note: In a real implementation, you'd upload the file to the server
+      setResponse(`File "${file.name}" selected. Note: File upload simulation - actual file would be uploaded to server.`);
+    }
+  };
 
   const handleEncrypt = async () => {
     if (!encryptInput || !encryptOutput || !encryptKey) {
@@ -396,13 +605,30 @@ const App = () => {
             <div className="grid gap-4">
               <div>
                 <label className="block text-cyber-light text-sm mb-2">Source File Path</label>
-                <input
-                  type="text"
-                  placeholder="Source File Path"
-                  className="w-full bg-cyber-dark/60 border border-cyber-blue/30 p-4 rounded-lg text-gray-100 placeholder-cyber-light/60 focus:border-cyber-blue focus:outline-none focus:ring-2 focus:ring-cyber-blue/50 font-mono"
-                  value={encryptInput}
-                  onChange={(e) => setEncryptInput(e.target.value)}
-                />
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Source File Path"
+                    className="flex-1 bg-cyber-dark/60 border border-cyber-blue/30 p-4 rounded-lg text-gray-100 placeholder-cyber-light/60 focus:border-cyber-blue focus:outline-none focus:ring-2 focus:ring-cyber-blue/50 font-mono"
+                    value={encryptInput}
+                    onChange={(e) => setEncryptInput(e.target.value)}
+                  />
+                  <button
+                    onClick={() => openFileBrowser('encrypt-input')}
+                    className="px-4 py-4 bg-cyber-blue/20 border border-cyber-blue/50 text-cyber-blue rounded-lg hover:bg-cyber-blue/30 transition-colors"
+                    title="Browse Files"
+                  >
+                    📁
+                  </button>
+                  <label className="px-4 py-4 bg-cyber-green/20 border border-cyber-green/50 text-cyber-green rounded-lg hover:bg-cyber-green/30 transition-colors cursor-pointer" title="Upload File">
+                    📤
+                    <input
+                      type="file"
+                      className="hidden"
+                      onChange={(e) => handleFileUpload(e, 'encrypt-input')}
+                    />
+                  </label>
+                </div>
                 <div className="flex flex-wrap gap-2 mt-2">
                   <span className="text-xs text-cyber-light">Quick paths:</span>
                   {CommonPaths.input.map((item, index) => (
@@ -418,13 +644,22 @@ const App = () => {
               </div>
               <div>
                 <label className="block text-cyber-light text-sm mb-2">Encrypted Output Path</label>
-                <input
-                  type="text"
-                  placeholder="Encrypted Output Path"
-                  className="w-full bg-cyber-dark/60 border border-cyber-blue/30 p-4 rounded-lg text-gray-100 placeholder-cyber-light/60 focus:border-cyber-blue focus:outline-none focus:ring-2 focus:ring-cyber-blue/50 font-mono"
-                  value={encryptOutput}
-                  onChange={(e) => setEncryptOutput(e.target.value)}
-                />
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Encrypted Output Path"
+                    className="flex-1 bg-cyber-dark/60 border border-cyber-blue/30 p-4 rounded-lg text-gray-100 placeholder-cyber-light/60 focus:border-cyber-blue focus:outline-none focus:ring-2 focus:ring-cyber-blue/50 font-mono"
+                    value={encryptOutput}
+                    onChange={(e) => setEncryptOutput(e.target.value)}
+                  />
+                  <button
+                    onClick={() => openFileBrowser('encrypt-output')}
+                    className="px-4 py-4 bg-cyber-blue/20 border border-cyber-blue/50 text-cyber-blue rounded-lg hover:bg-cyber-blue/30 transition-colors"
+                    title="Browse Folders"
+                  >
+                    📂
+                  </button>
+                </div>
                 <div className="flex flex-wrap gap-2 mt-2">
                   <span className="text-xs text-cyber-light">Quick paths:</span>
                   {CommonPaths.output.map((item, index) => (
@@ -468,13 +703,30 @@ const App = () => {
             <div className="grid gap-4">
               <div>
                 <label className="block text-cyber-light text-sm mb-2">Encrypted File Path</label>
-                <input
-                  type="text"
-                  placeholder="Encrypted File Path"
-                  className="w-full bg-cyber-dark/60 border border-cyber-green/30 p-4 rounded-lg text-gray-100 placeholder-cyber-light/60 focus:border-cyber-green focus:outline-none focus:ring-2 focus:ring-cyber-green/50 font-mono"
-                  value={decryptInput}
-                  onChange={(e) => setDecryptInput(e.target.value)}
-                />
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Encrypted File Path"
+                    className="flex-1 bg-cyber-dark/60 border border-cyber-green/30 p-4 rounded-lg text-gray-100 placeholder-cyber-light/60 focus:border-cyber-green focus:outline-none focus:ring-2 focus:ring-cyber-green/50 font-mono"
+                    value={decryptInput}
+                    onChange={(e) => setDecryptInput(e.target.value)}
+                  />
+                  <button
+                    onClick={() => openFileBrowser('decrypt-input')}
+                    className="px-4 py-4 bg-cyber-green/20 border border-cyber-green/50 text-cyber-green rounded-lg hover:bg-cyber-green/30 transition-colors"
+                    title="Browse Files"
+                  >
+                    📁
+                  </button>
+                  <label className="px-4 py-4 bg-cyber-orange/20 border border-cyber-orange/50 text-cyber-orange rounded-lg hover:bg-cyber-orange/30 transition-colors cursor-pointer" title="Upload Encrypted File">
+                    📤
+                    <input
+                      type="file"
+                      className="hidden"
+                      onChange={(e) => handleFileUpload(e, 'decrypt-input')}
+                    />
+                  </label>
+                </div>
                 <div className="flex flex-wrap gap-2 mt-2">
                   <span className="text-xs text-cyber-light">Quick paths:</span>
                   {CommonPaths.output.map((item, index) => (
@@ -490,13 +742,22 @@ const App = () => {
               </div>
               <div>
                 <label className="block text-cyber-light text-sm mb-2">Decrypted Output Path</label>
-                <input
-                  type="text"
-                  placeholder="Decrypted Output Path"
-                  className="w-full bg-cyber-dark/60 border border-cyber-green/30 p-4 rounded-lg text-gray-100 placeholder-cyber-light/60 focus:border-cyber-green focus:outline-none focus:ring-2 focus:ring-cyber-green/50 font-mono"
-                  value={decryptOutput}
-                  onChange={(e) => setDecryptOutput(e.target.value)}
-                />
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Decrypted Output Path"
+                    className="flex-1 bg-cyber-dark/60 border border-cyber-green/30 p-4 rounded-lg text-gray-100 placeholder-cyber-light/60 focus:border-cyber-green focus:outline-none focus:ring-2 focus:ring-cyber-green/50 font-mono"
+                    value={decryptOutput}
+                    onChange={(e) => setDecryptOutput(e.target.value)}
+                  />
+                  <button
+                    onClick={() => openFileBrowser('decrypt-output')}
+                    className="px-4 py-4 bg-cyber-green/20 border border-cyber-green/50 text-cyber-green rounded-lg hover:bg-cyber-green/30 transition-colors"
+                    title="Browse Folders"
+                  >
+                    📂
+                  </button>
+                </div>
                 <div className="flex flex-wrap gap-2 mt-2">
                   <span className="text-xs text-cyber-light">Quick paths:</span>
                   {CommonPaths.input.map((item, index) => (
@@ -595,6 +856,19 @@ const App = () => {
       </main>
 
       <Footer />
+
+      {/* File Browser Modal */}
+      <FileBrowser
+        isOpen={showFileBrowser}
+        onClose={() => setShowFileBrowser(false)}
+        currentPath={currentPath}
+        directories={browserDirectories}
+        files={browserFiles}
+        onSelectFile={selectFile}
+        onSelectDirectory={selectDirectory}
+        onBrowsePath={browseFiles}
+        mode={browserMode}
+      />
     </div>
   );
 };

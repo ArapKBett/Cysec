@@ -50,14 +50,18 @@ RUN mvn clean package -DskipTests -B && \
 # Stage 3: Build C/C++ Components
 FROM alpine:3.18 AS native-builder
 
-# Install build dependencies
+# Install build dependencies including static libraries
 RUN apk add --no-cache \
     gcc \
     g++ \
     musl-dev \
     openssl-dev \
+    openssl-libs-static \
     libpcap-dev \
-    make
+    libpcap-static \
+    linux-headers \
+    make \
+    pkgconfig
 
 WORKDIR /build
 
@@ -65,19 +69,21 @@ WORKDIR /build
 COPY backend/c/encrypt.c ./
 COPY backend/cpp/sniffer.cpp ./
 
-# Compile with security flags and static linking
+# Compile with optimized static linking for Alpine musl
 RUN gcc -o encrypt encrypt.c \
+    -static \
     -lssl -lcrypto \
-    -O2 -D_FORTIFY_SOURCE=2 \
+    -O3 -D_FORTIFY_SOURCE=2 \
     -fstack-protector-strong \
-    -Wl,-z,relro,-z,now \
-    -static && \
+    -fPIC -DPIC && \
     g++ -o sniffer sniffer.cpp \
+    -static \
     -lpcap \
-    -O2 -D_FORTIFY_SOURCE=2 \
+    -O3 -D_FORTIFY_SOURCE=2 \
     -fstack-protector-strong \
-    -Wl,-z,relro,-z,now \
-    -static-libgcc -static-libstdc++
+    -fPIC -DPIC \
+    -DPCAP_DONT_INCLUDE_PCAP_BPF_H \
+    -DNO_DBUS -DNO_RDMA
 
 # Stage 4: Production Runtime
 FROM eclipse-temurin:17-jre-alpine
@@ -98,8 +104,13 @@ RUN apk add --no-cache \
     libssl3 \
     libcrypto3 \
     libpcap \
+    libstdc++ \
+    libgcc \
+    musl \
     dumb-init \
     curl \
+    iproute2 \
+    net-tools \
     && rm -rf /var/cache/apk/*
 
 # Create application directory
@@ -118,7 +129,7 @@ COPY --from=native-builder --chown=cybervault:cybervault /build/encrypt /app/bac
 COPY --from=native-builder --chown=cybervault:cybervault /build/sniffer /app/backend/cpp/
 COPY --from=backend-builder --chown=cybervault:cybervault /build/app.jar /app/
 
-# Set executable permissions
+# Set executable permissions and capabilities for network scanning
 RUN chmod +x /app/backend/c/encrypt /app/backend/cpp/sniffer
 
 # Switch to non-root user

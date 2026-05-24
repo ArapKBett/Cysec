@@ -1,3 +1,12 @@
+// Disable problematic pcap features for Alpine
+#define PCAP_DONT_INCLUDE_PCAP_BPF_H
+#ifndef NO_DBUS
+#define NO_DBUS
+#endif
+#ifndef NO_RDMA
+#define NO_RDMA
+#endif
+
 #include <pcap.h>
 #include <iostream>
 #include <string>
@@ -29,7 +38,7 @@
     #include <arpa/inet.h>
     #include <unistd.h>
     #include <net/if.h>
-#else // Linux
+#else // Linux/Alpine
     #include <netinet/ip.h>
     #include <netinet/tcp.h>
     #include <netinet/udp.h>
@@ -39,6 +48,7 @@
     #include <sys/socket.h>
     #include <unistd.h>
     #include <net/if.h>
+    #include <linux/if_packet.h>
 #endif
 
 struct PacketStats {
