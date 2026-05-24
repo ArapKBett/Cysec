@@ -79,8 +79,8 @@ frontend/dist/
 frontend/.next/
 frontend/coverage/
 
-# Package managers
-package-lock.json
+# Package managers (uncomment to ignore)
+# package-lock.json  # Keep for reproducible builds
 yarn.lock
 pnpm-lock.yaml
 
