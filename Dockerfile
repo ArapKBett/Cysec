@@ -90,7 +90,8 @@ LABEL maintainer="Arap Bett <arap.bett@cybervault.com>" \
 
 # Install runtime dependencies only
 RUN apk add --no-cache \
-    libssl1.1 \
+    libssl3 \
+    libcrypto3 \
     libpcap \
     dumb-init \
     curl \
