@@ -1,7 +1,29 @@
 # CyberVault Security Platform - Multi-stage Docker Build
 # Optimized for production with security best practices
 
-# Stage 1: Build Java Backend
+# Stage 1: Build React Frontend
+FROM node:18-alpine AS frontend-builder
+
+# Set working directory
+WORKDIR /build
+
+# Create non-root user
+RUN addgroup -g 1001 -S nodegroup && \
+    adduser -u 1001 -S nodeuser -G nodegroup
+
+# Copy package files
+COPY frontend/package*.json ./
+
+# Install dependencies with lock file for reproducible builds
+RUN npm ci --omit=dev --no-audit --no-fund
+
+# Copy source code
+COPY frontend/ ./
+
+# Build production application
+RUN npm run build:prod
+
+# Stage 2: Build Java Backend
 FROM maven:3.9.5-eclipse-temurin-17-alpine AS backend-builder
 
 # Set working directory
@@ -24,28 +46,6 @@ COPY --from=frontend-builder /build/build ./src/main/resources/static
 # Build application
 RUN mvn clean package -DskipTests -B && \
     mv target/*.jar app.jar
-
-# Stage 2: Build React Frontend
-FROM node:18-alpine AS frontend-builder
-
-# Set working directory
-WORKDIR /build
-
-# Create non-root user
-RUN addgroup -g 1001 -S nodegroup && \
-    adduser -u 1001 -S nodeuser -G nodegroup
-
-# Copy package files
-COPY frontend/package*.json ./
-
-# Install dependencies with lock file for reproducible builds
-RUN npm ci --omit=dev --no-audit --no-fund
-
-# Copy source code
-COPY frontend/ ./
-
-# Build production application
-RUN npm run build:prod
 
 # Stage 3: Build C/C++ Components
 FROM alpine:3.18 AS native-builder
