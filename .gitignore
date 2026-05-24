@@ -1,23 +1,297 @@
-# Java
-backend/java/target/
-*.jar
-*.class
+# CyberVault Security Platform - Git Ignore Rules
+# Comprehensive ignore patterns for security and cleanliness
 
-# C/C++
+#######################
+# SECURITY SENSITIVE  #
+#######################
+
+# Environment variables and secrets
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.key
+*.pem
+*.crt
+*.p12
+*.jks
+secrets/
+credentials/
+config/secrets/
+
+# API keys and tokens
+*apikey*
+*token*
+*secret*
+*password*
+*.credentials
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Backup files
+*.backup
+*.bak
+*.old
+
+#######################
+# BUILD ARTIFACTS     #
+#######################
+
+# Java/Maven
+backend/java/target/
+backend/java/.mvn/
+*.jar
+*.war
+*.ear
+*.class
+*.orig
+mvnw
+mvnw.cmd
+.mvn/wrapper/maven-wrapper.jar
+
+# C/C++ compiled binaries
 backend/c/encrypt
 backend/cpp/sniffer
+*.o
+*.so
+*.dylib
+*.a
+*.exe
+*.out
 
-# Node
+# Node.js/React
 frontend/node_modules/
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
 frontend/.pnp
+frontend/.pnp.js
 frontend/.yarn/cache
+frontend/.yarn/unplugged
+frontend/.yarn/build-state.yml
+frontend/.yarn/install-state.gz
 frontend/build/
+frontend/dist/
+frontend/.next/
+frontend/coverage/
 
-# Environment variables
-.env
+# Package managers
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
 
-# Misc
-*.log
-.DS_Store
+#######################
+# DEVELOPMENT TOOLS   #
+#######################
+
+# IDEs and Editors
+.vscode/
 .idea/
 *.iml
+*.ipr
+*.iws
+.eclipse/
+.metadata/
+.settings/
+.project
+.classpath
+
+# JetBrains IDEs
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+# Visual Studio Code
+.vscode/
+.history/
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+
+#######################
+# OPERATING SYSTEMS   #
+#######################
+
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msm
+*.msp
+
+# Linux
+*~
+.nfs*
+
+#######################
+# LOGS AND REPORTS    #
+#######################
+
+# Application logs
+*.log
+logs/
+log/
+temp/
+tmp/
+*.tmp
+
+# Test and coverage reports
+coverage/
+*.lcov
+.coverage
+.pytest_cache/
+.tox/
+.coverage
+htmlcov/
+.nyc_output
+
+# Build logs
+build.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Performance logs
+.cache/
+
+#######################
+# DOCKER & DEPLOYMENT #
+#######################
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+.docker/
+
+# Kubernetes
+*.kubeconfig
+helm-*
+
+#######################
+# MISCELLANEOUS       #
+#######################
+
+# Archive files
+*.zip
+*.tar
+*.tar.gz
+*.rar
+*.7z
+
+# Temporary directories
+temp/
+tmp/
+cache/
+.cache/
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Optional npm cache directory
+.npm
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Optional eslint cache
+.eslintcache
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Optional SASS cache
+.sass-cache
+
+# Dependency directories for other package managers
+bower_components/
+jspm_packages/
+
+# TypeScript compiled output
+*.tsbuildinfo
+
+# Storybook build outputs
+.out
+.storybook-out
+
+# Spring Boot
+spring.log
+application-*.log
+
+#######################
+# PROJECT SPECIFIC    #
+#######################
+
+# CyberVault specific
+/uploads/
+/downloads/
+/encrypted/
+/decrypted/
+/network-logs/
+test-files/
+demo-files/
+
+# Build and distribution
+dist/
+release/
+publish/
+
+# Backup directories
+backups/
+old/
+
+#######################
+# VERSION CONTROL     #
+#######################
+
+# Git
+*.orig
+
+# Subversion
+.svn/
+
+# Mercurial
+.hg/
+.hgignore

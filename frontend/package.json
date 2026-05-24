@@ -1,43 +1,145 @@
 {
-  "name": "cybervault-frontend",
-  "version": "0.1.0",
+  "name": "cybervault-platform",
+  "version": "2.0.0",
   "private": true,
+  "description": "Advanced Cybersecurity Operations Terminal - Frontend Platform",
+  "author": {
+    "name": "Arap Bett",
+    "email": "arap.bett@cybervault.com",
+    "url": "https://github.com/arapbett"
+  },
+  "homepage": "https://cybervault.onrender.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/arapbett/cybervault.git"
+  },
+  "license": "MIT",
+  "keywords": [
+    "cybersecurity",
+    "encryption",
+    "network-analysis",
+    "security-tools",
+    "react",
+    "tailwindcss"
+  ],
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
   "dependencies": {
-    "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
+    "@testing-library/jest-dom": "^6.1.5",
+    "@testing-library/react": "^14.1.2",
+    "@testing-library/user-event": "^14.5.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^3.5.0",
+    "react-router-dom": "^6.20.1",
+    "axios": "^1.6.2",
+    "react-query": "^3.39.3",
+    "react-hook-form": "^7.48.2",
+    "react-hot-toast": "^2.4.1",
+    "framer-motion": "^10.16.16",
+    "react-icons": "^4.12.0",
+    "clsx": "^2.0.0",
+    "date-fns": "^2.30.0"
   },
   "scripts": {
     "start": "react-scripts start",
+    "dev": "react-scripts start",
     "build": "react-scripts build",
+    "build:prod": "GENERATE_SOURCEMAP=false react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "test:coverage": "react-scripts test --coverage --watchAll=false",
+    "test:ci": "CI=true react-scripts test --coverage --watchAll=false",
+    "eject": "react-scripts eject",
+    "lint": "eslint src/**/*.{js,jsx} --fix",
+    "lint:check": "eslint src/**/*.{js,jsx}",
+    "format": "prettier --write src/**/*.{js,jsx,css,md,json}",
+    "format:check": "prettier --check src/**/*.{js,jsx,css,md,json}",
+    "analyze": "npm run build && npx bundle-analyzer build/static/js/*.js",
+    "clean": "rm -rf build node_modules package-lock.json && npm install",
+    "security:audit": "npm audit",
+    "security:fix": "npm audit fix",
+    "precommit": "npm run lint:check && npm run format:check && npm run test:ci",
+    "serve": "npx serve -s build -l 3000"
   },
   "eslintConfig": {
     "extends": [
       "react-app",
       "react-app/jest"
-    ]
+    ],
+    "rules": {
+      "no-console": "warn",
+      "no-unused-vars": "warn",
+      "react/prop-types": "off",
+      "react/no-unescaped-entities": "warn"
+    }
+  },
+  "prettier": {
+    "semi": true,
+    "singleQuote": true,
+    "tabWidth": 2,
+    "trailingComma": "es5",
+    "printWidth": 80,
+    "bracketSpacing": true,
+    "arrowParens": "avoid"
+  },
+  "jest": {
+    "collectCoverageFrom": [
+      "src/**/*.{js,jsx}",
+      "!src/index.js",
+      "!src/reportWebVitals.js"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 70,
+        "functions": 70,
+        "lines": 70,
+        "statements": 70
+      }
+    }
   },
   "browserslist": {
     "production": [
       ">0.2%",
       "not dead",
-      "not op_mini all"
+      "not op_mini all",
+      "not ie <= 11"
     ],
     "development": [
       "last 1 chrome version",
       "last 1 firefox version",
-      "last 1 safari version"
+      "last 1 safari version",
+      "last 1 edge version"
     ]
   },
   "devDependencies": {
     "autoprefixer": "^10.4.16",
     "postcss": "^8.4.31",
-    "tailwindcss": "^3.3.5"
+    "tailwindcss": "^3.3.6",
+    "eslint": "^8.54.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.1",
+    "prettier": "^3.1.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.1.0",
+    "@types/react": "^18.2.39",
+    "@types/react-dom": "^18.2.17"
+  },
+  "proxy": "http://localhost:8080",
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "src/**/*.{js,jsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "src/**/*.{css,md,json}": [
+      "prettier --write"
+    ]
   }
 }

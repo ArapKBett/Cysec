@@ -1,0 +1,325 @@
+# CyberVault Security Platform - Docker Compose Configuration
+# Version 2.0 - Production Ready
+
+version: '3.8'
+
+services:
+  # Main Application Service
+  cybervault-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - BUILD_ENV=production
+    image: cybervault:latest
+    container_name: cybervault-platform
+    restart: unless-stopped
+
+    ports:
+      - "8080:8080"
+
+    environment:
+      - SPRING_PROFILES_ACTIVE=production
+      - SERVER_PORT=8080
+      - JAVA_OPTS=-Xms512m -Xmx1g -Djava.security.egd=file:/dev/./urandom
+      - LOG_LEVEL=INFO
+      - ENABLE_METRICS=true
+
+    volumes:
+      - app-logs:/app/logs
+      - app-temp:/app/temp
+      - app-uploads:/app/uploads
+
+    networks:
+      - cybervault-network
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/cybervault/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+    security_opt:
+      - no-new-privileges:true
+
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+    labels:
+      - "com.cybervault.service=main-app"
+      - "com.cybervault.version=2.0.0"
+      - "com.cybervault.environment=production"
+
+  # Nginx Reverse Proxy (Optional for production)
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: cybervault-proxy
+    restart: unless-stopped
+
+    ports:
+      - "80:80"
+      - "443:443"
+
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/ssl/certs:ro
+      - nginx-logs:/var/log/nginx
+
+    depends_on:
+      - cybervault-app
+
+    networks:
+      - cybervault-network
+
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+    labels:
+      - "com.cybervault.service=reverse-proxy"
+
+  # Redis for Session Storage (Optional)
+  redis:
+    image: redis:7-alpine
+    container_name: cybervault-redis
+    restart: unless-stopped
+
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-cybervault_redis_password}
+
+    volumes:
+      - redis-data:/data
+
+    networks:
+      - cybervault-network
+
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+
+    labels:
+      - "com.cybervault.service=cache"
+
+    profiles:
+      - redis
+      - full-stack
+
+  # PostgreSQL Database (Optional for future features)
+  postgres:
+    image: postgres:15-alpine
+    container_name: cybervault-postgres
+    restart: unless-stopped
+
+    environment:
+      - POSTGRES_DB=${DB_NAME:-cybervault}
+      - POSTGRES_USER=${DB_USERNAME:-cybervault_user}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-cybervault_secure_password}
+      - POSTGRES_INITDB_ARGS=--auth-host=scram-sha-256
+
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+
+    networks:
+      - cybervault-network
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-cybervault_user} -d ${DB_NAME:-cybervault}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.2'
+          memory: 256M
+
+    labels:
+      - "com.cybervault.service=database"
+
+    profiles:
+      - database
+      - full-stack
+
+  # Prometheus for Monitoring (Optional)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: cybervault-prometheus
+    restart: unless-stopped
+
+    ports:
+      - "9090:9090"
+
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+      - '--storage.tsdb.retention.time=30d'
+
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+
+    networks:
+      - cybervault-network
+
+    labels:
+      - "com.cybervault.service=monitoring"
+
+    profiles:
+      - monitoring
+      - full-stack
+
+  # Grafana for Visualization (Optional)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: cybervault-grafana
+    restart: unless-stopped
+
+    ports:
+      - "3000:3000"
+
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+      - GF_INSTALL_PLUGINS=grafana-piechart-panel
+
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana:/etc/grafana/provisioning:ro
+
+    depends_on:
+      - prometheus
+
+    networks:
+      - cybervault-network
+
+    labels:
+      - "com.cybervault.service=visualization"
+
+    profiles:
+      - monitoring
+      - full-stack
+
+# Networks Configuration
+networks:
+  cybervault-network:
+    driver: bridge
+    name: cybervault-net
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/16
+
+# Volumes Configuration
+volumes:
+  app-logs:
+    driver: local
+    name: cybervault-logs
+
+  app-temp:
+    driver: local
+    name: cybervault-temp
+
+  app-uploads:
+    driver: local
+    name: cybervault-uploads
+
+  nginx-logs:
+    driver: local
+    name: cybervault-nginx-logs
+
+  redis-data:
+    driver: local
+    name: cybervault-redis
+
+  postgres-data:
+    driver: local
+    name: cybervault-postgres
+
+  prometheus-data:
+    driver: local
+    name: cybervault-prometheus
+
+  grafana-data:
+    driver: local
+    name: cybervault-grafana
+
+# Development Override
+# Use: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+---
+# Development Configuration (docker-compose.dev.yml)
+version: '3.8'
+
+services:
+  cybervault-app:
+    build:
+      args:
+        - BUILD_ENV=development
+    environment:
+      - SPRING_PROFILES_ACTIVE=development
+      - LOG_LEVEL=DEBUG
+      - ENABLE_DEVTOOLS=true
+
+    ports:
+      - "8080:8080"
+      - "8000:8000"  # Debug port
+
+    volumes:
+      - .:/app/src:ro  # Mount source for hot reload
+      - app-logs:/app/logs
+
+    command: ["java", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8000", "-jar", "app.jar"]
+
+  # Frontend Development Server
+  frontend-dev:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: cybervault-frontend-dev
+
+    ports:
+      - "3000:3000"
+
+    environment:
+      - REACT_APP_API_URL=http://localhost:8080/cybervault
+      - CHOKIDAR_USEPOLLING=true
+
+    volumes:
+      - ./frontend:/app:delegated
+      - frontend-node-modules:/app/node_modules
+
+    networks:
+      - cybervault-network
+
+    profiles:
+      - development
+
+volumes:
+  frontend-node-modules:
+    driver: local

@@ -1,4 +1,187 @@
-/* Custom styles for App */
+/* Custom styles for CyberVault App */
+
+.App {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #2a2a2a 100%);
+  position: relative;
+}
+
+.App::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(0, 255, 136, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 40% 60%, rgba(255, 107, 0, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: -1;
+}
+
 main {
-  max-width: 1200px;
+  max-width: 1400px;
+  position: relative;
+  z-index: 10;
+}
+
+/* Cyber container styles */
+.cyber-container {
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  background: rgba(42, 42, 42, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.cyber-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    45deg,
+    transparent 48%,
+    rgba(0, 212, 255, 0.1) 50%,
+    transparent 52%
+  );
+  background-size: 20px 20px;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Cyber button animations */
+.cyber-btn {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.cyber-btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.cyber-btn:hover::after {
+  left: 100%;
+}
+
+/* Status indicators */
+.status-indicator {
+  position: relative;
+}
+
+.status-indicator::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -10px;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 4px;
+  background: #00ff88;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+/* Glow text effect */
+.glow-text {
+  text-shadow:
+    0 0 5px currentColor,
+    0 0 10px currentColor,
+    0 0 15px currentColor,
+    0 0 20px currentColor;
+}
+
+/* Scanning line animation */
+.scan-line {
+  position: relative;
+  overflow: hidden;
+}
+
+.scan-line::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #00d4ff, transparent);
+  animation: scan 2s linear infinite;
+}
+
+/* Terminal window effect */
+.terminal {
+  background: #000;
+  border: 1px solid #00ff88;
+  border-radius: 4px;
+  position: relative;
+}
+
+.terminal::before {
+  content: '● ● ●';
+  position: absolute;
+  top: 8px;
+  left: 12px;
+  color: #ff073a;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.terminal-content {
+  padding-top: 24px;
+}
+
+/* Data visualization bars */
+.data-bar {
+  background: linear-gradient(90deg, #00d4ff 0%, #00ff88 50%, #ffd60a 100%);
+  height: 4px;
+  border-radius: 2px;
+  position: relative;
+  overflow: hidden;
+}
+
+.data-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: scan 3s linear infinite;
+}
+
+/* Network grid background */
+.network-bg {
+  background-image:
+    linear-gradient(rgba(0, 212, 255, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 212, 255, 0.1) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .App {
+    padding: 0 16px;
+  }
+
+  main {
+    max-width: 100%;
+  }
+
+  .cyber-container {
+    margin: 16px 0;
+    padding: 16px;
+  }
 }
