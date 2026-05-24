@@ -43,10 +43,22 @@ const Navbar = () => {
 
           {/* Navigation Links */}
           <div className="hidden md:flex space-x-8">
-            <NavLink href="#home" text="HOME" />
-            <NavLink href="#encrypt" text="ENCRYPT" />
-            <NavLink href="#decrypt" text="DECRYPT" />
-            <NavLink href="#network" text="NETWORK" />
+            <NavLink href="#home" text="HOME" onClick={() => window.location.reload()} />
+            <NavLink href="#encrypt" text="ENCRYPT" onClick={() => {
+              // Find and click the encrypt tab
+              const encryptTab = document.querySelector('[data-tab="encrypt"]');
+              if (encryptTab) encryptTab.click();
+            }} />
+            <NavLink href="#decrypt" text="DECRYPT" onClick={() => {
+              // Find and click the decrypt tab
+              const decryptTab = document.querySelector('[data-tab="decrypt"]');
+              if (decryptTab) decryptTab.click();
+            }} />
+            <NavLink href="#network" text="NETWORK" onClick={() => {
+              // Find and click the network tab
+              const networkTab = document.querySelector('[data-tab="sniff"]');
+              if (networkTab) networkTab.click();
+            }} />
           </div>
 
           {/* Status Panel */}
@@ -82,9 +94,18 @@ const Navbar = () => {
         {/* Mobile Menu Button */}
         <div className="md:hidden mt-4">
           <div className="flex justify-center space-x-6">
-            <NavLink href="#encrypt" text="ENCRYPT" mobile />
-            <NavLink href="#decrypt" text="DECRYPT" mobile />
-            <NavLink href="#network" text="NETWORK" mobile />
+            <NavLink href="#encrypt" text="ENCRYPT" mobile onClick={() => {
+              const encryptTab = document.querySelector('[data-tab="encrypt"]');
+              if (encryptTab) encryptTab.click();
+            }} />
+            <NavLink href="#decrypt" text="DECRYPT" mobile onClick={() => {
+              const decryptTab = document.querySelector('[data-tab="decrypt"]');
+              if (decryptTab) decryptTab.click();
+            }} />
+            <NavLink href="#network" text="NETWORK" mobile onClick={() => {
+              const networkTab = document.querySelector('[data-tab="sniff"]');
+              if (networkTab) networkTab.click();
+            }} />
           </div>
         </div>
       </div>
@@ -97,10 +118,24 @@ const Navbar = () => {
   );
 };
 
-const NavLink = ({ href, text, mobile = false }) => {
+const NavLink = ({ href, text, mobile = false, onClick }) => {
+  const handleClick = (e) => {
+    e.preventDefault();
+    if (onClick) {
+      onClick();
+    } else {
+      // Smooth scroll to section
+      const targetId = href.replace('#', '');
+      const element = document.getElementById(targetId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  };
+
   return (
-    <a
-      href={href}
+    <button
+      onClick={handleClick}
       className={`
         relative font-cyber font-bold tracking-wider transition-all duration-200
         ${mobile ? 'text-sm' : 'text-base'}
@@ -114,7 +149,7 @@ const NavLink = ({ href, text, mobile = false }) => {
       `}
     >
       {text}
-    </a>
+    </button>
   );
 };
 

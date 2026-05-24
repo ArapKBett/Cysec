@@ -41,11 +41,29 @@ const App = () => {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('encrypt');
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [apiStatus, setApiStatus] = useState('CHECKING...');
 
   // Update time every second for the cyber aesthetic
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
+  }, []);
+
+  // Check API status on component mount
+  useEffect(() => {
+    const checkApiStatus = async () => {
+      try {
+        const res = await fetch('/api/v1/cyber/status');
+        if (res.ok) {
+          setApiStatus('OPERATIONAL');
+        } else {
+          setApiStatus('DEGRADED');
+        }
+      } catch (error) {
+        setApiStatus('OFFLINE');
+      }
+    };
+    checkApiStatus();
   }, []);
 
   const handleEncrypt = async () => {
@@ -55,7 +73,7 @@ const App = () => {
     }
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:8080/api/encrypt', {
+      const res = await fetch('/api/v1/cyber/encrypt', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams({
@@ -64,8 +82,13 @@ const App = () => {
           key: encryptKey,
         }),
       });
-      const text = await res.text();
-      setResponse(text);
+
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
+      const data = await res.json();
+      setResponse(JSON.stringify(data, null, 2));
     } catch (error) {
       setResponse('Error: ' + error.message);
     } finally {
@@ -80,7 +103,7 @@ const App = () => {
     }
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:8080/api/decrypt', {
+      const res = await fetch('/api/v1/cyber/decrypt', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams({
@@ -89,8 +112,13 @@ const App = () => {
           key: decryptKey,
         }),
       });
-      const text = await res.text();
-      setResponse(text);
+
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
+      const data = await res.json();
+      setResponse(JSON.stringify(data, null, 2));
     } catch (error) {
       setResponse('Error: ' + error.message);
     } finally {
@@ -105,9 +133,14 @@ const App = () => {
     }
     setLoading(true);
     try {
-      const res = await fetch(`http://localhost:8080/api/sniff?device=${sniffDevice}`);
-      const text = await res.text();
-      setResponse(text);
+      const res = await fetch(`/api/v1/cyber/network/scan?device=${encodeURIComponent(sniffDevice)}&duration=10`);
+
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
+      const data = await res.json();
+      setResponse(JSON.stringify(data, null, 2));
     } catch (error) {
       setResponse('Error: ' + error.message);
     } finally {
@@ -136,8 +169,11 @@ const App = () => {
               <div className="text-cyber-blue font-mono text-sm">
                 {currentTime.toLocaleTimeString()}
               </div>
-              <div className="text-cyber-green font-mono text-xs">
-                SYSTEM OPERATIONAL
+              <div className={`font-mono text-xs ${
+                apiStatus === 'OPERATIONAL' ? 'text-cyber-green' :
+                apiStatus === 'DEGRADED' ? 'text-cyber-orange' : 'text-cyber-red'
+              }`}>
+                API: {apiStatus}
               </div>
             </div>
           </div>
@@ -148,6 +184,7 @@ const App = () => {
         {/* Tab Navigation */}
         <div className="flex mb-8 bg-cyber-gray/30 p-2 rounded-lg border border-cyber-light/20">
           <button
+            data-tab="encrypt"
             onClick={() => setActiveTab('encrypt')}
             className={`flex items-center px-6 py-3 rounded-md transition-all duration-200 ${
               activeTab === 'encrypt'
@@ -159,6 +196,7 @@ const App = () => {
             ENCRYPT
           </button>
           <button
+            data-tab="decrypt"
             onClick={() => setActiveTab('decrypt')}
             className={`flex items-center px-6 py-3 rounded-md transition-all duration-200 ${
               activeTab === 'decrypt'
@@ -170,6 +208,7 @@ const App = () => {
             DECRYPT
           </button>
           <button
+            data-tab="sniff"
             onClick={() => setActiveTab('sniff')}
             className={`flex items-center px-6 py-3 rounded-md transition-all duration-200 ${
               activeTab === 'sniff'

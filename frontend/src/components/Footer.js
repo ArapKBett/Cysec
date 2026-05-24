@@ -32,7 +32,7 @@ const Footer = () => {
               CYBERVAULT
             </p>
             <p className="text-cyber-light text-sm font-mono">
-              &copy; 2025 Arap Bett. All Rights Reserved.
+              &copy; {new Date().getFullYear()} Arap Bett. All Rights Reserved.
             </p>
             <p className="text-cyber-green text-xs font-mono mt-1">
               SECURITY OPERATIONS TERMINAL
