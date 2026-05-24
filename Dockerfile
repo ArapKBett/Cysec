@@ -65,17 +65,19 @@ WORKDIR /build
 COPY backend/c/encrypt.c ./
 COPY backend/cpp/sniffer.cpp ./
 
-# Compile with security flags
+# Compile with security flags and static linking
 RUN gcc -o encrypt encrypt.c \
     -lssl -lcrypto \
     -O2 -D_FORTIFY_SOURCE=2 \
     -fstack-protector-strong \
-    -Wl,-z,relro,-z,now && \
+    -Wl,-z,relro,-z,now \
+    -static && \
     g++ -o sniffer sniffer.cpp \
     -lpcap \
     -O2 -D_FORTIFY_SOURCE=2 \
     -fstack-protector-strong \
-    -Wl,-z,relro,-z,now
+    -Wl,-z,relro,-z,now \
+    -static-libgcc -static-libstdc++
 
 # Stage 4: Production Runtime
 FROM eclipse-temurin:17-jre-alpine

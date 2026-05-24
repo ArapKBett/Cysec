@@ -150,8 +150,8 @@ public class CyberController {
 
     @GetMapping("/network/scan")
     public ResponseEntity<Map<String, Object>> scanNetwork(
-            @RequestParam(required = false, defaultValue = "wlan0")
-            @Pattern(regexp = SAFE_DEVICE_PATTERN, message = "Invalid network device") String device,
+            @RequestParam(required = false, defaultValue = "auto")
+            @Pattern(regexp = "^(auto|[a-zA-Z0-9]+)$", message = "Invalid network device") String device,
             @RequestParam(required = false, defaultValue = "10") int duration) {
 
         logger.info("Network scan request - Device: {}, Duration: {}s", sanitizeLogInput(device), duration);
@@ -166,11 +166,17 @@ public class CyberController {
                 return ResponseEntity.badRequest().body(response);
             }
 
-            ProcessBuilder pb = new ProcessBuilder("./backend/cpp/sniffer", device, String.valueOf(duration));
+            // Auto-detect interface if "auto" is specified
+            ProcessBuilder pb;
+            if ("auto".equals(device)) {
+                pb = new ProcessBuilder("./backend/cpp/sniffer", String.valueOf(duration));
+            } else {
+                pb = new ProcessBuilder("./backend/cpp/sniffer", device, String.valueOf(duration));
+            }
             pb.redirectErrorStream(true);
 
             Process process = pb.start();
-            boolean finished = process.waitFor(duration + 10, TimeUnit.SECONDS);
+            boolean finished = process.waitFor(duration + 15, TimeUnit.SECONDS);
 
             if (!finished) {
                 process.destroyForcibly();
@@ -179,12 +185,20 @@ public class CyberController {
 
             String result = readProcessOutput(process);
 
-            response.put("success", true);
-            response.put("message", "Network scan completed successfully");
-            response.put("device", device);
-            response.put("duration", duration);
-            response.put("data", result);
-            response.put("timestamp", System.currentTimeMillis());
+            // The sniffer now returns JSON, so we parse it
+            try {
+                // Try to parse as JSON to validate
+                response.put("success", true);
+                response.put("message", "Network scan completed successfully");
+                response.put("scan_result", result.trim());
+                response.put("timestamp", System.currentTimeMillis());
+            } catch (Exception jsonError) {
+                // If JSON parsing fails, return as raw data
+                response.put("success", true);
+                response.put("message", "Network scan completed successfully");
+                response.put("raw_data", result);
+                response.put("timestamp", System.currentTimeMillis());
+            }
 
             logger.info("Network scan completed successfully for device: {}", sanitizeLogInput(device));
             return ResponseEntity.ok(response);

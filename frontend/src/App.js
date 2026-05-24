@@ -29,14 +29,40 @@ const LoadingSpinner = () => (
   </svg>
 );
 
+const PathSuggestion = ({ label, path, onClick, color = "cyber-blue" }) => (
+  <button
+    onClick={() => onClick(path)}
+    className={`px-3 py-1 text-xs border border-${color}/30 bg-${color}/10 text-${color} rounded hover:bg-${color}/20 transition-colors`}
+  >
+    {label}
+  </button>
+);
+
+const CommonPaths = {
+  input: [
+    { label: "Documents", path: "/home/user/Documents/document.pdf" },
+    { label: "Downloads", path: "/home/user/Downloads/file.zip" },
+    { label: "Desktop", path: "/home/user/Desktop/important.txt" },
+    { label: "Temp", path: "/tmp/test_file.txt" },
+    { label: "Current Dir", path: "./sensitive_data.doc" }
+  ],
+  output: [
+    { label: "Encrypted", path: "/tmp/encrypted_file.enc" },
+    { label: "Secure Dir", path: "/home/user/Documents/secure/file.enc" },
+    { label: "Backup", path: "/backup/encrypted_backup.enc" },
+    { label: "Desktop", path: "/home/user/Desktop/encrypted.enc" },
+    { label: "Downloads", path: "/home/user/Downloads/output.enc" }
+  ]
+};
+
 const App = () => {
-  const [encryptInput, setEncryptInput] = useState('');
-  const [encryptOutput, setEncryptOutput] = useState('');
+  const [encryptInput, setEncryptInput] = useState('/tmp/document.txt');
+  const [encryptOutput, setEncryptOutput] = useState('/tmp/document.txt.enc');
   const [encryptKey, setEncryptKey] = useState('');
-  const [decryptInput, setDecryptInput] = useState('');
-  const [decryptOutput, setDecryptOutput] = useState('');
+  const [decryptInput, setDecryptInput] = useState('/tmp/document.txt.enc');
+  const [decryptOutput, setDecryptOutput] = useState('/tmp/document_decrypted.txt');
   const [decryptKey, setDecryptKey] = useState('');
-  const [sniffDevice, setSniffDevice] = useState('wlan0');
+  const [sniffDevice, setSniffDevice] = useState('auto');
   const [response, setResponse] = useState('');
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
@@ -140,7 +166,62 @@ const App = () => {
       }
 
       const data = await res.json();
-      setResponse(JSON.stringify(data, null, 2));
+
+      // Enhanced response formatting for network analysis
+      if (data.scan_result) {
+        try {
+          const scanData = JSON.parse(data.scan_result);
+          let formattedResponse = `🌐 NETWORK SCAN RESULTS\n`;
+          formattedResponse += `═══════════════════════════════════════\n\n`;
+
+          if (scanData.network_analysis) {
+            const analysis = scanData.network_analysis;
+
+            formattedResponse += `📊 PACKET STATISTICS:\n`;
+            formattedResponse += `   Total Packets: ${analysis.packet_stats?.total_packets || 0}\n`;
+            formattedResponse += `   Total Bytes: ${analysis.packet_stats?.total_bytes || 0}\n`;
+            formattedResponse += `   TCP: ${analysis.packet_stats?.tcp_packets || 0} | UDP: ${analysis.packet_stats?.udp_packets || 0} | ICMP: ${analysis.packet_stats?.icmp_packets || 0}\n\n`;
+
+            if (analysis.interfaces && analysis.interfaces.length > 0) {
+              formattedResponse += `🔌 NETWORK INTERFACES:\n`;
+              analysis.interfaces.forEach(iface => {
+                formattedResponse += `   ${iface.name}: ${iface.ip} (${iface.active ? 'ACTIVE' : 'INACTIVE'})\n`;
+              });
+              formattedResponse += '\n';
+            }
+
+            if (analysis.top_sources && analysis.top_sources.length > 0) {
+              formattedResponse += `📤 TOP SOURCE IPs:\n`;
+              analysis.top_sources.forEach(src => {
+                formattedResponse += `   ${src.ip}: ${src.packets} packets\n`;
+              });
+              formattedResponse += '\n';
+            }
+
+            if (analysis.top_destinations && analysis.top_destinations.length > 0) {
+              formattedResponse += `📥 TOP DESTINATION IPs:\n`;
+              analysis.top_destinations.forEach(dest => {
+                formattedResponse += `   ${dest.ip}: ${dest.packets} packets\n`;
+              });
+              formattedResponse += '\n';
+            }
+
+            if (analysis.top_ports && analysis.top_ports.length > 0) {
+              formattedResponse += `🔌 TOP PORTS:\n`;
+              analysis.top_ports.forEach(port => {
+                formattedResponse += `   Port ${port.port}: ${port.packets} packets\n`;
+              });
+            }
+          }
+
+          setResponse(formattedResponse);
+        } catch (parseError) {
+          // Fallback to raw JSON if parsing fails
+          setResponse(JSON.stringify(data, null, 2));
+        }
+      } else {
+        setResponse(JSON.stringify(data, null, 2));
+      }
     } catch (error) {
       setResponse('Error: ' + error.message);
     } finally {
@@ -313,20 +394,50 @@ const App = () => {
               FILE ENCRYPTION MODULE
             </h2>
             <div className="grid gap-4">
-              <input
-                type="text"
-                placeholder="Source File Path"
-                className="bg-cyber-dark/60 border border-cyber-blue/30 p-4 rounded-lg text-gray-100 placeholder-cyber-light/60 focus:border-cyber-blue focus:outline-none focus:ring-2 focus:ring-cyber-blue/50 font-mono"
-                value={encryptInput}
-                onChange={(e) => setEncryptInput(e.target.value)}
-              />
-              <input
-                type="text"
-                placeholder="Encrypted Output Path"
-                className="bg-cyber-dark/60 border border-cyber-blue/30 p-4 rounded-lg text-gray-100 placeholder-cyber-light/60 focus:border-cyber-blue focus:outline-none focus:ring-2 focus:ring-cyber-blue/50 font-mono"
-                value={encryptOutput}
-                onChange={(e) => setEncryptOutput(e.target.value)}
-              />
+              <div>
+                <label className="block text-cyber-light text-sm mb-2">Source File Path</label>
+                <input
+                  type="text"
+                  placeholder="Source File Path"
+                  className="w-full bg-cyber-dark/60 border border-cyber-blue/30 p-4 rounded-lg text-gray-100 placeholder-cyber-light/60 focus:border-cyber-blue focus:outline-none focus:ring-2 focus:ring-cyber-blue/50 font-mono"
+                  value={encryptInput}
+                  onChange={(e) => setEncryptInput(e.target.value)}
+                />
+                <div className="flex flex-wrap gap-2 mt-2">
+                  <span className="text-xs text-cyber-light">Quick paths:</span>
+                  {CommonPaths.input.map((item, index) => (
+                    <PathSuggestion
+                      key={index}
+                      label={item.label}
+                      path={item.path}
+                      onClick={setEncryptInput}
+                      color="cyber-blue"
+                    />
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label className="block text-cyber-light text-sm mb-2">Encrypted Output Path</label>
+                <input
+                  type="text"
+                  placeholder="Encrypted Output Path"
+                  className="w-full bg-cyber-dark/60 border border-cyber-blue/30 p-4 rounded-lg text-gray-100 placeholder-cyber-light/60 focus:border-cyber-blue focus:outline-none focus:ring-2 focus:ring-cyber-blue/50 font-mono"
+                  value={encryptOutput}
+                  onChange={(e) => setEncryptOutput(e.target.value)}
+                />
+                <div className="flex flex-wrap gap-2 mt-2">
+                  <span className="text-xs text-cyber-light">Quick paths:</span>
+                  {CommonPaths.output.map((item, index) => (
+                    <PathSuggestion
+                      key={index}
+                      label={item.label}
+                      path={item.path}
+                      onClick={setEncryptOutput}
+                      color="cyber-blue"
+                    />
+                  ))}
+                </div>
+              </div>
               <input
                 type="password"
                 placeholder="Encryption Key (max 31 chars)"
@@ -355,20 +466,50 @@ const App = () => {
               FILE DECRYPTION MODULE
             </h2>
             <div className="grid gap-4">
-              <input
-                type="text"
-                placeholder="Encrypted File Path"
-                className="bg-cyber-dark/60 border border-cyber-green/30 p-4 rounded-lg text-gray-100 placeholder-cyber-light/60 focus:border-cyber-green focus:outline-none focus:ring-2 focus:ring-cyber-green/50 font-mono"
-                value={decryptInput}
-                onChange={(e) => setDecryptInput(e.target.value)}
-              />
-              <input
-                type="text"
-                placeholder="Decrypted Output Path"
-                className="bg-cyber-dark/60 border border-cyber-green/30 p-4 rounded-lg text-gray-100 placeholder-cyber-light/60 focus:border-cyber-green focus:outline-none focus:ring-2 focus:ring-cyber-green/50 font-mono"
-                value={decryptOutput}
-                onChange={(e) => setDecryptOutput(e.target.value)}
-              />
+              <div>
+                <label className="block text-cyber-light text-sm mb-2">Encrypted File Path</label>
+                <input
+                  type="text"
+                  placeholder="Encrypted File Path"
+                  className="w-full bg-cyber-dark/60 border border-cyber-green/30 p-4 rounded-lg text-gray-100 placeholder-cyber-light/60 focus:border-cyber-green focus:outline-none focus:ring-2 focus:ring-cyber-green/50 font-mono"
+                  value={decryptInput}
+                  onChange={(e) => setDecryptInput(e.target.value)}
+                />
+                <div className="flex flex-wrap gap-2 mt-2">
+                  <span className="text-xs text-cyber-light">Quick paths:</span>
+                  {CommonPaths.output.map((item, index) => (
+                    <PathSuggestion
+                      key={index}
+                      label={item.label}
+                      path={item.path}
+                      onClick={setDecryptInput}
+                      color="cyber-green"
+                    />
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label className="block text-cyber-light text-sm mb-2">Decrypted Output Path</label>
+                <input
+                  type="text"
+                  placeholder="Decrypted Output Path"
+                  className="w-full bg-cyber-dark/60 border border-cyber-green/30 p-4 rounded-lg text-gray-100 placeholder-cyber-light/60 focus:border-cyber-green focus:outline-none focus:ring-2 focus:ring-cyber-green/50 font-mono"
+                  value={decryptOutput}
+                  onChange={(e) => setDecryptOutput(e.target.value)}
+                />
+                <div className="flex flex-wrap gap-2 mt-2">
+                  <span className="text-xs text-cyber-light">Quick paths:</span>
+                  {CommonPaths.input.map((item, index) => (
+                    <PathSuggestion
+                      key={index}
+                      label={item.label}
+                      path={item.path.replace('.enc', '_decrypted.txt')}
+                      onClick={setDecryptOutput}
+                      color="cyber-green"
+                    />
+                  ))}
+                </div>
+              </div>
               <input
                 type="password"
                 placeholder="Decryption Key (max 31 chars)"
@@ -397,13 +538,31 @@ const App = () => {
               NETWORK PACKET ANALYZER
             </h2>
             <div className="grid gap-4">
-              <input
-                type="text"
-                placeholder="Network Interface (e.g., wlan0, eth0)"
-                className="bg-cyber-dark/60 border border-cyber-orange/30 p-4 rounded-lg text-gray-100 placeholder-cyber-light/60 focus:border-cyber-orange focus:outline-none focus:ring-2 focus:ring-cyber-orange/50 font-mono"
-                value={sniffDevice}
-                onChange={(e) => setSniffDevice(e.target.value)}
-              />
+              <div>
+                <label className="block text-cyber-light text-sm mb-2">Network Interface</label>
+                <input
+                  type="text"
+                  placeholder="Network Interface (auto-detect or specify: eth0, wlan0)"
+                  className="w-full bg-cyber-dark/60 border border-cyber-orange/30 p-4 rounded-lg text-gray-100 placeholder-cyber-light/60 focus:border-cyber-orange focus:outline-none focus:ring-2 focus:ring-cyber-orange/50 font-mono"
+                  value={sniffDevice}
+                  onChange={(e) => setSniffDevice(e.target.value)}
+                />
+                <div className="flex flex-wrap gap-2 mt-2">
+                  <span className="text-xs text-cyber-light">Quick options:</span>
+                  <PathSuggestion label="Auto-detect" path="auto" onClick={setSniffDevice} color="cyber-orange" />
+                  <PathSuggestion label="Ethernet" path="eth0" onClick={setSniffDevice} color="cyber-orange" />
+                  <PathSuggestion label="WiFi" path="wlan0" onClick={setSniffDevice} color="cyber-orange" />
+                  <PathSuggestion label="Docker" path="docker0" onClick={setSniffDevice} color="cyber-orange" />
+                  <PathSuggestion label="Bridge" path="virbr0" onClick={setSniffDevice} color="cyber-orange" />
+                </div>
+                <div className="bg-cyber-dark/40 p-3 rounded mt-2 border border-cyber-orange/20">
+                  <p className="text-xs text-cyber-light">
+                    <strong className="text-cyber-orange">Enhanced Network Scanning:</strong> Automatically detects all network interfaces,
+                    analyzes packet types (TCP/UDP/ICMP), tracks top source/destination IPs, monitors common ports,
+                    and provides comprehensive network activity statistics.
+                  </p>
+                </div>
+              </div>
               <button
                 onClick={handleSniff}
                 disabled={loading}
