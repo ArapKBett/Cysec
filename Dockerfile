@@ -33,10 +33,10 @@ RUN addgroup -g 1001 -S nodegroup && \
     adduser -u 1001 -S nodeuser -G nodegroup
 
 # Copy package files
-COPY frontend/package*.json ./
+COPY frontend/package.json ./
 
-# Install dependencies with security audit
-RUN npm ci --only=production --audit-level=moderate
+# Install dependencies
+RUN npm install --production --no-audit --no-fund
 
 # Copy source code
 COPY frontend/ ./
