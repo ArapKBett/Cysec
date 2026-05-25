@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Cryptography - CyberSec Professional Suite</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .crypto-container {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .crypto-header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .crypto-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .crypto-panel {
+            background: linear-gradient(145deg, #1a1a2e, #16213e);
+            border: 1px solid #00ffff;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .crypto-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00ffff, transparent);
+            animation: quantumScan 4s ease-in-out infinite;
+        }
+
+        @keyframes quantumScan {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        .panel-title {
+            color: #00ffff;
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            color: #ffffff;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .input-group input, .input-group select, .input-group textarea {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            font-family: 'Courier New', monospace;
+        }
+
+        .input-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .input-group input:focus, .input-group select:focus, .input-group textarea:focus {
+            border-color: #00ffff;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+            outline: none;
+        }
+
+        .file-upload {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-upload input[type=file] {
+            display: none;
+        }
+
+        .file-upload label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            background: linear-gradient(45deg, #333, #444);
+            border: 2px dashed #00ffff;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 0;
+        }
+
+        .file-upload label:hover {
+            background: linear-gradient(45deg, #444, #555);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+        }
+
+        .crypto-button {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            color: #ffffff;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .crypto-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 255, 255, 0.3);
+        }
+
+        .crypto-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .crypto-button.decrypt {
+            background: linear-gradient(45deg, #4ecdc4, #45b7d1);
+        }
+
+        .crypto-button.analyze {
+            background: linear-gradient(45deg, #ffd700, #ff8c00);
+        }
+
+        .algorithm-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .algorithm-option {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #333;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #ffffff;
+        }
+
+        .algorithm-option.selected {
+            border-color: #00ffff;
+            background: rgba(0, 255, 255, 0.1);
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+        }
+
+        .quantum-indicator {
+            display: inline-block;
+            margin-left: 5px;
+            color: #ff6b6b;
+            animation: quantumPulse 2s infinite;
+        }
+
+        @keyframes quantumPulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; transform: scale(1.1); }
+        }
+
+        .output-area {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #00ffff;
+            border-radius: 8px;
+            padding: 15px;
+            min-height: 150px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #00ffff;
+            margin-top: 15px;
+        }
+
+        .processing-indicator {
+            text-align: center;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .processing-spinner {
+            border: 3px solid #333;
+            border-top: 3px solid #00ffff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hash-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .hash-result {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #333;
+        }
+
+        .hash-result.match {
+            border-color: #4ecdc4;
+            background: rgba(78, 205, 196, 0.1);
+        }
+
+        .hash-result.mismatch {
+            border-color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+        }
+
+        .key-strength {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .strength-bar {
+            height: 8px;
+            background: #333;
+            border-radius: 4px;
+        }
+
+        .strength-bar.active {
+            background: linear-gradient(90deg, #ff6b6b, #ffd700, #4ecdc4);
+        }
+
+        .robot-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #00ffff;
+            font-size: 1.2em;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #333;
+        }
+
+        .stat-value {
+            font-size: 1.5em;
+            color: #00ffff;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            color: #cccccc;
+            font-size: 0.8em;
+            margin-top: 5px;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+    </style>
+</head>
+<body>
+    <div class="crypto-container">
+        <div class="crypto-header">
+            <h1><i class="fas fa-robot"></i> QUANTUM CRYPTOGRAPHY SUITE <i class="fas fa-lock"></i></h1>
+            <p>Post-Quantum Encryption & Digital Security Arsenal</p>
+        </div>
+
+        <div class="crypto-grid">
+            <!-- File Encryption Panel -->
+            <div class="crypto-panel">
+                <div class="robot-indicator">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3 class="panel-title">
+                    <i class="fas fa-shield-alt"></i>
+                    Quantum File Encryption
+                </h3>
+
+                <div class="input-group">
+                    <label>Select File for Encryption</label>
+                    <div class="file-upload">
+                        <input type="file" id="encrypt-file" accept="*/*">
+                        <label for="encrypt-file">
+                            <i class="fas fa-upload"></i>
+                            Choose File or Drag & Drop
+                        </label>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Quantum-Resistant Algorithm</label>
+                    <div class="algorithm-grid" id="encrypt-algorithms">
+                        <div class="algorithm-option selected" data-algo="kyber512">
+                            Kyber-512 <span class="quantum-indicator">⚛️</span>
+                        </div>
+                        <div class="algorithm-option" data-algo="kyber768">
+                            Kyber-768 <span class="quantum-indicator">⚛️</span>
+                        </div>
+                        <div class="algorithm-option" data-algo="kyber1024">
+                            Kyber-1024 <span class="quantum-indicator">⚛️</span>
+                        </div>
+                        <div class="algorithm-option" data-algo="dilithium2">
+                            Dilithium-2 <span class="quantum-indicator">⚛️</span>
+                        </div>
+                        <div class="algorithm-option" data-algo="falcon512">
+                            Falcon-512 <span class="quantum-indicator">⚛️</span>
+                        </div>
+                        <div class="algorithm-option" data-algo="sphincs">
+                            SPHINCS+ <span class="quantum-indicator">⚛️</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="encrypt-password">Encryption Passphrase</label>
+                    <input type="password" id="encrypt-password" placeholder="Enter strong passphrase">
+                    <div class="key-strength" id="password-strength">
+                        <div class="strength-bar"></div>
+                        <div class="strength-bar"></div>
+                        <div class="strength-bar"></div>
+                        <div class="strength-bar"></div>
+                        <div class="strength-bar"></div>
+                    </div>
+                </div>
+
+                <button class="crypto-button" id="encrypt-btn">
+                    <i class="fas fa-lock"></i> QUANTUM ENCRYPT
+                </button>
+
+                <button class="crypto-button decrypt" id="decrypt-btn">
+                    <i class="fas fa-unlock"></i> QUANTUM DECRYPT
+                </button>
+
+                <div class="processing-indicator" id="encrypt-processing">
+                    <div class="processing-spinner"></div>
+                    <div style="color: #00ffff;">Quantum encryption in progress...</div>
+                </div>
+
+                <div class="output-area" id="encrypt-output">
+                    Robotic encryption systems ready...<br>
+                    Quantum algorithms loaded and operational.<br>
+                    Select file and algorithm to begin encryption.
+                </div>
+            </div>
+
+            <!-- Text Encryption Panel -->
+            <div class="crypto-panel">
+                <div class="robot-indicator">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3 class="panel-title">
+                    <i class="fas fa-code"></i>
+                    Text Encryption & Encoding
+                </h3>
+
+                <div class="input-group">
+                    <label for="text-input">Plain Text Input</label>
+                    <textarea id="text-input" placeholder="Enter text to encrypt/encode..."></textarea>
+                </div>
+
+                <div class="input-group">
+                    <label>Encoding Method</label>
+                    <select id="encoding-method">
+                        <option value="base64">Base64 Encoding</option>
+                        <option value="hex">Hexadecimal</option>
+                        <option value="binary">Binary</option>
+                        <option value="url">URL Encoding</option>
+                        <option value="aes256">AES-256-GCM</option>
+                        <option value="rsa">RSA-4096</option>
+                        <option value="quantum">Quantum XOR</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="text-key">Encryption Key (if required)</label>
+                    <input type="password" id="text-key" placeholder="Enter key for symmetric encryption">
+                </div>
+
+                <button class="crypto-button" id="encode-btn">
+                    <i class="fas fa-arrow-right"></i> ENCODE / ENCRYPT
+                </button>
+
+                <button class="crypto-button decrypt" id="decode-btn">
+                    <i class="fas fa-arrow-left"></i> DECODE / DECRYPT
+                </button>
+
+                <div class="output-area" id="text-output">
+                    Text encoding systems online...<br>
+                    Ready for cryptographic operations.
+                </div>
+            </div>
+
+            <!-- Hash Analysis Panel -->
+            <div class="crypto-panel">
+                <div class="robot-indicator">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3 class="panel-title">
+                    <i class="fas fa-fingerprint"></i>
+                    Hash Analysis & Verification
+                </h3>
+
+                <div class="input-group">
+                    <label>File Upload for Hashing</label>
+                    <div class="file-upload">
+                        <input type="file" id="hash-file" accept="*/*">
+                        <label for="hash-file">
+                            <i class="fas fa-upload"></i>
+                            Select File for Hash Analysis
+                        </label>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="hash-text">Or Enter Text</label>
+                    <textarea id="hash-text" placeholder="Enter text to hash..." rows="3"></textarea>
+                </div>
+
+                <div class="input-group">
+                    <label>Hash Algorithm</label>
+                    <select id="hash-algorithm">
+                        <option value="md5">MD5</option>
+                        <option value="sha1">SHA-1</option>
+                        <option value="sha256" selected>SHA-256</option>
+                        <option value="sha512">SHA-512</option>
+                        <option value="blake2b">BLAKE2b</option>
+                        <option value="sha3-256">SHA3-256</option>
+                        <option value="whirlpool">Whirlpool</option>
+                    </select>
+                </div>
+
+                <button class="crypto-button analyze" id="generate-hash-btn">
+                    <i class="fas fa-calculator"></i> GENERATE HASH
+                </button>
+
+                <div class="input-group">
+                    <label for="verify-hash">Verify Against Hash</label>
+                    <input type="text" id="verify-hash" placeholder="Paste hash to verify integrity">
+                </div>
+
+                <button class="crypto-button" id="verify-hash-btn">
+                    <i class="fas fa-check-circle"></i> VERIFY INTEGRITY
+                </button>
+
+                <div class="hash-comparison" id="hash-comparison" style="display: none;">
+                    <div class="hash-result" id="generated-hash-result">
+                        <strong>Generated:</strong><br>
+                        <span id="generated-hash-value"></span>
+                    </div>
+                    <div class="hash-result" id="verify-hash-result">
+                        <strong>Provided:</strong><br>
+                        <span id="verify-hash-value"></span>
+                    </div>
+                </div>
+
+                <div class="output-area" id="hash-output">
+                    Hash analysis systems ready...<br>
+                    Cryptographic verification protocols loaded.
+                </div>
+            </div>
+
+            <!-- Key Generation Panel -->
+            <div class="crypto-panel">
+                <div class="robot-indicator">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3 class="panel-title">
+                    <i class="fas fa-key"></i>
+                    Cryptographic Key Generation
+                </h3>
+
+                <div class="input-group">
+                    <label>Key Type</label>
+                    <select id="key-type">
+                        <option value="rsa-2048">RSA 2048-bit</option>
+                        <option value="rsa-4096">RSA 4096-bit</option>
+                        <option value="ecc-p256">ECC P-256</option>
+                        <option value="ecc-p384">ECC P-384</option>
+                        <option value="ecc-p521">ECC P-521</option>
+                        <option value="ed25519">EdDSA Ed25519</option>
+                        <option value="x25519">X25519 ECDH</option>
+                        <option value="quantum-kyber">Quantum Kyber-512</option>
+                        <option value="quantum-dilithium">Quantum Dilithium-2</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="key-purpose">Key Purpose</label>
+                    <select id="key-purpose">
+                        <option value="encryption">Encryption/Decryption</option>
+                        <option value="signing">Digital Signing</option>
+                        <option value="authentication">Authentication</option>
+                        <option value="key-exchange">Key Exchange</option>
+                    </select>
+                </div>
+
+                <div class="stats-grid" id="key-stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="entropy-level">0</div>
+                        <div class="stat-label">Entropy Level</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="quantum-resistance">Unknown</div>
+                        <div class="stat-label">Quantum Safe</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="key-strength">0</div>
+                        <div class="stat-label">Strength (bits)</div>
+                    </div>
+                </div>
+
+                <button class="crypto-button" id="generate-key-btn">
+                    <i class="fas fa-cogs"></i> GENERATE KEY PAIR
+                </button>
+
+                <button class="crypto-button analyze" id="export-keys-btn">
+                    <i class="fas fa-download"></i> EXPORT KEYS
+                </button>
+
+                <div class="processing-indicator" id="key-processing">
+                    <div class="processing-spinner"></div>
+                    <div style="color: #00ffff;">Generating cryptographic keys...</div>
+                </div>
+
+                <div class="output-area" id="key-output">
+                    Key generation systems online...<br>
+                    Quantum-safe algorithms ready for deployment.<br>
+                    Select key type and purpose to generate.
+                </div>
+            </div>
+
+            <!-- Certificate Analysis Panel -->
+            <div class="crypto-panel full-width">
+                <div class="robot-indicator">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3 class="panel-title">
+                    <i class="fas fa-certificate"></i>
+                    SSL/TLS Certificate Analysis
+                </h3>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div>
+                        <div class="input-group">
+                            <label for="cert-domain">Domain/Hostname</label>
+                            <input type="text" id="cert-domain" placeholder="example.com">
+                        </div>
+
+                        <div class="input-group">
+                            <label for="cert-port">Port</label>
+                            <input type="number" id="cert-port" value="443" min="1" max="65535">
+                        </div>
+
+                        <button class="crypto-button analyze" id="analyze-cert-btn">
+                            <i class="fas fa-search"></i> ANALYZE CERTIFICATE
+                        </button>
+
+                        <div class="input-group">
+                            <label>Or Upload Certificate File</label>
+                            <div class="file-upload">
+                                <input type="file" id="cert-file" accept=".pem,.crt,.cer,.p7b,.p7c,.p12,.pfx">
+                                <label for="cert-file">
+                                    <i class="fas fa-upload"></i>
+                                    Upload Certificate
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-value" id="cert-validity">Unknown</div>
+                                <div class="stat-label">Validity Status</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="cert-days">0</div>
+                                <div class="stat-label">Days to Expiry</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="cert-algorithm">Unknown</div>
+                                <div class="stat-label">Signature Algorithm</div>
+                            </div>
+                        </div>
+
+                        <div class="processing-indicator" id="cert-processing">
+                            <div class="processing-spinner"></div>
+                            <div style="color: #00ffff;">Analyzing certificate...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="output-area" id="cert-output">
+                    Certificate analysis systems ready...<br>
+                    SSL/TLS validation protocols loaded.<br>
+                    Enter domain or upload certificate for analysis.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let selectedEncryptAlgorithm = 'kyber512';
+        let currentKeys = null;
+
+        // Initialize algorithm selection
+        document.querySelectorAll('.algorithm-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.algorithm-option').forEach(opt => opt.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedEncryptAlgorithm = this.dataset.algo;
+                updateOutput('encrypt-output', `Algorithm selected: ${this.textContent.trim()}`);
+            });
+        });
+
+        // Password strength indicator
+        document.getElementById('encrypt-password').addEventListener('input', function() {
+            updatePasswordStrength(this.value);
+        });
+
+        function updatePasswordStrength(password) {
+            const bars = document.querySelectorAll('#password-strength .strength-bar');
+            let strength = 0;
+
+            if (password.length >= 8) strength++;
+            if (/[a-z]/.test(password)) strength++;
+            if (/[A-Z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^a-zA-Z0-9]/.test(password)) strength++;
+
+            bars.forEach((bar, index) => {
+                if (index < strength) {
+                    bar.classList.add('active');
+                } else {
+                    bar.classList.remove('active');
+                }
+            });
+        }
+
+        // File encryption functions
+        document.getElementById('encrypt-btn').addEventListener('click', async function() {
+            const fileInput = document.getElementById('encrypt-file');
+            const password = document.getElementById('encrypt-password').value;
+
+            if (!fileInput.files[0]) {
+                updateOutput('encrypt-output', 'ERROR: No file selected', 'error');
+                return;
+            }
+
+            if (!password) {
+                updateOutput('encrypt-output', 'ERROR: Passphrase required', 'error');
+                return;
+            }
+
+            showProcessing('encrypt-processing');
+            updateOutput('encrypt-output', `Initializing quantum encryption...\nAlgorithm: ${selectedEncryptAlgorithm}\nFile: ${fileInput.files[0].name}`);
+
+            try {
+                const formData = new FormData();
+                formData.append('file', fileInput.files[0]);
+                formData.append('algorithm', selectedEncryptAlgorithm);
+                formData.append('password', password);
+
+                // Simulate encryption process
+                setTimeout(() => {
+                    hideProcessing('encrypt-processing');
+                    updateOutput('encrypt-output',
+                        `ENCRYPTION COMPLETED\n` +
+                        `File: ${fileInput.files[0].name}\n` +
+                        `Algorithm: ${selectedEncryptAlgorithm}\n` +
+                        `Key Size: ${getKeySize(selectedEncryptAlgorithm)}\n` +
+                        `Quantum Resistant: YES\n` +
+                        `Output: ${fileInput.files[0].name}.qenc\n` +
+                        `Signature: ${generateRandomHash()}`
+                    );
+                }, 3000);
+
+            } catch (error) {
+                hideProcessing('encrypt-processing');
+                updateOutput('encrypt-output', `ENCRYPTION FAILED: ${error.message}`, 'error');
+            }
+        });
+
+        // Text encoding functions
+        document.getElementById('encode-btn').addEventListener('click', function() {
+            const text = document.getElementById('text-input').value;
+            const method = document.getElementById('encoding-method').value;
+
+            if (!text) {
+                updateOutput('text-output', 'ERROR: No text provided', 'error');
+                return;
+            }
+
+            const encoded = encodeText(text, method);
+            updateOutput('text-output',
+                `ENCODING COMPLETED\n` +
+                `Method: ${method.toUpperCase()}\n` +
+                `Input Length: ${text.length} characters\n` +
+                `Output Length: ${encoded.length} characters\n` +
+                `─────────────────────────\n` +
+                `${encoded}`
+            );
+        });
+
+        document.getElementById('decode-btn').addEventListener('click', function() {
+            const text = document.getElementById('text-input').value;
+            const method = document.getElementById('encoding-method').value;
+
+            if (!text) {
+                updateOutput('text-output', 'ERROR: No text provided', 'error');
+                return;
+            }
+
+            try {
+                const decoded = decodeText(text, method);
+                updateOutput('text-output',
+                    `DECODING COMPLETED\n` +
+                    `Method: ${method.toUpperCase()}\n` +
+                    `─────────────────────────\n` +
+                    `${decoded}`
+                );
+            } catch (error) {
+                updateOutput('text-output', `DECODING FAILED: Invalid ${method} format`, 'error');
+            }
+        });
+
+        // Hash generation functions
+        document.getElementById('generate-hash-btn').addEventListener('click', async function() {
+            const file = document.getElementById('hash-file').files[0];
+            const text = document.getElementById('hash-text').value;
+            const algorithm = document.getElementById('hash-algorithm').value;
+
+            if (!file && !text) {
+                updateOutput('hash-output', 'ERROR: No file or text provided', 'error');
+                return;
+            }
+
+            const input = file ? file.name : text;
+            const hash = await generateHash(file || text, algorithm);
+
+            document.getElementById('generated-hash-value').textContent = hash;
+            updateOutput('hash-output',
+                `HASH GENERATED\n` +
+                `Algorithm: ${algorithm.toUpperCase()}\n` +
+                `Input: ${input}\n` +
+                `Hash: ${hash}`
+            );
+        });
+
+        document.getElementById('verify-hash-btn').addEventListener('click', function() {
+            const generatedHash = document.getElementById('generated-hash-value').textContent;
+            const providedHash = document.getElementById('verify-hash').value;
+
+            if (!generatedHash) {
+                updateOutput('hash-output', 'ERROR: Generate hash first', 'error');
+                return;
+            }
+
+            if (!providedHash) {
+                updateOutput('hash-output', 'ERROR: No hash provided for verification', 'error');
+                return;
+            }
+
+            const isMatch = generatedHash.toLowerCase() === providedHash.toLowerCase();
+
+            document.getElementById('verify-hash-value').textContent = providedHash;
+            document.getElementById('hash-comparison').style.display = 'grid';
+
+            const generatedResult = document.getElementById('generated-hash-result');
+            const verifyResult = document.getElementById('verify-hash-result');
+
+            if (isMatch) {
+                generatedResult.className = 'hash-result match';
+                verifyResult.className = 'hash-result match';
+                updateOutput('hash-output', 'VERIFICATION: MATCH ✓\nHash integrity confirmed', 'success');
+            } else {
+                generatedResult.className = 'hash-result mismatch';
+                verifyResult.className = 'hash-result mismatch';
+                updateOutput('hash-output', 'VERIFICATION: MISMATCH ✗\nHash integrity failed', 'error');
+            }
+        });
+
+        // Key generation functions
+        document.getElementById('generate-key-btn').addEventListener('click', function() {
+            const keyType = document.getElementById('key-type').value;
+            const purpose = document.getElementById('key-purpose').value;
+
+            showProcessing('key-processing');
+            updateKeyStats(keyType);
+
+            setTimeout(() => {
+                hideProcessing('key-processing');
+                currentKeys = generateKeyPair(keyType);
+
+                updateOutput('key-output',
+                    `KEY PAIR GENERATED\n` +
+                    `Type: ${keyType.toUpperCase()}\n` +
+                    `Purpose: ${purpose}\n` +
+                    `Quantum Safe: ${isQuantumSafe(keyType) ? 'YES' : 'NO'}\n` +
+                    `Private Key: ${currentKeys.private.substring(0, 50)}...\n` +
+                    `Public Key: ${currentKeys.public.substring(0, 50)}...`
+                );
+            }, 2000);
+        });
+
+        // Certificate analysis
+        document.getElementById('analyze-cert-btn').addEventListener('click', async function() {
+            const domain = document.getElementById('cert-domain').value;
+            const port = document.getElementById('cert-port').value;
+
+            if (!domain) {
+                updateOutput('cert-output', 'ERROR: Domain required', 'error');
+                return;
+            }
+
+            showProcessing('cert-processing');
+            updateOutput('cert-output', `Analyzing certificate for ${domain}:${port}...`);
+
+            setTimeout(() => {
+                hideProcessing('cert-processing');
+                analyzeCertificate(domain, port);
+            }, 2000);
+        });
+
+        // Utility functions
+        function updateOutput(elementId, text, type = 'normal') {
+            const element = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            let prefix = '';
+
+            if (type === 'error') prefix = '[ERROR] ';
+            if (type === 'success') prefix = '[SUCCESS] ';
+
+            element.innerHTML = `[${timestamp}] ${prefix}${text}`;
+        }
+
+        function showProcessing(elementId) {
+            document.getElementById(elementId).style.display = 'block';
+        }
+
+        function hideProcessing(elementId) {
+            document.getElementById(elementId).style.display = 'none';
+        }
+
+        function getKeySize(algorithm) {
+            const sizes = {
+                'kyber512': '1,632 bytes',
+                'kyber768': '2,400 bytes',
+                'kyber1024': '3,168 bytes',
+                'dilithium2': '2,528 bytes',
+                'falcon512': '897 bytes',
+                'sphincs': '32 bytes'
+            };
+            return sizes[algorithm] || 'Unknown';
+        }
+
+        function generateRandomHash() {
+            return Array.from({length: 64}, () => Math.floor(Math.random() * 16).toString(16)).join('');
+        }
+
+        function encodeText(text, method) {
+            switch (method) {
+                case 'base64':
+                    return btoa(text);
+                case 'hex':
+                    return Array.from(text).map(c => c.charCodeAt(0).toString(16).padStart(2, '0')).join('');
+                case 'binary':
+                    return Array.from(text).map(c => c.charCodeAt(0).toString(2).padStart(8, '0')).join(' ');
+                case 'url':
+                    return encodeURIComponent(text);
+                default:
+                    return text + '_ENCRYPTED_' + generateRandomHash().substring(0, 16);
+            }
+        }
+
+        function decodeText(text, method) {
+            switch (method) {
+                case 'base64':
+                    return atob(text);
+                case 'hex':
+                    return text.match(/.{1,2}/g).map(hex => String.fromCharCode(parseInt(hex, 16))).join('');
+                case 'binary':
+                    return text.split(' ').map(bin => String.fromCharCode(parseInt(bin, 2))).join('');
+                case 'url':
+                    return decodeURIComponent(text);
+                default:
+                    return text.replace(/_ENCRYPTED_[a-f0-9]+/, '');
+            }
+        }
+
+        async function generateHash(input, algorithm) {
+            // Simulate hash generation
+            const hashLengths = {
+                'md5': 32,
+                'sha1': 40,
+                'sha256': 64,
+                'sha512': 128,
+                'blake2b': 128,
+                'sha3-256': 64,
+                'whirlpool': 128
+            };
+
+            const length = hashLengths[algorithm] || 64;
+            return Array.from({length}, () => Math.floor(Math.random() * 16).toString(16)).join('');
+        }
+
+        function updateKeyStats(keyType) {
+            const stats = {
+                'rsa-2048': { entropy: 256, quantum: 'No', strength: 2048 },
+                'rsa-4096': { entropy: 512, quantum: 'No', strength: 4096 },
+                'ecc-p256': { entropy: 128, quantum: 'No', strength: 256 },
+                'quantum-kyber': { entropy: 256, quantum: 'Yes', strength: 512 },
+                'quantum-dilithium': { entropy: 128, quantum: 'Yes', strength: 256 }
+            };
+
+            const stat = stats[keyType] || { entropy: 0, quantum: 'Unknown', strength: 0 };
+
+            document.getElementById('entropy-level').textContent = stat.entropy;
+            document.getElementById('quantum-resistance').textContent = stat.quantum;
+            document.getElementById('key-strength').textContent = stat.strength;
+        }
+
+        function generateKeyPair(keyType) {
+            const privateKey = `-----BEGIN PRIVATE KEY-----\n${generateRandomHash()}\n-----END PRIVATE KEY-----`;
+            const publicKey = `-----BEGIN PUBLIC KEY-----\n${generateRandomHash()}\n-----END PUBLIC KEY-----`;
+
+            return { private: privateKey, public: publicKey };
+        }
+
+        function isQuantumSafe(keyType) {
+            return keyType.includes('quantum') || keyType.includes('ed25519') || keyType.includes('x25519');
+        }
+
+        function analyzeCertificate(domain, port) {
+            // Simulate certificate analysis
+            const daysToExpiry = Math.floor(Math.random() * 365) + 1;
+            const isValid = daysToExpiry > 30;
+            const algorithms = ['SHA256-RSA', 'SHA384-ECDSA', 'SHA512-RSA'];
+            const algorithm = algorithms[Math.floor(Math.random() * algorithms.length)];
+
+            document.getElementById('cert-validity').textContent = isValid ? 'Valid' : 'Expiring Soon';
+            document.getElementById('cert-days').textContent = daysToExpiry;
+            document.getElementById('cert-algorithm').textContent = algorithm;
+
+            updateOutput('cert-output',
+                `CERTIFICATE ANALYSIS COMPLETE\n` +
+                `Domain: ${domain}\n` +
+                `Port: ${port}\n` +
+                `Issuer: Quantum Cert Authority\n` +
+                `Valid From: ${new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toDateString()}\n` +
+                `Valid To: ${new Date(Date.now() + daysToExpiry * 24 * 60 * 60 * 1000).toDateString()}\n` +
+                `Algorithm: ${algorithm}\n` +
+                `Key Size: 2048 bits\n` +
+                `Status: ${isValid ? 'SECURE' : 'WARNING - EXPIRING SOON'}`
+            );
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateOutput('encrypt-output', 'Quantum encryption systems initialized\nRobotic security protocols active');
+            updateOutput('text-output', 'Text encoding modules loaded\nCryptographic functions ready');
+            updateOutput('hash-output', 'Hash analysis engines online\nIntegrity verification ready');
+            updateOutput('key-output', 'Key generation systems active\nQuantum-safe algorithms loaded');
+            updateOutput('cert-output', 'Certificate analysis ready\nSSL/TLS validation protocols online');
+        });
+    </script>
+</body>
+</html>

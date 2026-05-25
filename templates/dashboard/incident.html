@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incident Response - CyberSec Professional Suite</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .incident-container {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .incident-header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .incident-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+
+        .incident-panel {
+            background: linear-gradient(145deg, #1a1a2e, #16213e);
+            border: 1px solid #ffa502;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(255, 165, 2, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .incident-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ffa502, transparent);
+            animation: incidentScan 4s ease-in-out infinite;
+        }
+
+        @keyframes incidentScan {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        .panel-title {
+            color: #ffa502;
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            color: #ffffff;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .input-group input, .input-group select, .input-group textarea {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus, .input-group select:focus, .input-group textarea:focus {
+            border-color: #ffa502;
+            box-shadow: 0 0 15px rgba(255, 165, 2, 0.3);
+            outline: none;
+        }
+
+        .incident-button {
+            background: linear-gradient(45deg, #ffa502, #ff8c00);
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            color: #000000;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            margin-bottom: 10px;
+        }
+
+        .incident-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255, 165, 2, 0.3);
+        }
+
+        .incident-button.critical {
+            background: linear-gradient(45deg, #ff4757, #ff6b6b);
+            color: #ffffff;
+        }
+
+        .incident-button.investigate {
+            background: linear-gradient(45deg, #45b7d1, #4ecdc4);
+            color: #ffffff;
+        }
+
+        .severity-level {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9em;
+            text-transform: uppercase;
+        }
+
+        .severity-critical {
+            background: #ff4757;
+            color: #ffffff;
+            animation: criticalPulse 2s infinite;
+        }
+
+        .severity-high {
+            background: #ff6b6b;
+            color: #ffffff;
+        }
+
+        .severity-medium {
+            background: #ffa502;
+            color: #000000;
+        }
+
+        .severity-low {
+            background: #26de81;
+            color: #ffffff;
+        }
+
+        @keyframes criticalPulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; box-shadow: 0 0 20px rgba(255, 71, 87, 0.7); }
+        }
+
+        .incident-item {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .incident-item:hover {
+            border-color: #ffa502;
+            background: rgba(255, 165, 2, 0.1);
+        }
+
+        .incident-item.critical {
+            border-left: 4px solid #ff4757;
+            background: rgba(255, 71, 87, 0.1);
+        }
+
+        .incident-item.high {
+            border-left: 4px solid #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+        }
+
+        .incident-item.medium {
+            border-left: 4px solid #ffa502;
+            background: rgba(255, 165, 2, 0.1);
+        }
+
+        .incident-item.low {
+            border-left: 4px solid #26de81;
+            background: rgba(38, 222, 129, 0.1);
+        }
+
+        .incident-header-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .incident-id {
+            color: #ffa502;
+            font-weight: bold;
+            font-family: monospace;
+        }
+
+        .incident-time {
+            color: #cccccc;
+            font-size: 0.9em;
+        }
+
+        .incident-title {
+            color: #ffffff;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        .incident-description {
+            color: #cccccc;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .incident-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+
+        .detail-item {
+            color: #ffffff;
+        }
+
+        .detail-label {
+            color: #cccccc;
+            font-weight: bold;
+        }
+
+        .timeline-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .timeline-event {
+            border-left: 3px solid #ffa502;
+            padding-left: 15px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .timeline-event::before {
+            content: '';
+            position: absolute;
+            left: -6px;
+            top: 0;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ffa502;
+        }
+
+        .timeline-event.critical::before {
+            background: #ff4757;
+        }
+
+        .timeline-event.critical {
+            border-left-color: #ff4757;
+        }
+
+        .timeline-time {
+            color: #ffa502;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        .timeline-action {
+            color: #ffffff;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+
+        .timeline-description {
+            color: #cccccc;
+            font-size: 0.9em;
+        }
+
+        .playbook-step {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .playbook-step.active {
+            border-color: #ffa502;
+            background: rgba(255, 165, 2, 0.1);
+        }
+
+        .playbook-step.completed {
+            border-color: #4ecdc4;
+            background: rgba(78, 205, 196, 0.1);
+        }
+
+        .step-number {
+            position: absolute;
+            top: -10px;
+            left: 15px;
+            background: #ffa502;
+            color: #000000;
+            padding: 5px 10px;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .step-number.completed {
+            background: #4ecdc4;
+            color: #ffffff;
+        }
+
+        .step-title {
+            color: #ffa502;
+            font-weight: bold;
+            margin-bottom: 10px;
+            margin-top: 5px;
+        }
+
+        .step-description {
+            color: #ffffff;
+            margin-bottom: 10px;
+        }
+
+        .step-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .step-button {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .step-button.complete {
+            background: #4ecdc4;
+            color: #ffffff;
+        }
+
+        .step-button.skip {
+            background: #666;
+            color: #ffffff;
+        }
+
+        .step-button:hover {
+            transform: translateY(-1px);
+        }
+
+        .evidence-item {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+
+        .evidence-type {
+            color: #ffa502;
+            font-weight: bold;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .evidence-content {
+            color: #ffffff;
+            font-family: monospace;
+            font-size: 0.9em;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        .evidence-meta {
+            color: #cccccc;
+            font-size: 0.8em;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        .status-open {
+            background: #ff4757;
+            box-shadow: 0 0 10px #ff4757;
+        }
+
+        .status-investigating {
+            background: #ffa502;
+            box-shadow: 0 0 10px #ffa502;
+        }
+
+        .status-contained {
+            background: #45b7d1;
+            box-shadow: 0 0 10px #45b7d1;
+        }
+
+        .status-resolved {
+            background: #4ecdc4;
+            box-shadow: 0 0 10px #4ecdc4;
+        }
+
+        .robot-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #ffa502;
+            font-size: 1.2em;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .communication-panel {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #ffa502;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .communication-header {
+            color: #ffa502;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .stakeholder-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .stakeholder-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 6px;
+        }
+
+        .stakeholder-status {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4ecdc4;
+        }
+
+        .stakeholder-status.offline {
+            background: #666;
+        }
+
+        .stakeholder-name {
+            color: #ffffff;
+            font-size: 0.9em;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .metric-card {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #333;
+        }
+
+        .metric-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #ffa502;
+        }
+
+        .metric-label {
+            color: #cccccc;
+            margin-top: 5px;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="incident-container">
+        <div class="incident-header">
+            <h1><i class="fas fa-robot"></i> INCIDENT RESPONSE CENTER <i class="fas fa-exclamation-triangle"></i></h1>
+            <p>Advanced Cybersecurity Incident Management & Response Platform</p>
+        </div>
+
+        <div class="incident-grid">
+            <!-- Incident Creation -->
+            <div class="incident-panel">
+                <div class="robot-indicator">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3 class="panel-title">
+                    <i class="fas fa-plus-circle"></i>
+                    Create New Incident
+                </h3>
+
+                <div class="input-group">
+                    <label for="incident-title">Incident Title</label>
+                    <input type="text" id="incident-title" placeholder="Brief description of the security incident">
+                </div>
+
+                <div class="input-group">
+                    <label for="incident-description">Detailed Description</label>
+                    <textarea id="incident-description" rows="4" placeholder="Detailed description of the incident, including what was observed..."></textarea>
+                </div>
+
+                <div class="input-group">
+                    <label for="incident-severity">Severity Level</label>
+                    <select id="incident-severity">
+                        <option value="low">Low - Minimal Impact</option>
+                        <option value="medium" selected>Medium - Moderate Impact</option>
+                        <option value="high">High - Significant Impact</option>
+                        <option value="critical">Critical - Severe Impact</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="incident-category">Incident Category</label>
+                    <select id="incident-category">
+                        <option value="malware">Malware Infection</option>
+                        <option value="data-breach">Data Breach</option>
+                        <option value="unauthorized-access">Unauthorized Access</option>
+                        <option value="ddos">DDoS Attack</option>
+                        <option value="phishing">Phishing Attack</option>
+                        <option value="insider-threat">Insider Threat</option>
+                        <option value="system-compromise">System Compromise</option>
+                        <option value="data-loss">Data Loss</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="affected-systems">Affected Systems</label>
+                    <input type="text" id="affected-systems" placeholder="List of affected systems/IPs/domains">
+                </div>
+
+                <button class="incident-button critical" id="create-incident">
+                    <i class="fas fa-exclamation-triangle"></i> CREATE INCIDENT
+                </button>
+
+                <div style="margin-top: 15px;">
+                    <button class="incident-button" onclick="generateIncident()">
+                        <i class="fas fa-robot"></i> AI-ASSISTED DETECTION
+                    </button>
+                </div>
+            </div>
+
+            <!-- Active Incidents Dashboard -->
+            <div class="incident-panel">
+                <div class="robot-indicator">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3 class="panel-title">
+                    <i class="fas fa-list-alt"></i>
+                    Active Incidents
+                </h3>
+
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value" id="critical-count">0</div>
+                        <div class="metric-label">Critical</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="high-count">0</div>
+                        <div class="metric-label">High</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="medium-count">0</div>
+                        <div class="metric-label">Medium</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="low-count">0</div>
+                        <div class="metric-label">Low</div>
+                    </div>
+                </div>
+
+                <div style="max-height: 400px; overflow-y: auto;" id="active-incidents">
+                    <div style="color: #cccccc; font-style: italic; text-align: center;">
+                        No active incidents
+                    </div>
+                </div>
+
+                <div style="margin-top: 15px;">
+                    <button class="incident-button investigate" onclick="refreshIncidents()">
+                        <i class="fas fa-sync"></i> REFRESH
+                    </button>
+                </div>
+            </div>
+
+            <!-- Incident Response Playbook -->
+            <div class="incident-panel">
+                <div class="robot-indicator">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3 class="panel-title">
+                    <i class="fas fa-book"></i>
+                    Response Playbook
+                </h3>
+
+                <div class="input-group">
+                    <label for="playbook-type">Playbook Type</label>
+                    <select id="playbook-type" onchange="loadPlaybook()">
+                        <option value="">Select Incident Type</option>
+                        <option value="malware">Malware Incident</option>
+                        <option value="data-breach">Data Breach</option>
+                        <option value="ddos">DDoS Attack</option>
+                        <option value="phishing">Phishing Attack</option>
+                        <option value="insider-threat">Insider Threat</option>
+                    </select>
+                </div>
+
+                <div id="playbook-steps">
+                    <div style="color: #cccccc; font-style: italic; text-align: center;">
+                        Select incident type to load response playbook
+                    </div>
+                </div>
+            </div>
+
+            <!-- Evidence Collection -->
+            <div class="incident-panel">
+                <div class="robot-indicator">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3 class="panel-title">
+                    <i class="fas fa-search"></i>
+                    Evidence Collection
+                </h3>
+
+                <div class="input-group">
+                    <label for="evidence-type">Evidence Type</label>
+                    <select id="evidence-type">
+                        <option value="logs">System Logs</option>
+                        <option value="network">Network Capture</option>
+                        <option value="memory">Memory Dump</option>
+                        <option value="disk">Disk Image</option>
+                        <option value="file">Suspicious File</option>
+                        <option value="screenshot">Screenshot</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="evidence-source">Source System</label>
+                    <input type="text" id="evidence-source" placeholder="Hostname, IP, or system identifier">
+                </div>
+
+                <div class="input-group">
+                    <label for="evidence-description">Evidence Description</label>
+                    <textarea id="evidence-description" rows="3" placeholder="Description of the evidence and its relevance..."></textarea>
+                </div>
+
+                <button class="incident-button" id="collect-evidence">
+                    <i class="fas fa-download"></i> COLLECT EVIDENCE
+                </button>
+
+                <div id="evidence-list" style="margin-top: 15px; max-height: 300px; overflow-y: auto;">
+                    <!-- Evidence items will appear here -->
+                </div>
+            </div>
+
+            <!-- Communication Center -->
+            <div class="incident-panel">
+                <div class="robot-indicator">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3 class="panel-title">
+                    <i class="fas fa-comments"></i>
+                    Communication Center
+                </h3>
+
+                <div class="communication-panel">
+                    <div class="communication-header">Stakeholder Status</div>
+                    <div class="stakeholder-list">
+                        <div class="stakeholder-item">
+                            <div class="stakeholder-status"></div>
+                            <div class="stakeholder-name">CISO</div>
+                        </div>
+                        <div class="stakeholder-item">
+                            <div class="stakeholder-status"></div>
+                            <div class="stakeholder-name">IT Manager</div>
+                        </div>
+                        <div class="stakeholder-item">
+                            <div class="stakeholder-status offline"></div>
+                            <div class="stakeholder-name">Legal Team</div>
+                        </div>
+                        <div class="stakeholder-item">
+                            <div class="stakeholder-status"></div>
+                            <div class="stakeholder-name">SOC Team</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="notification-message">Notification Message</label>
+                    <textarea id="notification-message" rows="4" placeholder="Enter incident notification message..."></textarea>
+                </div>
+
+                <div class="input-group">
+                    <label for="notification-urgency">Urgency Level</label>
+                    <select id="notification-urgency">
+                        <option value="low">Low Priority</option>
+                        <option value="normal">Normal</option>
+                        <option value="high">High Priority</option>
+                        <option value="urgent">Urgent</option>
+                    </select>
+                </div>
+
+                <button class="incident-button critical" onclick="sendNotification()">
+                    <i class="fas fa-bell"></i> SEND NOTIFICATION
+                </button>
+            </div>
+
+            <!-- Forensic Analysis -->
+            <div class="incident-panel">
+                <div class="robot-indicator">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3 class="panel-title">
+                    <i class="fas fa-microscope"></i>
+                    Forensic Analysis
+                </h3>
+
+                <div class="input-group">
+                    <label for="forensic-target">Analysis Target</label>
+                    <input type="text" id="forensic-target" placeholder="IP, hostname, file hash, or artifact">
+                </div>
+
+                <div class="input-group">
+                    <label for="analysis-type">Analysis Type</label>
+                    <select id="analysis-type">
+                        <option value="network">Network Traffic Analysis</option>
+                        <option value="file">File Analysis</option>
+                        <option value="memory">Memory Analysis</option>
+                        <option value="timeline">Timeline Analysis</option>
+                        <option value="behavioral">Behavioral Analysis</option>
+                    </select>
+                </div>
+
+                <button class="incident-button investigate" onclick="startForensicAnalysis()">
+                    <i class="fas fa-search"></i> START ANALYSIS
+                </button>
+
+                <div id="forensic-results" style="margin-top: 15px;">
+                    <div style="color: #cccccc; font-style: italic; text-align: center;">
+                        Enter analysis target to begin forensic investigation
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Incident Timeline -->
+        <div class="incident-panel full-width" style="margin-top: 25px;">
+            <div class="robot-indicator">
+                <i class="fas fa-robot"></i>
+            </div>
+            <h3 class="panel-title">
+                <i class="fas fa-clock"></i>
+                Incident Timeline & Activity Log
+            </h3>
+
+            <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+                <button class="incident-button" onclick="exportTimeline()" style="width: auto; padding: 8px 16px;">
+                    <i class="fas fa-download"></i> Export Timeline
+                </button>
+                <button class="incident-button" onclick="generateReport()" style="width: auto; padding: 8px 16px;">
+                    <i class="fas fa-file-alt"></i> Generate Report
+                </button>
+                <button class="incident-button" onclick="clearTimeline()" style="width: auto; padding: 8px 16px;">
+                    <i class="fas fa-trash"></i> Clear Timeline
+                </button>
+            </div>
+
+            <div class="timeline-container" id="incident-timeline">
+                <div class="timeline-event">
+                    <div class="timeline-time">System Initialized</div>
+                    <div class="timeline-action">Incident Response Platform Online</div>
+                    <div class="timeline-description">Robotic incident management system ready for security operations</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let activeIncidents = [];
+        let evidenceItems = [];
+        let incidentCounter = 1;
+        let playbookSteps = {};
+
+        // Incident response playbooks
+        const playbooks = {
+            malware: [
+                { title: "Immediate Containment", description: "Isolate affected systems to prevent spread", completed: false },
+                { title: "Asset Identification", description: "Identify all affected systems and assets", completed: false },
+                { title: "Malware Analysis", description: "Analyze malware samples for IOCs", completed: false },
+                { title: "System Scanning", description: "Scan all systems for malware presence", completed: false },
+                { title: "Remediation", description: "Remove malware and restore clean backups", completed: false },
+                { title: "Monitoring", description: "Monitor for signs of reinfection", completed: false }
+            ],
+            "data-breach": [
+                { title: "Breach Assessment", description: "Determine scope and nature of data breach", completed: false },
+                { title: "Legal Notification", description: "Notify legal and compliance teams immediately", completed: false },
+                { title: "Evidence Preservation", description: "Preserve all relevant evidence and logs", completed: false },
+                { title: "Impact Analysis", description: "Assess impact on customers and business", completed: false },
+                { title: "Containment", description: "Stop ongoing data exfiltration", completed: false },
+                { title: "Notification", description: "Notify affected parties and authorities", completed: false }
+            ],
+            ddos: [
+                { title: "Traffic Analysis", description: "Analyze incoming traffic patterns", completed: false },
+                { title: "Rate Limiting", description: "Implement rate limiting and traffic filtering", completed: false },
+                { title: "ISP Coordination", description: "Coordinate with ISP for upstream filtering", completed: false },
+                { title: "Resource Scaling", description: "Scale infrastructure resources if possible", completed: false },
+                { title: "Alternative Routing", description: "Activate alternative traffic routes", completed: false },
+                { title: "Recovery Planning", description: "Plan for post-attack recovery", completed: false }
+            ],
+            phishing: [
+                { title: "Email Analysis", description: "Analyze phishing email for IOCs", completed: false },
+                { title: "User Notification", description: "Notify users about phishing campaign", completed: false },
+                { title: "Email Quarantine", description: "Quarantine similar emails from mail system", completed: false },
+                { title: "Credential Reset", description: "Force password reset for affected users", completed: false },
+                { title: "Domain Blocking", description: "Block malicious domains and URLs", completed: false },
+                { title: "Training Update", description: "Update security awareness training", completed: false }
+            ],
+            "insider-threat": [
+                { title: "Access Review", description: "Review user access and permissions", completed: false },
+                { title: "Activity Monitoring", description: "Monitor suspicious user activities", completed: false },
+                { title: "Evidence Collection", description: "Collect evidence of insider activities", completed: false },
+                { title: "Legal Consultation", description: "Consult with legal team on actions", completed: false },
+                { title: "Access Restriction", description: "Restrict access as appropriate", completed: false },
+                { title: "HR Coordination", description: "Coordinate with HR for personnel actions", completed: false }
+            ]
+        };
+
+        // Event listeners
+        document.getElementById('create-incident').addEventListener('click', createIncident);
+        document.getElementById('collect-evidence').addEventListener('click', collectEvidence);
+
+        function createIncident() {
+            const title = document.getElementById('incident-title').value.trim();
+            const description = document.getElementById('incident-description').value.trim();
+            const severity = document.getElementById('incident-severity').value;
+            const category = document.getElementById('incident-category').value;
+            const systems = document.getElementById('affected-systems').value.trim();
+
+            if (!title || !description) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            const incident = {
+                id: `INC-${Date.now().toString().slice(-6)}`,
+                number: incidentCounter++,
+                title: title,
+                description: description,
+                severity: severity,
+                category: category,
+                affectedSystems: systems,
+                status: 'open',
+                createdAt: new Date(),
+                assignedTo: 'SOC Team',
+                lastUpdate: new Date()
+            };
+
+            activeIncidents.unshift(incident);
+            updateIncidentDisplay();
+            addToTimeline(`New ${severity} severity incident created: ${title}`, 'create', severity);
+
+            // Clear form
+            document.getElementById('incident-title').value = '';
+            document.getElementById('incident-description').value = '';
+            document.getElementById('affected-systems').value = '';
+
+            // Auto-select appropriate playbook
+            document.getElementById('playbook-type').value = category;
+            loadPlaybook();
+        }
+
+        function updateIncidentDisplay() {
+            const container = document.getElementById('active-incidents');
+
+            // Update metrics
+            const counts = { critical: 0, high: 0, medium: 0, low: 0 };
+            activeIncidents.forEach(incident => {
+                counts[incident.severity]++;
+            });
+
+            document.getElementById('critical-count').textContent = counts.critical;
+            document.getElementById('high-count').textContent = counts.high;
+            document.getElementById('medium-count').textContent = counts.medium;
+            document.getElementById('low-count').textContent = counts.low;
+
+            if (activeIncidents.length === 0) {
+                container.innerHTML = '<div style="color: #cccccc; font-style: italic; text-align: center;">No active incidents</div>';
+                return;
+            }
+
+            container.innerHTML = activeIncidents.map(incident => `
+                <div class="incident-item ${incident.severity}">
+                    <div class="incident-header-info">
+                        <div class="incident-id">${incident.id}</div>
+                        <div class="incident-time">${incident.createdAt.toLocaleString()}</div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <div class="incident-title">${incident.title}</div>
+                        <span class="severity-${incident.severity}">${incident.severity.toUpperCase()}</span>
+                    </div>
+
+                    <div class="incident-description">${incident.description}</div>
+
+                    <div class="incident-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Status:</span>
+                            <span class="status-indicator status-${incident.status}"></span>
+                            ${incident.status.toUpperCase()}
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Category:</span>
+                            ${incident.category.replace('-', ' ').toUpperCase()}
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Assigned:</span>
+                            ${incident.assignedTo}
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Systems:</span>
+                            ${incident.affectedSystems || 'Unknown'}
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 15px; display: flex; gap: 10px;">
+                        <button class="step-button complete" onclick="updateIncidentStatus('${incident.id}', 'investigating')">
+                            <i class="fas fa-search"></i> Investigate
+                        </button>
+                        <button class="step-button" onclick="updateIncidentStatus('${incident.id}', 'contained')" style="background: #45b7d1;">
+                            <i class="fas fa-shield-alt"></i> Contain
+                        </button>
+                        <button class="step-button skip" onclick="updateIncidentStatus('${incident.id}', 'resolved')">
+                            <i class="fas fa-check"></i> Resolve
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateIncidentStatus(incidentId, newStatus) {
+            const incident = activeIncidents.find(inc => inc.id === incidentId);
+            if (incident) {
+                const oldStatus = incident.status;
+                incident.status = newStatus;
+                incident.lastUpdate = new Date();
+                updateIncidentDisplay();
+                addToTimeline(`Incident ${incidentId} status changed from ${oldStatus} to ${newStatus}`, 'update', incident.severity);
+
+                if (newStatus === 'resolved') {
+                    setTimeout(() => {
+                        activeIncidents = activeIncidents.filter(inc => inc.id !== incidentId);
+                        updateIncidentDisplay();
+                        addToTimeline(`Incident ${incidentId} closed and archived`, 'close');
+                    }, 2000);
+                }
+            }
+        }
+
+        function loadPlaybook() {
+            const type = document.getElementById('playbook-type').value;
+            const container = document.getElementById('playbook-steps');
+
+            if (!type || !playbooks[type]) {
+                container.innerHTML = '<div style="color: #cccccc; font-style: italic; text-align: center;">Select incident type to load response playbook</div>';
+                return;
+            }
+
+            playbookSteps[type] = playbooks[type].map(step => ({ ...step }));
+
+            container.innerHTML = playbookSteps[type].map((step, index) => `
+                <div class="playbook-step ${step.completed ? 'completed' : (index === 0 ? 'active' : '')}">
+                    <div class="step-number ${step.completed ? 'completed' : ''}">${index + 1}</div>
+                    <div class="step-title">${step.title}</div>
+                    <div class="step-description">${step.description}</div>
+                    <div class="step-actions">
+                        <button class="step-button complete" onclick="completeStep('${type}', ${index})" ${step.completed ? 'disabled' : ''}>
+                            <i class="fas fa-check"></i> Complete
+                        </button>
+                        <button class="step-button skip" onclick="skipStep('${type}', ${index})" ${step.completed ? 'disabled' : ''}>
+                            <i class="fas fa-forward"></i> Skip
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            addToTimeline(`${type.replace('-', ' ')} response playbook loaded`, 'playbook');
+        }
+
+        function completeStep(playbookType, stepIndex) {
+            playbookSteps[playbookType][stepIndex].completed = true;
+            loadPlaybook();
+            addToTimeline(`Playbook step completed: ${playbookSteps[playbookType][stepIndex].title}`, 'step');
+        }
+
+        function skipStep(playbookType, stepIndex) {
+            playbookSteps[playbookType][stepIndex].completed = true;
+            loadPlaybook();
+            addToTimeline(`Playbook step skipped: ${playbookSteps[playbookType][stepIndex].title}`, 'step');
+        }
+
+        function collectEvidence() {
+            const type = document.getElementById('evidence-type').value;
+            const source = document.getElementById('evidence-source').value.trim();
+            const description = document.getElementById('evidence-description').value.trim();
+
+            if (!source || !description) {
+                alert('Please fill in all evidence fields');
+                return;
+            }
+
+            const evidence = {
+                id: `EVD-${Date.now().toString().slice(-6)}`,
+                type: type,
+                source: source,
+                description: description,
+                collectedAt: new Date(),
+                hash: generateHash(),
+                size: Math.floor(Math.random() * 1000000) + 1000 // Simulated file size
+            };
+
+            evidenceItems.unshift(evidence);
+            displayEvidence();
+            addToTimeline(`Evidence collected: ${type} from ${source}`, 'evidence');
+
+            // Clear form
+            document.getElementById('evidence-source').value = '';
+            document.getElementById('evidence-description').value = '';
+        }
+
+        function displayEvidence() {
+            const container = document.getElementById('evidence-list');
+
+            if (evidenceItems.length === 0) {
+                container.innerHTML = '<div style="color: #cccccc; font-style: italic; text-align: center;">No evidence collected</div>';
+                return;
+            }
+
+            container.innerHTML = evidenceItems.slice(0, 5).map(evidence => `
+                <div class="evidence-item">
+                    <div class="evidence-type">${evidence.type.toUpperCase()} - ${evidence.id}</div>
+                    <div class="evidence-content">${evidence.description}</div>
+                    <div class="evidence-meta">
+                        <span>Source: ${evidence.source}</span>
+                        <span>Collected: ${evidence.collectedAt.toLocaleTimeString()}</span>
+                    </div>
+                    <div class="evidence-meta">
+                        <span>Hash: ${evidence.hash}</span>
+                        <span>Size: ${formatFileSize(evidence.size)}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function generateHash() {
+            return Array.from({length: 40}, () => Math.floor(Math.random() * 16).toString(16)).join('');
+        }
+
+        function formatFileSize(bytes) {
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function startForensicAnalysis() {
+            const target = document.getElementById('forensic-target').value.trim();
+            const analysisType = document.getElementById('analysis-type').value;
+
+            if (!target) {
+                alert('Please enter analysis target');
+                return;
+            }
+
+            document.getElementById('forensic-results').innerHTML = '<div style="color: #ffa502;">Robotic forensic analysis in progress...</div>';
+
+            setTimeout(() => {
+                const results = generateForensicResults(target, analysisType);
+                displayForensicResults(results);
+                addToTimeline(`Forensic analysis completed: ${analysisType} on ${target}`, 'forensic');
+            }, 3000);
+        }
+
+        function generateForensicResults(target, type) {
+            const findings = [
+                `${type} analysis completed for ${target}`,
+                'Suspicious activity patterns detected',
+                'Potential compromise indicators found',
+                'Robotic analysis suggests further investigation'
+            ];
+
+            return {
+                target: target,
+                type: type,
+                findings: findings,
+                confidence: Math.floor(Math.random() * 40) + 60,
+                iocs: [
+                    `192.168.1.${Math.floor(Math.random() * 255)}`,
+                    `malicious-domain-${Math.floor(Math.random() * 100)}.com`,
+                    generateHash().substring(0, 32)
+                ]
+            };
+        }
+
+        function displayForensicResults(results) {
+            const container = document.getElementById('forensic-results');
+
+            container.innerHTML = `
+                <div style="background: rgba(255,165,2,0.1); border: 1px solid #ffa502; border-radius: 8px; padding: 15px;">
+                    <div style="color: #ffa502; font-weight: bold; margin-bottom: 10px;">
+                        FORENSIC ANALYSIS COMPLETE
+                    </div>
+                    <div style="color: #ffffff; margin-bottom: 10px;">
+                        Target: ${results.target}<br>
+                        Type: ${results.type}<br>
+                        Confidence: ${results.confidence}%
+                    </div>
+                    <div style="color: #cccccc; margin-bottom: 10px;">
+                        <strong>Findings:</strong><br>
+                        ${results.findings.map(finding => `• ${finding}`).join('<br>')}
+                    </div>
+                    <div style="color: #cccccc;">
+                        <strong>IOCs Discovered:</strong><br>
+                        ${results.iocs.map(ioc => `<code style="color: #ffa502;">${ioc}</code>`).join('<br>')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function addToTimeline(description, action = 'info', severity = 'normal') {
+            const timeline = document.getElementById('incident-timeline');
+            const event = document.createElement('div');
+            event.className = `timeline-event ${severity === 'critical' ? 'critical' : ''}`;
+            event.innerHTML = `
+                <div class="timeline-time">${new Date().toLocaleTimeString()}</div>
+                <div class="timeline-action">${action.toUpperCase()}</div>
+                <div class="timeline-description">${description}</div>
+            `;
+            timeline.insertBefore(event, timeline.firstChild);
+
+            // Limit timeline entries
+            if (timeline.children.length > 50) {
+                timeline.removeChild(timeline.lastChild);
+            }
+        }
+
+        function generateIncident() {
+            const incidentTypes = [
+                {
+                    title: 'Suspicious Network Traffic Detected',
+                    description: 'Abnormal outbound traffic patterns detected by AI monitoring systems',
+                    severity: 'high',
+                    category: 'system-compromise',
+                    systems: '192.168.1.50, 192.168.1.75'
+                },
+                {
+                    title: 'Malware Detection Alert',
+                    description: 'Advanced persistent threat detected on multiple endpoints',
+                    severity: 'critical',
+                    category: 'malware',
+                    systems: 'WS-001, WS-002, SRV-DB01'
+                },
+                {
+                    title: 'Unusual Admin Access',
+                    description: 'Unauthorized administrative access attempt detected',
+                    severity: 'medium',
+                    category: 'unauthorized-access',
+                    systems: 'Domain Controller'
+                }
+            ];
+
+            const incident = incidentTypes[Math.floor(Math.random() * incidentTypes.length)];
+
+            document.getElementById('incident-title').value = incident.title;
+            document.getElementById('incident-description').value = incident.description;
+            document.getElementById('incident-severity').value = incident.severity;
+            document.getElementById('incident-category').value = incident.category;
+            document.getElementById('affected-systems').value = incident.systems;
+
+            addToTimeline('AI-assisted incident detection activated', 'ai');
+        }
+
+        function sendNotification() {
+            const message = document.getElementById('notification-message').value.trim();
+            const urgency = document.getElementById('notification-urgency').value;
+
+            if (!message) {
+                alert('Please enter notification message');
+                return;
+            }
+
+            addToTimeline(`Notification sent to stakeholders (${urgency} priority): ${message.substring(0, 50)}...`, 'notification');
+            document.getElementById('notification-message').value = '';
+        }
+
+        function refreshIncidents() {
+            updateIncidentDisplay();
+            addToTimeline('Incident dashboard refreshed', 'system');
+        }
+
+        function exportTimeline() {
+            addToTimeline('Incident timeline exported for documentation', 'export');
+        }
+
+        function generateReport() {
+            addToTimeline('Incident response report generated', 'report');
+        }
+
+        function clearTimeline() {
+            const timeline = document.getElementById('incident-timeline');
+            timeline.innerHTML = `
+                <div class="timeline-event">
+                    <div class="timeline-time">Timeline Cleared</div>
+                    <div class="timeline-action">RESET</div>
+                    <div class="timeline-description">Incident timeline has been reset</div>
+                </div>
+            `;
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateIncidentDisplay();
+            displayEvidence();
+            addToTimeline('Incident Response Center initialized and ready for operations', 'system');
+        });
+    </script>
+</body>
+</html>

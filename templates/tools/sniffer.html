@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}Network Sniffer{% endblock %}
+
+{% block content %}
+<div class="tool-interface">
+    <h2 class="mb-4"><i class="fas fa-network-wired me-2"></i>Network Traffic Analyzer</h2>
+    
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Controls</h5>
+                    <div class="mb-3">
+                        <label class="form-label">Network Interface</label>
+                        <select id="interfaceSelect" class="form-select">
+                            <option value="eth0">Ethernet (eth0)</option>
+                            <option value="wlan0">Wi-Fi (wlan0)</option>
+                        </select>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button id="startBtn" class="btn btn-success">
+                            <i class="fas fa-play me-2"></i>Start Sniffing
+                        </button>
+                        <button id="stopBtn" class="btn btn-danger" disabled>
+                            <i class="fas fa-stop me-2"></i>Stop
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Statistics</h5>
+                    <div id="stats" class="sniffer-stats">
+                        <div class="mb-3">
+                            <span class="fw-bold">Total Packets:</span>
+                            <span id="totalPackets">0</span>
+                        </div>
+                        <div class="mb-3">
+                            <span class="fw-bold">Protocol Distribution:</span>
+                            <canvas id="protocolChart" width="300" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Live Traffic</h5>
+                    <div id="trafficList" class="traffic-list">
+                        <div class="list-group" style="max-height: 600px; overflow-y: auto;">
+                            <!-- Traffic items will be added here dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const interfaceSelect = document.getElementById('interfaceSelect');
+    const trafficList = document.querySelector('.traffic-list .list-group');
+    const totalPackets = document.getElementById('totalPackets');
+    let chart = null;
+    let eventSource = null;
+
+    // Initialize Chart
+    const ctx = document.getElementById('protocolChart').getContext('2d');
+    chart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['TCP', 'UDP', 'ICMP', 'Other'],
+            datasets: [{
+                data: [0, 0, 0, 0],
+                backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#858796']
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+
+    startBtn.addEventListener('click', async () => {
+        startBtn.disabled = true;
+        stopBtn.disabled = false;
+        trafficList.innerHTML = '';
+        
+        // Start SSE connection
+        eventSource = new EventSource(`/sniffer/stream?interface=${interfaceSelect.value}`);
+        
+        eventSource.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            totalPackets.textContent = data.total_packets;
+            
+            // Update chart
+            chart.data.datasets[0].data = [
+                data.protocols.TCP || 0,
+                data.protocols.UDP || 0,
+                data.protocols.ICMP || 0,
+                data.protocols.Other || 0
+            ];
+            chart.update();
+            
+            // Add traffic entry
+            if(data.packet) {
+                const entry = document.createElement('div');
+                entry.className = 'list-group-item';
+                entry.innerHTML = `
+                    <div class="d-flex justify-content-between">
+                        <span>${data.packet.src} → ${data.packet.dst}</span>
+                        <small class="text-muted">${data.packet.protocol}</small>
+                    </div>
+                    <small class="text-muted">${data.packet.summary}</small>
+                `;
+                trafficList.prepend(entry);
+            }
+        };
+    });
+
+    stopBtn.addEventListener('click', async () => {
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+        if(eventSource) eventSource.close();
+        
+        await fetch('/sniffer/control', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({action: 'stop'})
+        });
+    });
+});
+</script>
+{% endblock %}
+{% endblock %}

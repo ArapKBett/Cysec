@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Threat Intelligence - CyberSec Professional Suite</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .threat-container {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .threat-header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .threat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+
+        .threat-panel {
+            background: linear-gradient(145deg, #1a1a2e, #16213e);
+            border: 1px solid #ffd700;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(255, 215, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .threat-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ffd700, transparent);
+            animation: intelScan 4s ease-in-out infinite;
+        }
+
+        @keyframes intelScan {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        .panel-title {
+            color: #ffd700;
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            color: #ffffff;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .input-group input, .input-group select, .input-group textarea {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            border-color: #ffd700;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+            outline: none;
+        }
+
+        .threat-button {
+            background: linear-gradient(45deg, #ffd700, #ff8c00);
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            color: #000000;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            margin-bottom: 10px;
+        }
+
+        .threat-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255, 215, 0, 0.3);
+        }
+
+        .threat-button.analyze {
+            background: linear-gradient(45deg, #ff6b6b, #ff4757);
+            color: #ffffff;
+        }
+
+        .threat-button.feeds {
+            background: linear-gradient(45deg, #4ecdc4, #45b7d1);
+        }
+
+        .intel-sources {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .source-option {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #333;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #ffffff;
+            position: relative;
+        }
+
+        .source-option.active {
+            border-color: #ffd700;
+            background: rgba(255, 215, 0, 0.1);
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+        }
+
+        .source-status {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4ecdc4;
+        }
+
+        .source-status.offline {
+            background: #ff4757;
+        }
+
+        .threat-level {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .threat-level.critical {
+            background: #ff4757;
+            color: #ffffff;
+        }
+
+        .threat-level.high {
+            background: #ff6b6b;
+            color: #ffffff;
+        }
+
+        .threat-level.medium {
+            background: #ffa502;
+            color: #ffffff;
+        }
+
+        .threat-level.low {
+            background: #26de81;
+            color: #ffffff;
+        }
+
+        .threat-level.info {
+            background: #45b7d1;
+            color: #ffffff;
+        }
+
+        .intel-feed {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .intel-feed.malicious {
+            border-color: #ff4757;
+            background: rgba(255, 71, 87, 0.1);
+        }
+
+        .intel-feed.suspicious {
+            border-color: #ffa502;
+            background: rgba(255, 165, 2, 0.1);
+        }
+
+        .intel-feed.clean {
+            border-color: #4ecdc4;
+            background: rgba(78, 205, 196, 0.1);
+        }
+
+        .indicator-type {
+            background: #1a1a2e;
+            color: #ffd700;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            margin-right: 5px;
+            border: 1px solid #ffd700;
+        }
+
+        .reputation-score {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .score-bar {
+            flex: 1;
+            height: 8px;
+            background: #333;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .score-fill {
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .score-fill.malicious {
+            background: linear-gradient(90deg, #ff4757, #ff6b6b);
+        }
+
+        .score-fill.suspicious {
+            background: linear-gradient(90deg, #ffa502, #ffd700);
+        }
+
+        .score-fill.clean {
+            background: linear-gradient(90deg, #26de81, #4ecdc4);
+        }
+
+        .intel-timeline {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .timeline-item {
+            border-left: 3px solid #ffd700;
+            padding-left: 10px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -6px;
+            top: 0;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ffd700;
+        }
+
+        .timeline-time {
+            color: #ffd700;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .timeline-event {
+            color: #ffffff;
+            margin-top: 5px;
+        }
+
+        .ioc-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .ioc-table th, .ioc-table td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #333;
+            color: #ffffff;
+            font-size: 0.9em;
+        }
+
+        .ioc-table th {
+            background: rgba(255, 215, 0, 0.1);
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #333;
+        }
+
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .stat-label {
+            color: #cccccc;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .robot-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #ffd700;
+            font-size: 1.2em;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .threat-map {
+            height: 300px;
+            background: radial-gradient(circle at center, #1a1a2e 0%, #0a0a0a 100%);
+            border: 1px solid #ffd700;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .threat-map::after {
+            content: 'GLOBAL THREAT MAP - QUANTUM SURVEILLANCE ACTIVE';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: #ffd700;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        .threat-dot {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            animation: threatPulse 2s infinite;
+        }
+
+        .threat-dot.critical {
+            background: #ff4757;
+            box-shadow: 0 0 10px #ff4757;
+        }
+
+        .threat-dot.high {
+            background: #ff6b6b;
+            box-shadow: 0 0 8px #ff6b6b;
+        }
+
+        .threat-dot.medium {
+            background: #ffa502;
+            box-shadow: 0 0 6px #ffa502;
+        }
+
+        @keyframes threatPulse {
+            0%, 100% { opacity: 0.7; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.5); }
+        }
+    </style>
+</head>
+<body>
+    <div class="threat-container">
+        <div class="threat-header">
+            <h1><i class="fas fa-robot"></i> THREAT INTELLIGENCE CENTER <i class="fas fa-shield-alt"></i></h1>
+            <p>AI-Powered Global Threat Analysis & Attribution Platform</p>
+        </div>
+
+        <div class="threat-grid">
+            <!-- Indicator Analysis -->
+            <div class="threat-panel">
+                <div class="robot-indicator">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3 class="panel-title">
+                    <i class="fas fa-search"></i>
+                    IOC Analysis Engine
+                </h3>
+
+                <div class="input-group">
+                    <label for="indicator">Indicator of Compromise</label>
+                    <input type="text" id="indicator" placeholder="IP address, domain, hash, or URL">
+                </div>
+
+                <div class="input-group">
+                    <label>Indicator Type</label>
+                    <select id="indicator-type">
+                        <option value="auto">Auto-detect</option>
+                        <option value="ip">IP Address</option>
+                        <option value="domain">Domain</option>
+                        <option value="url">URL</option>
+                        <option value="md5">MD5 Hash</option>
+                        <option value="sha1">SHA1 Hash</option>
+                        <option value="sha256">SHA256 Hash</option>
+                        <option value="email">Email Address</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label>Intelligence Sources</label>
+                    <div class="intel-sources" id="intel-sources">
+                        <div class="source-option active" data-source="virustotal">
+                            <div class="source-status"></div>
+                            VirusTotal
+                        </div>
+                        <div class="source-option active" data-source="shodan">
+                            <div class="source-status"></div>
+                            Shodan
+                        </div>
+                        <div class="source-option active" data-source="greynoise">
+                            <div class="source-status"></div>
+                            GreyNoise
+                        </div>
+                        <div class="source-option active" data-source="alienvault">
+                            <div class="source-status"></div>
+                            AlienVault
+                        </div>
+                        <div class="source-option active" data-source="malwarebytes">
+                            <div class="source-status"></div>
+                            Malwarebytes
+                        </div>
+                        <div class="source-option active" data-source="threatminer">
+                            <div class="source-status"></div>
+                            ThreatMiner
+                        </div>
+                    </div>
+                </div>
+
+                <button class="threat-button analyze" id="analyze-indicator">
+                    <i class="fas fa-microscope"></i> ANALYZE INDICATOR
+                </button>
+
+                <div id="analysis-results" style="margin-top: 20px;">
+                    <!-- Analysis results will appear here -->
+                </div>
+            </div>
+
+            <!-- Threat Feeds -->
+            <div class="threat-panel">
+                <div class="robot-indicator">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3 class="panel-title">
+                    <i class="fas fa-rss"></i>
+                    Live Threat Feeds
+                </h3>
+
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="feed-count">0</div>
+                        <div class="stat-label">Active Feeds</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="indicator-count">0</div>
+                        <div class="stat-label">Indicators</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="threat-score">0</div>
+                        <div class="stat-label">Threat Score</div>
+                    </div>
+                </div>
+
+                <button class="threat-button feeds" id="refresh-feeds">
+                    <i class="fas fa-sync-alt"></i> REFRESH THREAT FEEDS
+                </button>
+
+                <div id="threat-feeds" style="margin-top: 20px; max-height: 300px; overflow-y: auto;">
+                    <!-- Threat feeds will appear here -->
+                </div>
+            </div>
+
+            <!-- Attribution & Campaigns -->
+            <div class="threat-panel">
+                <div class="robot-indicator">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3 class="panel-title">
+                    <i class="fas fa-users"></i>
+                    Threat Actor Attribution
+                </h3>
+
+                <div class="input-group">
+                    <label for="actor-search">Actor or Campaign Name</label>
+                    <input type="text" id="actor-search" placeholder="APT29, Lazarus, Carbanak, etc.">
+                </div>
+
+                <div class="input-group">
+                    <label for="campaign-filter">Campaign Type</label>
+                    <select id="campaign-filter">
+                        <option value="">All Campaigns</option>
+                        <option value="apt">Advanced Persistent Threat</option>
+                        <option value="ransomware">Ransomware</option>
+                        <option value="banking">Banking Trojan</option>
+                        <option value="espionage">Cyber Espionage</option>
+                        <option value="cybercrime">Cybercrime</option>
+                        <option value="nation-state">Nation State</option>
+                    </select>
+                </div>
+
+                <button class="threat-button" id="search-actors">
+                    <i class="fas fa-user-secret"></i> SEARCH THREAT ACTORS
+                </button>
+
+                <div id="actor-results" style="margin-top: 20px; max-height: 250px; overflow-y: auto;">
+                    <div style="color: #cccccc; font-style: italic;">
+                        Search for threat actors and campaigns for attribution intelligence.
+                    </div>
+                </div>
+            </div>
+
+            <!-- MITRE ATT&CK Framework -->
+            <div class="threat-panel">
+                <div class="robot-indicator">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3 class="panel-title">
+                    <i class="fas fa-chess"></i>
+                    MITRE ATT&CK Mapping
+                </h3>
+
+                <div class="input-group">
+                    <label for="attack-technique">Technique ID or Name</label>
+                    <input type="text" id="attack-technique" placeholder="T1055, Process Injection, etc.">
+                </div>
+
+                <div class="input-group">
+                    <label for="attack-tactic">Tactic Filter</label>
+                    <select id="attack-tactic">
+                        <option value="">All Tactics</option>
+                        <option value="initial-access">Initial Access</option>
+                        <option value="execution">Execution</option>
+                        <option value="persistence">Persistence</option>
+                        <option value="privilege-escalation">Privilege Escalation</option>
+                        <option value="defense-evasion">Defense Evasion</option>
+                        <option value="credential-access">Credential Access</option>
+                        <option value="discovery">Discovery</option>
+                        <option value="lateral-movement">Lateral Movement</option>
+                        <option value="collection">Collection</option>
+                        <option value="exfiltration">Exfiltration</option>
+                        <option value="impact">Impact</option>
+                    </select>
+                </div>
+
+                <button class="threat-button" id="search-attack">
+                    <i class="fas fa-crosshairs"></i> MAP TECHNIQUES
+                </button>
+
+                <div id="attack-results" style="margin-top: 20px; max-height: 250px; overflow-y: auto;">
+                    <div style="color: #cccccc; font-style: italic;">
+                        Map threats to MITRE ATT&CK framework for tactical analysis.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Intelligence Timeline -->
+            <div class="threat-panel">
+                <div class="robot-indicator">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3 class="panel-title">
+                    <i class="fas fa-clock"></i>
+                    Intelligence Timeline
+                </h3>
+
+                <div class="input-group">
+                    <label for="timeline-filter">Time Range</label>
+                    <select id="timeline-filter">
+                        <option value="1h">Last Hour</option>
+                        <option value="24h" selected>Last 24 Hours</option>
+                        <option value="7d">Last 7 Days</option>
+                        <option value="30d">Last 30 Days</option>
+                    </select>
+                </div>
+
+                <button class="threat-button" id="load-timeline">
+                    <i class="fas fa-history"></i> LOAD TIMELINE
+                </button>
+
+                <div class="intel-timeline" id="intel-timeline">
+                    <!-- Timeline events will appear here -->
+                </div>
+            </div>
+
+            <!-- IOC Management -->
+            <div class="threat-panel">
+                <div class="robot-indicator">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3 class="panel-title">
+                    <i class="fas fa-list"></i>
+                    IOC Management
+                </h3>
+
+                <div class="input-group">
+                    <label for="ioc-input">Bulk IOC Import</label>
+                    <textarea id="ioc-input" rows="4" placeholder="Paste IOCs (one per line)..."></textarea>
+                </div>
+
+                <div class="input-group">
+                    <label for="ioc-tags">Tags (comma-separated)</label>
+                    <input type="text" id="ioc-tags" placeholder="malware, apt, ransomware">
+                </div>
+
+                <button class="threat-button" id="import-iocs">
+                    <i class="fas fa-upload"></i> IMPORT IOCS
+                </button>
+
+                <button class="threat-button analyze" id="export-iocs">
+                    <i class="fas fa-download"></i> EXPORT IOCS
+                </button>
+
+                <div style="margin-top: 15px; max-height: 200px; overflow-y: auto;">
+                    <table class="ioc-table" id="ioc-table">
+                        <thead>
+                            <tr>
+                                <th>IOC</th>
+                                <th>Type</th>
+                                <th>Confidence</th>
+                                <th>Tags</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- IOC entries will appear here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Global Threat Map -->
+        <div class="threat-panel full-width" style="margin-top: 30px;">
+            <div class="robot-indicator">
+                <i class="fas fa-robot"></i>
+            </div>
+            <h3 class="panel-title">
+                <i class="fas fa-globe"></i>
+                Global Threat Intelligence Map
+            </h3>
+
+            <div class="threat-map" id="threat-map">
+                <!-- Threat indicators will be plotted here -->
+            </div>
+
+            <div style="margin-top: 20px;">
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" style="color: #ff4757;" id="global-critical">0</div>
+                        <div class="stat-label">Critical Threats</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" style="color: #ff6b6b;" id="global-high">0</div>
+                        <div class="stat-label">High Threats</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" style="color: #ffa502;" id="global-medium">0</div>
+                        <div class="stat-label">Medium Threats</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" style="color: #ffd700;" id="monitored-ips">0</div>
+                        <div class="stat-label">Monitored IPs</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" style="color: #4ecdc4;" id="blocked-threats">0</div>
+                        <div class="stat-label">Blocked Threats</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" style="color: #45b7d1;" id="intel-sources">6</div>
+                        <div class="stat-label">Intel Sources</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let activeSources = ['virustotal', 'shodan', 'greynoise', 'alienvault', 'malwarebytes', 'threatminer'];
+        let iocDatabase = [];
+        let threatStats = { critical: 0, high: 0, medium: 0, monitored: 0, blocked: 0 };
+
+        // Sample threat actor data
+        const threatActors = [
+            {
+                name: 'APT29 (Cozy Bear)',
+                type: 'nation-state',
+                description: 'Russian nation-state actor targeting government and defense sectors',
+                techniques: ['T1055', 'T1003', 'T1021'],
+                campaigns: ['SolarWinds Supply Chain']
+            },
+            {
+                name: 'Lazarus Group',
+                type: 'cybercrime',
+                description: 'North Korean cybercrime group behind major financial heists',
+                techniques: ['T1566', 'T1059', 'T1105'],
+                campaigns: ['WannaCry', 'Sony Pictures']
+            },
+            {
+                name: 'Carbanak',
+                type: 'banking',
+                description: 'Financial-focused cybercrime group targeting banks',
+                techniques: ['T1566', 'T1112', 'T1027'],
+                campaigns: ['Carbanak Campaign']
+            }
+        ];
+
+        // MITRE ATT&CK techniques sample
+        const attackTechniques = [
+            {
+                id: 'T1055',
+                name: 'Process Injection',
+                tactic: 'defense-evasion',
+                description: 'Adversaries may inject code into processes in order to evade process-based defenses'
+            },
+            {
+                id: 'T1566',
+                name: 'Phishing',
+                tactic: 'initial-access',
+                description: 'Adversaries may send phishing messages to gain access to victim systems'
+            },
+            {
+                id: 'T1003',
+                name: 'OS Credential Dumping',
+                tactic: 'credential-access',
+                description: 'Adversaries may attempt to dump credentials to obtain account login information'
+            }
+        ];
+
+        // Initialize source selection
+        document.querySelectorAll('.source-option').forEach(option => {
+            option.addEventListener('click', function() {
+                this.classList.toggle('active');
+                const source = this.dataset.source;
+                if (activeSources.includes(source)) {
+                    activeSources = activeSources.filter(s => s !== source);
+                } else {
+                    activeSources.push(source);
+                }
+                updateSourceStats();
+            });
+        });
+
+        // Event listeners
+        document.getElementById('analyze-indicator').addEventListener('click', analyzeIndicator);
+        document.getElementById('refresh-feeds').addEventListener('click', refreshThreatFeeds);
+        document.getElementById('search-actors').addEventListener('click', searchThreatActors);
+        document.getElementById('search-attack').addEventListener('click', searchMitreAttack);
+        document.getElementById('load-timeline').addEventListener('click', loadIntelTimeline);
+        document.getElementById('import-iocs').addEventListener('click', importIOCs);
+        document.getElementById('export-iocs').addEventListener('click', exportIOCs);
+
+        async function analyzeIndicator() {
+            const indicator = document.getElementById('indicator').value.trim();
+            const type = document.getElementById('indicator-type').value;
+
+            if (!indicator) {
+                showAnalysisResult('ERROR: No indicator provided', 'error');
+                return;
+            }
+
+            showAnalysisResult('ANALYZING INDICATOR: ' + indicator, 'info');
+
+            try {
+                // Make API call to backend
+                const response = await fetch('/api/v2/threat-intel/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        indicator: indicator,
+                        type: type === 'auto' ? detectIndicatorType(indicator) : type,
+                        sources: activeSources
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    displayAnalysisResults(data);
+                } else {
+                    simulateAnalysis(indicator, type);
+                }
+            } catch (error) {
+                simulateAnalysis(indicator, type);
+            }
+        }
+
+        function simulateAnalysis(indicator, type) {
+            const detectedType = type === 'auto' ? detectIndicatorType(indicator) : type;
+
+            setTimeout(() => {
+                const analysisResult = generateAnalysisResult(indicator, detectedType);
+                displayAnalysisResults(analysisResult);
+            }, 2000);
+        }
+
+        function detectIndicatorType(indicator) {
+            if (/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(indicator)) return 'ip';
+            if (/^[a-fA-F0-9]{32}$/.test(indicator)) return 'md5';
+            if (/^[a-fA-F0-9]{40}$/.test(indicator)) return 'sha1';
+            if (/^[a-fA-F0-9]{64}$/.test(indicator)) return 'sha256';
+            if (/^https?:\/\//.test(indicator)) return 'url';
+            if (/@/.test(indicator)) return 'email';
+            return 'domain';
+        }
+
+        function generateAnalysisResult(indicator, type) {
+            const maliciousChance = Math.random();
+            let classification = 'clean';
+            let threatLevel = 'low';
+
+            if (maliciousChance > 0.8) {
+                classification = 'malicious';
+                threatLevel = ['critical', 'high'][Math.floor(Math.random() * 2)];
+            } else if (maliciousChance > 0.6) {
+                classification = 'suspicious';
+                threatLevel = 'medium';
+            }
+
+            return {
+                indicator: indicator,
+                type: type,
+                classification: classification,
+                threat_level: threatLevel,
+                reputation_score: Math.floor(Math.random() * 100),
+                sources_detected: Math.floor(Math.random() * activeSources.length) + 1,
+                first_seen: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
+                last_seen: new Date().toISOString(),
+                campaigns: classification === 'malicious' ? ['Quantum Threat Campaign', 'APT-2024-001'] : [],
+                related_malware: classification === 'malicious' ? ['TrojanDropper', 'Backdoor.Generic'] : []
+            };
+        }
+
+        function displayAnalysisResults(data) {
+            const container = document.getElementById('analysis-results');
+            const classColor = {
+                'malicious': '#ff4757',
+                'suspicious': '#ffa502',
+                'clean': '#4ecdc4'
+            };
+
+            container.innerHTML = `
+                <div class="intel-feed ${data.classification}">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <span class="indicator-type">${data.type.toUpperCase()}</span>
+                        <span class="threat-level ${data.threat_level}">${data.threat_level.toUpperCase()}</span>
+                    </div>
+
+                    <div style="color: #ffffff; font-weight: bold; margin-bottom: 10px; word-break: break-all;">
+                        ${data.indicator}
+                    </div>
+
+                    <div class="reputation-score">
+                        <span style="color: #ffd700;">Reputation:</span>
+                        <div class="score-bar">
+                            <div class="score-fill ${data.classification}" style="width: ${100 - data.reputation_score}%;"></div>
+                        </div>
+                        <span style="color: ${classColor[data.classification]};">${data.reputation_score}/100</span>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0; font-size: 0.9em;">
+                        <div style="color: #cccccc;">Sources: <span style="color: #ffd700;">${data.sources_detected}/${activeSources.length}</span></div>
+                        <div style="color: #cccccc;">Classification: <span style="color: ${classColor[data.classification]};">${data.classification.toUpperCase()}</span></div>
+                        <div style="color: #cccccc;">First Seen: <span style="color: #ffffff;">${new Date(data.first_seen).toLocaleDateString()}</span></div>
+                        <div style="color: #cccccc;">Last Seen: <span style="color: #ffffff;">${new Date(data.last_seen).toLocaleDateString()}</span></div>
+                    </div>
+
+                    ${data.campaigns.length > 0 ? `
+                        <div style="margin-top: 10px;">
+                            <div style="color: #ff4757; font-weight: bold;">Associated Campaigns:</div>
+                            <div style="color: #ffffff;">${data.campaigns.join(', ')}</div>
+                        </div>
+                    ` : ''}
+
+                    ${data.related_malware.length > 0 ? `
+                        <div style="margin-top: 10px;">
+                            <div style="color: #ff6b6b; font-weight: bold;">Related Malware:</div>
+                            <div style="color: #ffffff;">${data.related_malware.join(', ')}</div>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+
+            // Add to IOC database if malicious
+            if (data.classification === 'malicious') {
+                addToIOCDatabase(data);
+            }
+        }
+
+        function refreshThreatFeeds() {
+            document.getElementById('feed-count').textContent = '...';
+            document.getElementById('indicator-count').textContent = '...';
+            document.getElementById('threat-score').textContent = '...';
+
+            setTimeout(() => {
+                const feeds = generateThreatFeeds();
+                displayThreatFeeds(feeds);
+                updateFeedStats(feeds);
+            }, 1500);
+        }
+
+        function generateThreatFeeds() {
+            const feeds = [];
+            const feedTypes = ['malware', 'phishing', 'botnet', 'apt', 'ransomware'];
+
+            for (let i = 0; i < 10; i++) {
+                const type = feedTypes[Math.floor(Math.random() * feedTypes.length)];
+                const severity = ['critical', 'high', 'medium', 'low'][Math.floor(Math.random() * 4)];
+
+                feeds.push({
+                    type: type,
+                    severity: severity,
+                    indicator: generateRandomIndicator(),
+                    description: `${type.charAt(0).toUpperCase() + type.slice(1)} activity detected`,
+                    timestamp: new Date(Date.now() - Math.random() * 3600000).toISOString(),
+                    source: activeSources[Math.floor(Math.random() * activeSources.length)]
+                });
+            }
+
+            return feeds.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        }
+
+        function generateRandomIndicator() {
+            const types = ['ip', 'domain', 'hash'];
+            const type = types[Math.floor(Math.random() * types.length)];
+
+            switch (type) {
+                case 'ip':
+                    return `${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`;
+                case 'domain':
+                    const domains = ['malicious-site.com', 'evil-domain.net', 'threat-actor.org', 'phishing-site.co'];
+                    return domains[Math.floor(Math.random() * domains.length)];
+                case 'hash':
+                    return Array.from({length: 64}, () => Math.floor(Math.random() * 16).toString(16)).join('');
+            }
+        }
+
+        function displayThreatFeeds(feeds) {
+            const container = document.getElementById('threat-feeds');
+
+            container.innerHTML = feeds.map(feed => `
+                <div class="intel-feed ${feed.severity === 'critical' || feed.severity === 'high' ? 'malicious' : 'suspicious'}">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                        <span class="indicator-type">${feed.type.toUpperCase()}</span>
+                        <span class="threat-level ${feed.severity}">${feed.severity.toUpperCase()}</span>
+                    </div>
+                    <div style="color: #ffffff; font-weight: bold; margin-bottom: 5px; font-family: monospace;">
+                        ${feed.indicator}
+                    </div>
+                    <div style="color: #cccccc; font-size: 0.9em; margin-bottom: 5px;">
+                        ${feed.description}
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.8em; color: #ffd700;">
+                        <span>Source: ${feed.source}</span>
+                        <span>${new Date(feed.timestamp).toLocaleTimeString()}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateFeedStats(feeds) {
+            document.getElementById('feed-count').textContent = activeSources.length;
+            document.getElementById('indicator-count').textContent = feeds.length;
+
+            const threatScore = feeds.reduce((score, feed) => {
+                const weights = { critical: 10, high: 7, medium: 4, low: 1 };
+                return score + weights[feed.severity];
+            }, 0);
+
+            document.getElementById('threat-score').textContent = threatScore;
+        }
+
+        function searchThreatActors() {
+            const query = document.getElementById('actor-search').value.toLowerCase();
+            const filter = document.getElementById('campaign-filter').value;
+
+            const results = threatActors.filter(actor =>
+                (actor.name.toLowerCase().includes(query) ||
+                 actor.description.toLowerCase().includes(query)) &&
+                (!filter || actor.type === filter)
+            );
+
+            displayThreatActors(results);
+        }
+
+        function displayThreatActors(actors) {
+            const container = document.getElementById('actor-results');
+
+            if (actors.length === 0) {
+                container.innerHTML = '<div style="color: #ffd700;">No threat actors found matching criteria</div>';
+                return;
+            }
+
+            container.innerHTML = actors.map(actor => `
+                <div style="border: 1px solid #ffd700; padding: 10px; margin: 5px 0; border-radius: 5px; background: rgba(255,215,0,0.1);">
+                    <div style="color: #ffd700; font-weight: bold; margin-bottom: 5px;">${actor.name}</div>
+                    <div style="color: #ffffff; margin-bottom: 5px;">${actor.description}</div>
+                    <div style="color: #cccccc; font-size: 0.9em; margin-bottom: 5px;">
+                        Type: ${actor.type} | Techniques: ${actor.techniques.join(', ')}
+                    </div>
+                    <div style="color: #ff6b6b; font-size: 0.9em;">
+                        Campaigns: ${actor.campaigns.join(', ')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function searchMitreAttack() {
+            const query = document.getElementById('attack-technique').value.toLowerCase();
+            const tactic = document.getElementById('attack-tactic').value;
+
+            const results = attackTechniques.filter(technique =>
+                (technique.id.toLowerCase().includes(query) ||
+                 technique.name.toLowerCase().includes(query) ||
+                 technique.description.toLowerCase().includes(query)) &&
+                (!tactic || technique.tactic === tactic)
+            );
+
+            displayMitreResults(results);
+        }
+
+        function displayMitreResults(techniques) {
+            const container = document.getElementById('attack-results');
+
+            if (techniques.length === 0) {
+                container.innerHTML = '<div style="color: #ffd700;">No MITRE ATT&CK techniques found</div>';
+                return;
+            }
+
+            container.innerHTML = techniques.map(technique => `
+                <div style="border: 1px solid #4ecdc4; padding: 10px; margin: 5px 0; border-radius: 5px; background: rgba(78,205,196,0.1);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                        <span style="color: #4ecdc4; font-weight: bold;">${technique.id}</span>
+                        <span style="color: #ffd700; font-size: 0.8em; text-transform: uppercase;">${technique.tactic}</span>
+                    </div>
+                    <div style="color: #ffffff; font-weight: bold; margin-bottom: 5px;">${technique.name}</div>
+                    <div style="color: #cccccc; font-size: 0.9em;">${technique.description}</div>
+                </div>
+            `).join('');
+        }
+
+        function loadIntelTimeline() {
+            const range = document.getElementById('timeline-filter').value;
+            const container = document.getElementById('intel-timeline');
+
+            container.innerHTML = '<div style="color: #ffd700;">Loading intelligence timeline...</div>';
+
+            setTimeout(() => {
+                const events = generateTimelineEvents(range);
+                displayTimeline(events);
+            }, 1000);
+        }
+
+        function generateTimelineEvents(range) {
+            const events = [];
+            const eventTypes = ['threat detected', 'malware identified', 'campaign discovered', 'IOC added'];
+            const rangeHours = { '1h': 1, '24h': 24, '7d': 168, '30d': 720 };
+
+            for (let i = 0; i < 20; i++) {
+                const hoursAgo = Math.random() * rangeHours[range];
+                events.push({
+                    timestamp: new Date(Date.now() - hoursAgo * 60 * 60 * 1000),
+                    type: eventTypes[Math.floor(Math.random() * eventTypes.length)],
+                    description: `Robotic analysis detected ${eventTypes[Math.floor(Math.random() * eventTypes.length)]} from threat actor`,
+                    severity: ['high', 'medium', 'low'][Math.floor(Math.random() * 3)]
+                });
+            }
+
+            return events.sort((a, b) => b.timestamp - a.timestamp);
+        }
+
+        function displayTimeline(events) {
+            const container = document.getElementById('intel-timeline');
+
+            container.innerHTML = events.map(event => `
+                <div class="timeline-item">
+                    <div class="timeline-time">${event.timestamp.toLocaleTimeString()}</div>
+                    <div class="timeline-event" style="color: ${event.severity === 'high' ? '#ff6b6b' : event.severity === 'medium' ? '#ffa502' : '#4ecdc4'};">
+                        ${event.description}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function importIOCs() {
+            const input = document.getElementById('ioc-input').value.trim();
+            const tags = document.getElementById('ioc-tags').value.trim();
+
+            if (!input) return;
+
+            const iocs = input.split('\n').filter(line => line.trim());
+            iocs.forEach(ioc => {
+                const type = detectIndicatorType(ioc.trim());
+                addToIOCDatabase({
+                    indicator: ioc.trim(),
+                    type: type,
+                    confidence: Math.floor(Math.random() * 40) + 60,
+                    tags: tags.split(',').map(tag => tag.trim()).filter(tag => tag),
+                    timestamp: new Date()
+                });
+            });
+
+            updateIOCTable();
+            document.getElementById('ioc-input').value = '';
+            document.getElementById('ioc-tags').value = '';
+        }
+
+        function addToIOCDatabase(data) {
+            iocDatabase.push({
+                indicator: data.indicator,
+                type: data.type,
+                confidence: data.confidence || 75,
+                tags: data.tags || [],
+                timestamp: new Date()
+            });
+        }
+
+        function updateIOCTable() {
+            const tbody = document.querySelector('#ioc-table tbody');
+            tbody.innerHTML = iocDatabase.slice(-10).reverse().map(ioc => `
+                <tr>
+                    <td style="font-family: monospace;">${ioc.indicator.length > 30 ? ioc.indicator.substring(0, 30) + '...' : ioc.indicator}</td>
+                    <td><span class="indicator-type">${ioc.type.toUpperCase()}</span></td>
+                    <td style="color: ${ioc.confidence > 80 ? '#4ecdc4' : ioc.confidence > 60 ? '#ffa502' : '#ff6b6b'};">${ioc.confidence}%</td>
+                    <td>${ioc.tags.join(', ')}</td>
+                </tr>
+            `).join('');
+        }
+
+        function exportIOCs() {
+            if (iocDatabase.length === 0) {
+                alert('No IOCs to export');
+                return;
+            }
+
+            const csv = 'Indicator,Type,Confidence,Tags,Timestamp\n' +
+                iocDatabase.map(ioc =>
+                    `"${ioc.indicator}","${ioc.type}",${ioc.confidence},"${ioc.tags.join('; ')}","${ioc.timestamp.toISOString()}"`
+                ).join('\n');
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'threat_intelligence_iocs.csv';
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        function showAnalysisResult(message, type) {
+            const container = document.getElementById('analysis-results');
+            container.innerHTML = `<div style="color: ${type === 'error' ? '#ff4757' : type === 'info' ? '#ffd700' : '#4ecdc4'};">${message}</div>`;
+        }
+
+        function updateSourceStats() {
+            document.getElementById('intel-sources').textContent = activeSources.length;
+        }
+
+        function initializeThreatMap() {
+            const map = document.getElementById('threat-map');
+
+            // Add random threat indicators on the map
+            for (let i = 0; i < 20; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'threat-dot ' + ['critical', 'high', 'medium'][Math.floor(Math.random() * 3)];
+                dot.style.left = Math.random() * 95 + '%';
+                dot.style.top = Math.random() * 85 + 15 + '%';
+                map.appendChild(dot);
+            }
+
+            // Update global stats
+            document.getElementById('global-critical').textContent = Math.floor(Math.random() * 10);
+            document.getElementById('global-high').textContent = Math.floor(Math.random() * 25);
+            document.getElementById('global-medium').textContent = Math.floor(Math.random() * 50);
+            document.getElementById('monitored-ips').textContent = Math.floor(Math.random() * 1000) + 500;
+            document.getElementById('blocked-threats').textContent = Math.floor(Math.random() * 100) + 50;
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateSourceStats();
+            initializeThreatMap();
+
+            // Auto-refresh feeds every 30 seconds
+            setInterval(() => {
+                if (document.getElementById('threat-feeds').children.length > 0) {
+                    refreshThreatFeeds();
+                }
+            }, 30000);
+        });
+    </script>
+</body>
+</html>

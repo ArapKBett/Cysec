@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{% block title %}CyberSec Professional Suite{% endblock %}</title>
+
+    <!-- Security Headers -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+
+    <!-- Favicon -->
+    <link rel="icon" href="{{ url_for('static', filename='logo.png') }}" type="image/png">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+    <!-- CSS -->
+    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'cyber-dark': '#0a0b0d',
+                        'cyber-accent': '#00d9ff',
+                        'cyber-blue': '#1e40af',
+                        'cyber-text': '#a0a9c0',
+                        'cyber-light': '#f8fafc'
+                    },
+                    fontFamily: {
+                        'mono': ['JetBrains Mono', 'monospace'],
+                        'inter': ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    {% block head %}{% endblock %}
+</head>
+<body class="dark:bg-cyber-dark bg-cyber-light min-h-screen font-inter">
+
+    <!-- Navigation Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-cyber-dark via-gray-900 to-cyber-dark border-b border-cyber-accent shadow-xl">
+        <nav class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+
+                <!-- Logo and Title -->
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-cyber-accent to-cyber-blue rounded-lg shadow-lg">
+                        <i class="fas fa-shield-alt text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-white font-mono">CyberSec</h1>
+                        <p class="text-xs text-cyber-text opacity-75">Professional Suite v2.0</p>
+                    </div>
+                </div>
+
+                <!-- Navigation Links -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="{{ url_for('index') }}" class="text-cyber-text hover:text-cyber-accent transition-colors duration-200 font-medium flex items-center" data-tooltip="Command Center">
+                        <i class="fas fa-tachometer-alt mr-2"></i>Dashboard
+                    </a>
+                    <div class="relative group">
+                        <button class="text-cyber-text hover:text-cyber-accent transition-colors duration-200 font-medium flex items-center" data-tooltip="Security Tools">
+                            <i class="fas fa-tools mr-2"></i>Tools
+                            <i class="fas fa-chevron-down ml-2 text-xs"></i>
+                        </button>
+                        <div class="absolute top-full left-0 mt-2 w-64 bg-gray-800 border border-cyber-accent rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
+                            <div class="p-2">
+                                <a href="/dashboard/scanner" class="flex items-center p-3 text-cyber-text hover:text-white hover:bg-gray-700 rounded transition-colors duration-200">
+                                    <i class="fas fa-radar-dish mr-3 text-cyber-accent"></i>
+                                    <div>
+                                        <div class="font-medium">Advanced Scanner</div>
+                                        <div class="text-xs opacity-75">Network & vulnerability scanning</div>
+                                    </div>
+                                </a>
+                                <a href="/dashboard/crypto" class="flex items-center p-3 text-cyber-text hover:text-white hover:bg-gray-700 rounded transition-colors duration-200">
+                                    <i class="fas fa-lock mr-3 text-green-400"></i>
+                                    <div>
+                                        <div class="font-medium">Quantum Crypto</div>
+                                        <div class="text-xs opacity-75">Advanced encryption suite</div>
+                                    </div>
+                                </a>
+                                <a href="/dashboard/monitor" class="flex items-center p-3 text-cyber-text hover:text-white hover:bg-gray-700 rounded transition-colors duration-200">
+                                    <i class="fas fa-eye mr-3 text-yellow-400"></i>
+                                    <div>
+                                        <div class="font-medium">Network Monitor</div>
+                                        <div class="text-xs opacity-75">Network traffic analysis</div>
+                                    </div>
+                                </a>
+                                <a href="/dashboard/audit" class="flex items-center p-3 text-cyber-text hover:text-white hover:bg-gray-700 rounded transition-colors duration-200">
+                                    <i class="fas fa-key mr-3 text-purple-400"></i>
+                                    <div>
+                                        <div class="font-medium">Password Audit</div>
+                                        <div class="text-xs opacity-75">Password strength analysis</div>
+                                    </div>
+                                </a>
+                                <a href="/dashboard/ids" class="flex items-center p-3 text-cyber-text hover:text-white hover:bg-gray-700 rounded transition-colors duration-200">
+                                    <i class="fas fa-shield-virus mr-3 text-red-400"></i>
+                                    <div>
+                                        <div class="font-medium">Intrusion Detection</div>
+                                        <div class="text-xs opacity-75">Real-time threat detection</div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User Menu -->
+                <div class="flex items-center space-x-4">
+                    <!-- Notifications -->
+                    <div class="relative">
+                        <button class="p-2 text-cyber-text hover:text-white transition-colors relative" data-tooltip="Security Alerts">
+                            <i class="fas fa-bell text-lg"></i>
+                            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
+                        </button>
+                    </div>
+
+                    <!-- System Status -->
+                    <div class="hidden lg:flex items-center space-x-2 px-3 py-1 bg-green-900/30 border border-green-500/30 rounded-full">
+                        <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                        <span class="text-green-400 text-sm font-mono">OPERATIONAL</span>
+                    </div>
+
+                    <!-- User Profile -->
+                    <div class="relative group">
+                        <button class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-800 transition-colors">
+                            <div class="w-8 h-8 bg-gradient-to-br from-cyber-accent to-cyber-blue rounded-full flex items-center justify-center">
+                                <i class="fas fa-user text-white text-sm"></i>
+                            </div>
+                            <span class="hidden md:block text-white text-sm">Admin</span>
+                            <i class="fas fa-chevron-down text-cyber-text text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="pt-20 min-h-screen">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Global Loading Overlay -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[9999] hidden">
+        <div class="text-center">
+            <div class="w-16 h-16 border-4 border-cyber-accent border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <div class="text-white font-mono">Processing...</div>
+        </div>
+    </div>
+
+    <!-- Terminal Output Modal -->
+    <div id="terminalModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-[9999] hidden">
+        <div class="bg-gray-900 border border-cyber-accent rounded-lg shadow-2xl w-full max-w-4xl mx-4 max-h-[80vh] flex flex-col">
+            <div class="flex items-center justify-between p-4 border-b border-gray-700">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-terminal text-cyber-accent"></i>
+                    <span class="text-white font-mono">Terminal Output</span>
+                </div>
+                <button onclick="closeTerminal()" class="text-gray-400 hover:text-white transition-colors">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="terminalContent" class="flex-1 p-4 font-mono text-sm text-green-400 bg-black overflow-auto">
+                <!-- Terminal content will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Global variables
+        let activeScans = new Map();
+
+        // Utility functions
+        function showLoading() {
+            document.getElementById('loadingOverlay').classList.remove('hidden');
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').classList.add('hidden');
+        }
+
+        function showTerminal(content) {
+            document.getElementById('terminalContent').innerHTML = content;
+            document.getElementById('terminalModal').classList.remove('hidden');
+        }
+
+        function closeTerminal() {
+            document.getElementById('terminalModal').classList.add('hidden');
+        }
+
+        // Initialize tooltips
+        document.addEventListener('DOMContentLoaded', function() {
+            const tooltipElements = document.querySelectorAll('[data-tooltip]');
+            tooltipElements.forEach(element => {
+                element.addEventListener('mouseenter', function(e) {
+                    const tooltip = document.createElement('div');
+                    tooltip.className = 'absolute z-50 px-2 py-1 bg-gray-800 border border-cyber-accent text-white text-xs rounded shadow-lg pointer-events-none';
+                    tooltip.textContent = e.target.getAttribute('data-tooltip');
+                    tooltip.id = 'tooltip-' + Date.now();
+
+                    document.body.appendChild(tooltip);
+
+                    const rect = e.target.getBoundingClientRect();
+                    tooltip.style.top = (rect.bottom + 5) + 'px';
+                    tooltip.style.left = (rect.left + rect.width / 2 - tooltip.offsetWidth / 2) + 'px';
+                });
+
+                element.addEventListener('mouseleave', function() {
+                    const tooltips = document.querySelectorAll('[id^="tooltip-"]');
+                    tooltips.forEach(tooltip => tooltip.remove());
+                });
+            });
+        });
+    </script>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

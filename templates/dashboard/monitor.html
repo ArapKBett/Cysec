@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Monitor - CyberSec Professional Suite</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .monitor-container {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .monitor-header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .monitor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+
+        .monitor-panel {
+            background: linear-gradient(145deg, #1a1a2e, #16213e);
+            border: 1px solid #4ecdc4;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(78, 205, 196, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .monitor-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #4ecdc4, transparent);
+            animation: monitorScan 3s ease-in-out infinite;
+        }
+
+        @keyframes monitorScan {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        .panel-title {
+            color: #4ecdc4;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        .status-online {
+            background: #4ecdc4;
+            box-shadow: 0 0 10px #4ecdc4;
+        }
+
+        .status-warning {
+            background: #ffd700;
+            box-shadow: 0 0 10px #ffd700;
+        }
+
+        .status-critical {
+            background: #ff4757;
+            box-shadow: 0 0 10px #ff4757;
+        }
+
+        .status-offline {
+            background: #666;
+        }
+
+        .metric-display {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #4ecdc4;
+        }
+
+        .metric-label {
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        .metric-value {
+            color: #4ecdc4;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        .metric-value.warning {
+            color: #ffd700;
+        }
+
+        .metric-value.critical {
+            color: #ff4757;
+        }
+
+        .chart-container {
+            height: 150px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            margin: 15px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-line {
+            position: absolute;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to top, #4ecdc4, transparent);
+            animation: chartPulse 2s infinite;
+        }
+
+        @keyframes chartPulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+
+        .alert-item {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-left: 4px solid;
+            position: relative;
+        }
+
+        .alert-item.critical {
+            border-left-color: #ff4757;
+            background: rgba(255, 71, 87, 0.1);
+        }
+
+        .alert-item.warning {
+            border-left-color: #ffd700;
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        .alert-item.info {
+            border-left-color: #4ecdc4;
+            background: rgba(78, 205, 196, 0.1);
+        }
+
+        .alert-time {
+            color: #cccccc;
+            font-size: 0.8em;
+            float: right;
+        }
+
+        .alert-message {
+            color: #ffffff;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .alert-details {
+            color: #cccccc;
+            font-size: 0.9em;
+        }
+
+        .log-console {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #4ecdc4;
+            border-radius: 8px;
+            padding: 15px;
+            height: 200px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+        }
+
+        .log-line {
+            margin-bottom: 2px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .log-timestamp {
+            color: #666;
+            min-width: 80px;
+        }
+
+        .log-level {
+            min-width: 50px;
+            font-weight: bold;
+        }
+
+        .log-level.INFO {
+            color: #4ecdc4;
+        }
+
+        .log-level.WARN {
+            color: #ffd700;
+        }
+
+        .log-level.ERROR {
+            color: #ff4757;
+        }
+
+        .log-level.DEBUG {
+            color: #cccccc;
+        }
+
+        .log-message {
+            color: #ffffff;
+            flex: 1;
+        }
+
+        .network-map {
+            height: 200px;
+            background: radial-gradient(circle at center, #1a1a2e 0%, #0a0a0a 100%);
+            border: 1px solid #4ecdc4;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .network-node {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4ecdc4;
+            box-shadow: 0 0 10px #4ecdc4;
+            animation: networkPulse 3s infinite;
+        }
+
+        .network-node.warning {
+            background: #ffd700;
+            box-shadow: 0 0 10px #ffd700;
+        }
+
+        .network-node.critical {
+            background: #ff4757;
+            box-shadow: 0 0 10px #ff4757;
+        }
+
+        @keyframes networkPulse {
+            0%, 100% { opacity: 0.7; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .process-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .process-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 6px;
+            margin-bottom: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        .process-name {
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        .process-stats {
+            color: #4ecdc4;
+            display: flex;
+            gap: 15px;
+        }
+
+        .robot-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #4ecdc4;
+            font-size: 1.2em;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .traffic-flow {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        .flow-arrow {
+            color: #4ecdc4;
+            font-size: 1.5em;
+            animation: flowPulse 1s infinite;
+        }
+
+        @keyframes flowPulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .bandwidth-meter {
+            width: 100%;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .bandwidth-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4ecdc4, #45b7d1);
+            transition: width 0.3s ease;
+            position: relative;
+        }
+
+        .bandwidth-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .control-button {
+            background: linear-gradient(45deg, #4ecdc4, #45b7d1);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            color: #ffffff;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+            margin: 2px;
+        }
+
+        .control-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(78, 205, 196, 0.3);
+        }
+
+        .control-button.danger {
+            background: linear-gradient(45deg, #ff4757, #ff6b6b);
+        }
+
+        .control-button.warning {
+            background: linear-gradient(45deg, #ffd700, #ff8c00);
+            color: #000000;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .monitoring-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="monitor-container">
+        <div class="monitor-header">
+            <h1><i class="fas fa-robot"></i> SECURITY MONITORING CENTER <i class="fas fa-radar"></i></h1>
+            <p>Real-time Cybersecurity Operations & Threat Detection</p>
+        </div>
+
+        <div class="monitor-grid">
+            <!-- System Status -->
+            <div class="monitor-panel">
+                <div class="robot-indicator">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3 class="panel-title">
+                    <i class="fas fa-heartbeat"></i>
+                    System Health Monitor
+                </h3>
+
+                <div class="metric-display">
+                    <span class="metric-label">
+                        <span class="status-indicator status-online"></span>
+                        CPU Usage
+                    </span>
+                    <span class="metric-value" id="cpu-usage">0%</span>
+                </div>
+
+                <div class="metric-display">
+                    <span class="metric-label">
+                        <span class="status-indicator status-online"></span>
+                        Memory Usage
+                    </span>
+                    <span class="metric-value" id="memory-usage">0%</span>
+                </div>
+
+                <div class="metric-display">
+                    <span class="metric-label">
+                        <span class="status-indicator status-online"></span>
+                        Disk Usage
+                    </span>
+                    <span class="metric-value" id="disk-usage">0%</span>
+                </div>
+
+                <div class="metric-display">
+                    <span class="metric-label">
+                        <span class="status-indicator status-online"></span>
+                        Network Load
+                    </span>
+                    <span class="metric-value" id="network-load">0%</span>
+                </div>
+
+                <div class="chart-container" id="system-chart">
+                    <!-- Dynamic system performance chart -->
+                </div>
+
+                <div class="monitoring-controls">
+                    <button class="control-button" onclick="restartService('monitoring')">
+                        <i class="fas fa-redo"></i> Restart Monitor
+                    </button>
+                    <button class="control-button warning" onclick="toggleService('firewall')">
+                        <i class="fas fa-shield-alt"></i> Firewall
+                    </button>
+                </div>
+            </div>
+
+            <!-- Network Traffic -->
+            <div class="monitor-panel">
+                <div class="robot-indicator">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3 class="panel-title">
+                    <i class="fas fa-wifi"></i>
+                    Network Traffic Analysis
+                </h3>
+
+                <div class="traffic-flow">
+                    <div style="text-align: center;">
+                        <div style="color: #4ecdc4; font-weight: bold;">INBOUND</div>
+                        <div style="color: #ffffff; font-size: 1.2em;" id="inbound-traffic">0 MB/s</div>
+                    </div>
+                    <div class="flow-arrow">⟷</div>
+                    <div style="text-align: center;">
+                        <div style="color: #ff6b6b; font-weight: bold;">OUTBOUND</div>
+                        <div style="color: #ffffff; font-size: 1.2em;" id="outbound-traffic">0 MB/s</div>
+                    </div>
+                </div>
+
+                <div style="margin: 15px 0;">
+                    <div style="color: #cccccc; margin-bottom: 5px;">Bandwidth Utilization</div>
+                    <div class="bandwidth-meter">
+                        <div class="bandwidth-fill" id="bandwidth-fill" style="width: 0%;"></div>
+                    </div>
+                </div>
+
+                <div class="metric-display">
+                    <span class="metric-label">Active Connections</span>
+                    <span class="metric-value" id="active-connections">0</span>
+                </div>
+
+                <div class="metric-display">
+                    <span class="metric-label">Blocked Requests</span>
+                    <span class="metric-value critical" id="blocked-requests">0</span>
+                </div>
+
+                <div class="metric-display">
+                    <span class="metric-label">Packets/Second</span>
+                    <span class="metric-value" id="packets-per-second">0</span>
+                </div>
+
+                <div class="monitoring-controls">
+                    <button class="control-button" onclick="captureTraffic()">
+                        <i class="fas fa-download"></i> Packet Capture
+                    </button>
+                    <button class="control-button danger" onclick="blockTraffic()">
+                        <i class="fas fa-ban"></i> Block Traffic
+                    </button>
+                </div>
+            </div>
+
+            <!-- Security Alerts -->
+            <div class="monitor-panel">
+                <div class="robot-indicator">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3 class="panel-title">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Security Alerts
+                </h3>
+
+                <div style="max-height: 300px; overflow-y: auto;" id="security-alerts">
+                    <!-- Alerts will be populated here -->
+                </div>
+
+                <div class="monitoring-controls">
+                    <button class="control-button" onclick="acknowledgeAlerts()">
+                        <i class="fas fa-check"></i> Acknowledge All
+                    </button>
+                    <button class="control-button warning" onclick="exportAlerts()">
+                        <i class="fas fa-download"></i> Export Alerts
+                    </button>
+                </div>
+            </div>
+
+            <!-- Process Monitor -->
+            <div class="monitor-panel">
+                <div class="robot-indicator">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3 class="panel-title">
+                    <i class="fas fa-tasks"></i>
+                    Process Monitor
+                </h3>
+
+                <div class="process-list" id="process-list">
+                    <!-- Process list will be populated here -->
+                </div>
+
+                <div class="monitoring-controls">
+                    <button class="control-button" onclick="refreshProcesses()">
+                        <i class="fas fa-sync"></i> Refresh
+                    </button>
+                    <button class="control-button danger" onclick="killSuspiciousProcesses()">
+                        <i class="fas fa-times"></i> Kill Suspicious
+                    </button>
+                </div>
+            </div>
+
+            <!-- File System Monitor -->
+            <div class="monitor-panel">
+                <div class="robot-indicator">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3 class="panel-title">
+                    <i class="fas fa-folder-open"></i>
+                    File System Monitor
+                </h3>
+
+                <div class="metric-display">
+                    <span class="metric-label">Files Monitored</span>
+                    <span class="metric-value" id="monitored-files">0</span>
+                </div>
+
+                <div class="metric-display">
+                    <span class="metric-label">File Changes</span>
+                    <span class="metric-value warning" id="file-changes">0</span>
+                </div>
+
+                <div class="metric-display">
+                    <span class="metric-label">Suspicious Activity</span>
+                    <span class="metric-value critical" id="suspicious-activity">0</span>
+                </div>
+
+                <div style="margin: 15px 0; max-height: 150px; overflow-y: auto;">
+                    <div style="color: #cccccc; margin-bottom: 10px; font-weight: bold;">Recent File Events:</div>
+                    <div id="file-events">
+                        <!-- File events will be populated here -->
+                    </div>
+                </div>
+
+                <div class="monitoring-controls">
+                    <button class="control-button" onclick="scanFileSystem()">
+                        <i class="fas fa-search"></i> Full Scan
+                    </button>
+                    <button class="control-button warning" onclick="quarantineFiles()">
+                        <i class="fas fa-lock"></i> Quarantine
+                    </button>
+                </div>
+            </div>
+
+            <!-- Network Map -->
+            <div class="monitor-panel">
+                <div class="robot-indicator">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3 class="panel-title">
+                    <i class="fas fa-project-diagram"></i>
+                    Network Topology
+                </h3>
+
+                <div class="network-map" id="network-map">
+                    <!-- Network nodes will be plotted here -->
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px;">
+                    <div style="text-align: center;">
+                        <div style="color: #4ecdc4; font-weight: bold;" id="online-nodes">0</div>
+                        <div style="color: #cccccc; font-size: 0.9em;">Online Nodes</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="color: #ff4757; font-weight: bold;" id="offline-nodes">0</div>
+                        <div style="color: #cccccc; font-size: 0.9em;">Offline Nodes</div>
+                    </div>
+                </div>
+
+                <div class="monitoring-controls">
+                    <button class="control-button" onclick="scanNetwork()">
+                        <i class="fas fa-radar"></i> Network Scan
+                    </button>
+                    <button class="control-button" onclick="isolateNode()">
+                        <i class="fas fa-ban"></i> Isolate Node
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Logs -->
+        <div class="monitor-panel full-width" style="margin-top: 20px;">
+            <div class="robot-indicator">
+                <i class="fas fa-robot"></i>
+            </div>
+            <h3 class="panel-title">
+                <i class="fas fa-list-alt"></i>
+                Real-time System Logs
+            </h3>
+
+            <div class="monitoring-controls">
+                <button class="control-button" onclick="filterLogs('ALL')">All Logs</button>
+                <button class="control-button" onclick="filterLogs('ERROR')">Errors Only</button>
+                <button class="control-button" onclick="filterLogs('WARN')">Warnings Only</button>
+                <button class="control-button warning" onclick="clearLogs()">Clear Logs</button>
+                <button class="control-button" onclick="exportLogs()">Export Logs</button>
+            </div>
+
+            <div class="log-console" id="log-console">
+                <!-- Real-time logs will appear here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global monitoring state
+        let monitoringActive = true;
+        let systemMetrics = { cpu: 0, memory: 0, disk: 0, network: 0 };
+        let networkTraffic = { inbound: 0, outbound: 0 };
+        let securityAlerts = [];
+        let systemProcesses = [];
+        let fileEvents = [];
+        let logFilter = 'ALL';
+
+        // Sample processes for monitoring
+        const sampleProcesses = [
+            { name: 'cybersec-monitor', cpu: 5, memory: 128 },
+            { name: 'threat-hunter', cpu: 12, memory: 256 },
+            { name: 'firewall-daemon', cpu: 3, memory: 64 },
+            { name: 'intrusion-detector', cpu: 8, memory: 192 },
+            { name: 'log-analyzer', cpu: 6, memory: 96 }
+        ];
+
+        // Sample security events
+        const securityEventTypes = [
+            'Malware detection on endpoint',
+            'Unusual network traffic detected',
+            'Failed authentication attempts',
+            'Suspicious file modification',
+            'Intrusion attempt blocked',
+            'Vulnerability scan detected',
+            'Unauthorized access attempt',
+            'Data exfiltration detected'
+        ];
+
+        // Initialize monitoring
+        function initializeMonitoring() {
+            updateSystemMetrics();
+            updateNetworkTraffic();
+            generateSecurityAlerts();
+            updateProcessList();
+            generateFileEvents();
+            initializeNetworkMap();
+            startLogStream();
+
+            // Start real-time updates
+            setInterval(updateSystemMetrics, 2000);
+            setInterval(updateNetworkTraffic, 1500);
+            setInterval(generateSecurityAlerts, 10000);
+            setInterval(updateProcessList, 5000);
+            setInterval(generateFileEvents, 8000);
+            setInterval(addLogEntry, 3000);
+        }
+
+        function updateSystemMetrics() {
+            // Simulate system metrics
+            systemMetrics.cpu = Math.max(0, Math.min(100, systemMetrics.cpu + (Math.random() - 0.5) * 10));
+            systemMetrics.memory = Math.max(0, Math.min(100, systemMetrics.memory + (Math.random() - 0.5) * 8));
+            systemMetrics.disk = Math.max(0, Math.min(100, systemMetrics.disk + (Math.random() - 0.5) * 2));
+            systemMetrics.network = Math.max(0, Math.min(100, systemMetrics.network + (Math.random() - 0.5) * 15));
+
+            // Update display
+            updateMetricDisplay('cpu-usage', systemMetrics.cpu);
+            updateMetricDisplay('memory-usage', systemMetrics.memory);
+            updateMetricDisplay('disk-usage', systemMetrics.disk);
+            updateMetricDisplay('network-load', systemMetrics.network);
+
+            // Update system chart
+            updateSystemChart();
+        }
+
+        function updateMetricDisplay(elementId, value) {
+            const element = document.getElementById(elementId);
+            element.textContent = Math.round(value) + '%';
+
+            // Update color based on threshold
+            if (value > 80) {
+                element.className = 'metric-value critical';
+            } else if (value > 60) {
+                element.className = 'metric-value warning';
+            } else {
+                element.className = 'metric-value';
+            }
+        }
+
+        function updateSystemChart() {
+            const chartContainer = document.getElementById('system-chart');
+
+            // Add new chart line
+            const line = document.createElement('div');
+            line.className = 'chart-line';
+            line.style.left = chartContainer.children.length * 3 + 'px';
+            line.style.height = (systemMetrics.cpu / 100) * 150 + 'px';
+            chartContainer.appendChild(line);
+
+            // Remove old lines to prevent overflow
+            while (chartContainer.children.length > 100) {
+                chartContainer.removeChild(chartContainer.firstChild);
+            }
+        }
+
+        function updateNetworkTraffic() {
+            // Simulate network traffic
+            networkTraffic.inbound = Math.max(0, networkTraffic.inbound + (Math.random() - 0.5) * 20);
+            networkTraffic.outbound = Math.max(0, networkTraffic.outbound + (Math.random() - 0.5) * 15);
+
+            document.getElementById('inbound-traffic').textContent = networkTraffic.inbound.toFixed(1) + ' MB/s';
+            document.getElementById('outbound-traffic').textContent = networkTraffic.outbound.toFixed(1) + ' MB/s';
+
+            const totalTraffic = networkTraffic.inbound + networkTraffic.outbound;
+            const bandwidthUsage = Math.min(100, (totalTraffic / 100) * 100);
+            document.getElementById('bandwidth-fill').style.width = bandwidthUsage + '%';
+
+            // Update network metrics
+            document.getElementById('active-connections').textContent = Math.floor(Math.random() * 150) + 50;
+            document.getElementById('blocked-requests').textContent = Math.floor(Math.random() * 10);
+            document.getElementById('packets-per-second').textContent = Math.floor(totalTraffic * 1000);
+        }
+
+        function generateSecurityAlerts() {
+            if (Math.random() < 0.7) { // 70% chance to generate alert
+                const eventType = securityEventTypes[Math.floor(Math.random() * securityEventTypes.length)];
+                const severity = ['critical', 'warning', 'info'][Math.floor(Math.random() * 3)];
+
+                const alert = {
+                    id: Date.now(),
+                    severity: severity,
+                    message: eventType,
+                    details: `Source: ${generateRandomIP()} | Detection: Robotic AI Analysis`,
+                    timestamp: new Date()
+                };
+
+                securityAlerts.unshift(alert);
+                if (securityAlerts.length > 20) securityAlerts.pop();
+
+                displaySecurityAlerts();
+                addLogEntry('ALERT', `${severity.toUpperCase()}: ${eventType}`);
+            }
+        }
+
+        function displaySecurityAlerts() {
+            const container = document.getElementById('security-alerts');
+            container.innerHTML = securityAlerts.slice(0, 10).map(alert => `
+                <div class="alert-item ${alert.severity}">
+                    <div class="alert-time">${alert.timestamp.toLocaleTimeString()}</div>
+                    <div class="alert-message">${alert.message}</div>
+                    <div class="alert-details">${alert.details}</div>
+                </div>
+            `).join('');
+        }
+
+        function updateProcessList() {
+            const container = document.getElementById('process-list');
+
+            // Simulate process changes
+            systemProcesses = sampleProcesses.map(proc => ({
+                ...proc,
+                cpu: Math.max(0, Math.min(100, proc.cpu + (Math.random() - 0.5) * 5)),
+                memory: Math.max(16, Math.min(512, proc.memory + (Math.random() - 0.5) * 20))
+            }));
+
+            container.innerHTML = systemProcesses.map(proc => `
+                <div class="process-item">
+                    <div class="process-name">${proc.name}</div>
+                    <div class="process-stats">
+                        <span>CPU: ${proc.cpu.toFixed(1)}%</span>
+                        <span>RAM: ${proc.memory.toFixed(0)}MB</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function generateFileEvents() {
+            if (Math.random() < 0.6) { // 60% chance to generate file event
+                const eventTypes = [
+                    'File created: /tmp/suspicious_file.exe',
+                    'File modified: /etc/passwd',
+                    'File deleted: /var/log/security.log',
+                    'Permission changed: /usr/bin/system_tool',
+                    'File accessed: /home/user/sensitive_data.txt'
+                ];
+
+                const event = {
+                    type: eventTypes[Math.floor(Math.random() * eventTypes.length)],
+                    timestamp: new Date(),
+                    severity: Math.random() > 0.7 ? 'critical' : 'info'
+                };
+
+                fileEvents.unshift(event);
+                if (fileEvents.length > 10) fileEvents.pop();
+
+                displayFileEvents();
+                updateFileMetrics();
+            }
+        }
+
+        function displayFileEvents() {
+            const container = document.getElementById('file-events');
+            container.innerHTML = fileEvents.map(event => `
+                <div style="padding: 5px; border-left: 2px solid ${event.severity === 'critical' ? '#ff4757' : '#4ecdc4'}; margin-bottom: 5px;">
+                    <div style="color: #ffffff; font-size: 0.9em;">${event.type}</div>
+                    <div style="color: #cccccc; font-size: 0.8em;">${event.timestamp.toLocaleTimeString()}</div>
+                </div>
+            `).join('');
+        }
+
+        function updateFileMetrics() {
+            document.getElementById('monitored-files').textContent = Math.floor(Math.random() * 1000) + 5000;
+            document.getElementById('file-changes').textContent = fileEvents.length;
+            document.getElementById('suspicious-activity').textContent = fileEvents.filter(e => e.severity === 'critical').length;
+        }
+
+        function initializeNetworkMap() {
+            const map = document.getElementById('network-map');
+
+            // Add network nodes
+            for (let i = 0; i < 15; i++) {
+                const node = document.createElement('div');
+                const status = Math.random() > 0.8 ? (Math.random() > 0.5 ? 'warning' : 'critical') : '';
+                node.className = 'network-node ' + status;
+                node.style.left = Math.random() * 90 + 5 + '%';
+                node.style.top = Math.random() * 80 + 10 + '%';
+                map.appendChild(node);
+            }
+
+            updateNetworkStats();
+        }
+
+        function updateNetworkStats() {
+            const nodes = document.querySelectorAll('.network-node');
+            const onlineNodes = Array.from(nodes).filter(node => !node.classList.contains('critical')).length;
+            const offlineNodes = Array.from(nodes).filter(node => node.classList.contains('critical')).length;
+
+            document.getElementById('online-nodes').textContent = onlineNodes;
+            document.getElementById('offline-nodes').textContent = offlineNodes;
+        }
+
+        function startLogStream() {
+            const console = document.getElementById('log-console');
+
+            // Add initial log entries
+            const initialLogs = [
+                'System monitoring initialized',
+                'Robotic security protocols activated',
+                'Network surveillance commenced',
+                'Threat detection engines online',
+                'Real-time analysis systems ready'
+            ];
+
+            initialLogs.forEach(message => {
+                addLogEntry('INFO', message);
+            });
+        }
+
+        function addLogEntry(level = null, message = null) {
+            const console = document.getElementById('log-console');
+            const levels = ['INFO', 'WARN', 'ERROR', 'DEBUG'];
+            const messages = [
+                'Security scan completed successfully',
+                'Network traffic analysis update',
+                'Threat intelligence feed synchronized',
+                'Process monitoring checkpoint',
+                'File system integrity verified',
+                'Firewall rules updated',
+                'Intrusion detection system active',
+                'Malware signatures updated'
+            ];
+
+            const logLevel = level || levels[Math.floor(Math.random() * levels.length)];
+            const logMessage = message || messages[Math.floor(Math.random() * messages.length)];
+
+            if (logFilter !== 'ALL' && logLevel !== logFilter) {
+                return;
+            }
+
+            const logLine = document.createElement('div');
+            logLine.className = 'log-line';
+            logLine.innerHTML = `
+                <span class="log-timestamp">${new Date().toLocaleTimeString()}</span>
+                <span class="log-level ${logLevel}">${logLevel}</span>
+                <span class="log-message">${logMessage}</span>
+            `;
+
+            console.appendChild(logLine);
+            console.scrollTop = console.scrollHeight;
+
+            // Limit log entries
+            if (console.children.length > 200) {
+                console.removeChild(console.firstChild);
+            }
+        }
+
+        function generateRandomIP() {
+            return `${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`;
+        }
+
+        // Control functions
+        function restartService(service) {
+            addLogEntry('INFO', `Restarting ${service} service...`);
+            setTimeout(() => {
+                addLogEntry('INFO', `${service} service restarted successfully`);
+            }, 2000);
+        }
+
+        function toggleService(service) {
+            const status = Math.random() > 0.5 ? 'enabled' : 'disabled';
+            addLogEntry('WARN', `${service} service ${status}`);
+        }
+
+        function captureTraffic() {
+            addLogEntry('INFO', 'Network packet capture initiated');
+            setTimeout(() => {
+                addLogEntry('INFO', 'Packet capture saved: capture_' + Date.now() + '.pcap');
+            }, 3000);
+        }
+
+        function blockTraffic() {
+            const ip = generateRandomIP();
+            addLogEntry('WARN', `Blocking traffic from ${ip}`);
+        }
+
+        function acknowledgeAlerts() {
+            securityAlerts = [];
+            displaySecurityAlerts();
+            addLogEntry('INFO', 'All security alerts acknowledged');
+        }
+
+        function exportAlerts() {
+            addLogEntry('INFO', 'Exporting security alerts to file');
+        }
+
+        function refreshProcesses() {
+            addLogEntry('INFO', 'Refreshing process list...');
+            updateProcessList();
+        }
+
+        function killSuspiciousProcesses() {
+            addLogEntry('WARN', 'Terminating suspicious processes');
+        }
+
+        function scanFileSystem() {
+            addLogEntry('INFO', 'Initiating full file system scan');
+        }
+
+        function quarantineFiles() {
+            addLogEntry('WARN', 'Quarantining suspicious files');
+        }
+
+        function scanNetwork() {
+            addLogEntry('INFO', 'Starting network topology scan');
+        }
+
+        function isolateNode() {
+            addLogEntry('WARN', 'Isolating network node for analysis');
+        }
+
+        function filterLogs(filter) {
+            logFilter = filter;
+            const console = document.getElementById('log-console');
+            console.innerHTML = '';
+            addLogEntry('INFO', `Log filter set to: ${filter}`);
+        }
+
+        function clearLogs() {
+            document.getElementById('log-console').innerHTML = '';
+            addLogEntry('INFO', 'Log console cleared');
+        }
+
+        function exportLogs() {
+            addLogEntry('INFO', 'Exporting system logs to file');
+        }
+
+        // Initialize everything when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeMonitoring();
+        });
+    </script>
+</body>
+</html>

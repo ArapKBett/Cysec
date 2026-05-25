@@ -1,0 +1,505 @@
+{% extends "base.html" %}
+
+{% block title %}CyberSec Professional Suite - Command Center{% endblock %}
+
+{% block content %}
+<!-- Advanced Hero Section -->
+<section class="relative py-20 overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-br from-cyber-dark via-gray-900 to-cyber-dark opacity-70"></div>
+
+    <!-- Animated grid background -->
+    <div class="absolute inset-0 opacity-20">
+        <div class="absolute inset-0" style="
+            background-image:
+                linear-gradient(rgba(0,217,255,0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,217,255,0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+        "></div>
+    </div>
+
+    <div class="container mx-auto px-6 relative z-10">
+        <div class="text-center mb-16 animate-slide-up">
+            <h1 class="text-6xl md:text-7xl font-bold mb-8 text-effect-glow">
+                <span class="bg-gradient-to-r from-cyber-accent-bright to-cyber-blue-neon bg-clip-text text-transparent">
+                    CyberSec
+                </span>
+                <span class="text-white block mt-2">Professional Suite</span>
+            </h1>
+            <div class="w-32 h-1 mx-auto mb-8 bg-gradient-to-r from-transparent via-cyber-accent to-transparent"></div>
+
+            <p class="text-2xl text-cyber-text mb-12 max-w-4xl mx-auto font-light leading-relaxed animate-slide-up animate-delay-200">
+                Military-grade cybersecurity platform with AI-powered threat detection,
+                <span class="text-cyber-accent-bright font-medium">quantum-resistant encryption</span>,
+                and real-time vulnerability assessment capabilities.
+            </p>
+
+            <div class="flex flex-col sm:flex-row gap-6 justify-center animate-slide-up animate-delay-400">
+                <a href="/dashboard/scanner" class="btn-cyber transform hover:scale-105">
+                    <i class="fas fa-shield-alt mr-2"></i>Launch Security Scan
+                </a>
+                <a href="#features" class="btn-cyber bg-transparent border-2 border-cyber-accent hover:bg-cyber-accent hover:shadow-lg">
+                    <i class="fas fa-cogs mr-2"></i>Explore Arsenal
+                </a>
+            </div>
+        </div>
+
+        <!-- Advanced Real-time Stats Dashboard -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16">
+            <div class="stat-card animate-slide-up animate-delay-100">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-gradient-to-br from-cyber-accent to-cyber-blue rounded-lg flex items-center justify-center">
+                        <i class="fas fa-radar-dish text-white text-xl"></i>
+                    </div>
+                    <div class="text-right">
+                        <div class="stat-number" id="scans-count">0</div>
+                        <div class="stat-label">Active Scans</div>
+                    </div>
+                </div>
+                <div class="w-full bg-cyber-dark-tertiary rounded-full h-2">
+                    <div class="bg-gradient-to-r from-cyber-accent to-cyber-blue h-2 rounded-full animate-pulse" style="width: 0%" id="scans-progress"></div>
+                </div>
+            </div>
+
+            <div class="stat-card animate-slide-up animate-delay-200">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-gradient-to-br from-cyber-error to-red-600 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-shield-virus text-white text-xl"></i>
+                    </div>
+                    <div class="text-right">
+                        <div class="stat-number text-cyber-error" id="threats-detected">247</div>
+                        <div class="stat-label">Threats Blocked</div>
+                    </div>
+                </div>
+                <div class="w-full bg-cyber-dark-tertiary rounded-full h-2">
+                    <div class="bg-gradient-to-r from-cyber-error to-red-600 h-2 rounded-full animate-pulse" style="width: 85%"></div>
+                </div>
+            </div>
+
+            <div class="stat-card animate-slide-up animate-delay-300">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-gradient-to-br from-cyber-success to-green-600 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-server text-white text-xl"></i>
+                    </div>
+                    <div class="text-right">
+                        <div class="stat-number text-cyber-success" id="systems-monitored">12</div>
+                        <div class="stat-label">Systems Protected</div>
+                    </div>
+                </div>
+                <div class="w-full bg-cyber-dark-tertiary rounded-full h-2">
+                    <div class="bg-gradient-to-r from-cyber-success to-green-600 h-2 rounded-full" style="width: 100%"></div>
+                </div>
+            </div>
+
+            <div class="stat-card animate-slide-up animate-delay-400">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-gradient-to-br from-cyber-warning to-yellow-600 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-clock text-white text-xl"></i>
+                    </div>
+                    <div class="text-right">
+                        <div class="stat-number text-cyber-warning" id="uptime">99.9%</div>
+                        <div class="stat-label">System Uptime</div>
+                    </div>
+                </div>
+                <div class="w-full bg-cyber-dark-tertiary rounded-full h-2">
+                    <div class="bg-gradient-to-r from-cyber-warning to-yellow-600 h-2 rounded-full" style="width: 99.9%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section id="features" class="py-16 bg-gradient-to-b from-cyber-dark to-cyber-dark-secondary">
+    <div class="container mx-auto px-6">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl font-bold mb-4">Advanced Security Arsenal</h2>
+            <p class="text-xl text-cyber-text max-w-2xl mx-auto">
+                Comprehensive cybersecurity toolkit designed for modern threats and enterprise environments
+            </p>
+        </div>
+
+        <div class="cyber-grid cyber-grid-3">
+            <!-- Advanced Scanner -->
+            <div class="cyber-card group">
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 bg-gradient-to-br from-cyber-accent to-cyber-blue rounded-lg flex items-center justify-center mr-4">
+                        <i class="fas fa-radar-dish text-white text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold">Advanced Scanner</h3>
+                </div>
+                <p class="text-cyber-text mb-4">
+                    Multi-threaded network and vulnerability scanner with intelligent threat detection and comprehensive reporting.
+                </p>
+                <ul class="text-sm text-cyber-text space-y-1 mb-6">
+                    <li><i class="fas fa-check text-cyber-success mr-2"></i>Port & Service Detection</li>
+                    <li><i class="fas fa-check text-cyber-success mr-2"></i>Vulnerability Assessment</li>
+                    <li><i class="fas fa-check text-cyber-success mr-2"></i>Real-time Monitoring</li>
+                    <li><i class="fas fa-check text-cyber-success mr-2"></i>Custom Rule Engine</li>
+                </ul>
+                <a href="/dashboard/scanner" class="btn-cyber w-full">
+                    <i class="fas fa-play mr-2"></i>Launch Scanner
+                </a>
+            </div>
+
+            <!-- Network Monitor -->
+            <div class="cyber-card group">
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-lg flex items-center justify-center mr-4">
+                        <i class="fas fa-network-wired text-white text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold">Network Monitor</h3>
+                </div>
+                <p class="text-cyber-text mb-4">
+                    Real-time network traffic analysis with anomaly detection and automated incident response capabilities.
+                </p>
+                <ul class="text-sm text-cyber-text space-y-1 mb-6">
+                    <li><i class="fas fa-check text-cyber-success mr-2"></i>Packet Analysis</li>
+                    <li><i class="fas fa-check text-cyber-success mr-2"></i>Anomaly Detection</li>
+                    <li><i class="fas fa-check text-cyber-success mr-2"></i>Flow Monitoring</li>
+                    <li><i class="fas fa-check text-cyber-success mr-2"></i>DPI Engine</li>
+                </ul>
+                <a href="/dashboard/monitor" class="btn-cyber w-full">
+                    <i class="fas fa-chart-line mr-2"></i>Monitor Network
+                </a>
+            </div>
+
+            <!-- Quantum Crypto -->
+            <div class="cyber-card group">
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center mr-4">
+                        <i class="fas fa-lock text-white text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold">Quantum Crypto</h3>
+                </div>
+                <p class="text-cyber-text mb-4">
+                    Next-generation encryption with quantum-resistant algorithms and advanced key management systems.
+                </p>
+                <ul class="text-sm text-cyber-text space-y-1 mb-6">
+                    <li><i class="fas fa-check text-cyber-success mr-2"></i>Post-Quantum Encryption</li>
+                    <li><i class="fas fa-check text-cyber-success mr-2"></i>Digital Signatures</li>
+                    <li><i class="fas fa-check text-cyber-success mr-2"></i>Key Management</li>
+                    <li><i class="fas fa-check text-cyber-success mr-2"></i>Zero-Knowledge Proofs</li>
+                </ul>
+                <a href="/dashboard/crypto" class="btn-cyber w-full">
+                    <i class="fas fa-shield-alt mr-2"></i>Access Crypto Suite
+                </a>
+            </div>
+
+            <!-- Password Audit -->
+            <div class="cyber-card group">
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center mr-4">
+                        <i class="fas fa-key text-white text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold">Password Audit</h3>
+                </div>
+                <p class="text-cyber-text mb-4">
+                    Advanced password security analysis with entropy calculation, breach checking, and policy enforcement.
+                </p>
+                <ul class="text-sm text-cyber-text space-y-1 mb-6">
+                    <li><i class="fas fa-check text-cyber-success mr-2"></i>Entropy Analysis</li>
+                    <li><i class="fas fa-check text-cyber-success mr-2"></i>Breach Detection</li>
+                    <li><i class="fas fa-check text-cyber-success mr-2"></i>Policy Compliance</li>
+                    <li><i class="fas fa-check text-cyber-success mr-2"></i>Strength Scoring</li>
+                </ul>
+                <a href="/dashboard/audit" class="btn-cyber w-full">
+                    <i class="fas fa-check-circle mr-2"></i>Audit Passwords
+                </a>
+            </div>
+
+            <!-- Intrusion Detection -->
+            <div class="cyber-card group">
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 bg-gradient-to-br from-red-500 to-pink-600 rounded-lg flex items-center justify-center mr-4">
+                        <i class="fas fa-shield-virus text-white text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold">Intrusion Detection</h3>
+                </div>
+                <p class="text-cyber-text mb-4">
+                    AI-powered intrusion detection system with machine learning algorithms for advanced threat hunting.
+                </p>
+                <ul class="text-sm text-cyber-text space-y-1 mb-6">
+                    <li><i class="fas fa-check text-cyber-success mr-2"></i>Behavioral Analysis</li>
+                    <li><i class="fas fa-check text-cyber-success mr-2"></i>ML-based Detection</li>
+                    <li><i class="fas fa-check text-cyber-success mr-2"></i>Real-time Alerts</li>
+                    <li><i class="fas fa-check text-cyber-success mr-2"></i>Threat Hunting</li>
+                </ul>
+                <a href="/dashboard/ids" class="btn-cyber w-full">
+                    <i class="fas fa-search mr-2"></i>Launch IDS
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Security Dashboard -->
+<section class="py-16">
+    <div class="container mx-auto px-6">
+        <div class="text-center mb-12">
+            <h2 class="text-4xl font-bold mb-4">Real-time Security Dashboard</h2>
+            <p class="text-xl text-cyber-text">Monitor your security posture in real-time</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <!-- System Health -->
+            <div class="cyber-card">
+                <h3 class="text-xl font-bold mb-6">System Health</h3>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-cyber-text">CPU Usage</span>
+                        <div class="w-32 progress-cyber">
+                            <div class="progress-bar-cyber" style="width: 23%"></div>
+                        </div>
+                        <span class="text-white font-mono">23%</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-cyber-text">Memory Usage</span>
+                        <div class="w-32 progress-cyber">
+                            <div class="progress-bar-cyber" style="width: 67%"></div>
+                        </div>
+                        <span class="text-white font-mono">67%</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-cyber-text">Network I/O</span>
+                        <div class="w-32 progress-cyber">
+                            <div class="progress-bar-cyber" style="width: 34%"></div>
+                        </div>
+                        <span class="text-white font-mono">34%</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-cyber-text">Disk Usage</span>
+                        <div class="w-32 progress-cyber">
+                            <div class="progress-bar-cyber" style="width: 45%"></div>
+                        </div>
+                        <span class="text-white font-mono">45%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="cyber-card">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold">Security Events</h3>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                        <span class="text-green-400 text-sm font-mono">LIVE</span>
+                    </div>
+                </div>
+                <div class="space-y-3" id="securityEvents">
+                    <div class="flex items-center justify-between p-3 bg-cyber-dark-tertiary rounded">
+                        <div>
+                            <div class="text-white font-medium">Port Scan Detected</div>
+                            <div class="text-sm text-cyber-text">192.168.1.100</div>
+                        </div>
+                        <span class="severity-medium">MEDIUM</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-cyber-dark-tertiary rounded">
+                        <div>
+                            <div class="text-white font-medium">Failed Login</div>
+                            <div class="text-sm text-cyber-text">203.0.113.42</div>
+                        </div>
+                        <span class="severity-high">HIGH</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-cyber-dark-tertiary rounded">
+                        <div>
+                            <div class="text-white font-medium">Malware Blocked</div>
+                            <div class="text-sm text-cyber-text">Email Gateway</div>
+                        </div>
+                        <span class="severity-critical">CRITICAL</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Quick Actions -->
+<section class="py-16 bg-gradient-to-r from-cyber-dark-secondary to-cyber-dark-tertiary">
+    <div class="container mx-auto px-6">
+        <div class="text-center mb-12">
+            <h2 class="text-4xl font-bold mb-4">Quick Actions</h2>
+            <p class="text-xl text-cyber-text">Launch security operations with a single click</p>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <button onclick="startQuickScan()" class="cyber-card text-center hover:transform hover:scale-105 transition-all cursor-pointer">
+                <i class="fas fa-bolt text-3xl text-cyber-accent mb-4"></i>
+                <h4 class="font-bold mb-2">Quick Scan</h4>
+                <p class="text-sm text-cyber-text">Fast security assessment</p>
+            </button>
+
+            <button onclick="checkThreatFeeds()" class="cyber-card text-center hover:transform hover:scale-105 transition-all cursor-pointer">
+                <i class="fas fa-rss text-3xl text-cyber-blue mb-4"></i>
+                <h4 class="font-bold mb-2">Threat Feeds</h4>
+                <p class="text-sm text-cyber-text">Update threat intelligence</p>
+            </button>
+
+            <button onclick="generateReport()" class="cyber-card text-center hover:transform hover:scale-105 transition-all cursor-pointer">
+                <i class="fas fa-chart-bar text-3xl text-cyber-success mb-4"></i>
+                <h4 class="font-bold mb-2">Security Report</h4>
+                <p class="text-sm text-cyber-text">Generate compliance report</p>
+            </button>
+
+            <button onclick="systemDiagnostics()" class="cyber-card text-center hover:transform hover:scale-105 transition-all cursor-pointer">
+                <i class="fas fa-stethoscope text-3xl text-cyber-warning mb-4"></i>
+                <h4 class="font-bold mb-2">Diagnostics</h4>
+                <p class="text-sm text-cyber-text">System health check</p>
+            </button>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Real-time dashboard updates
+    let scanCount = 0;
+    let threatsBlocked = 247;
+
+    // Initialize dashboard
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeDashboard();
+        animateCounters();
+    });
+
+    function initializeDashboard() {
+        console.log('🚀 CyberSec Professional Suite initialized');
+        console.log('🛡️ Real-time monitoring active');
+        console.log('🔒 Quantum encryption ready');
+
+        // Simulate real-time threat detection
+        setInterval(updateThreatCounter, 5000);
+        setInterval(addSecurityEvent, 10000);
+    }
+
+    function animateCounters() {
+        // Animate counter numbers
+        const counters = document.querySelectorAll('.stat-number');
+        counters.forEach(counter => {
+            const target = parseInt(counter.textContent.replace(/[^0-9]/g, ''));
+            let current = 0;
+            const increment = target / 100;
+
+            const updateCounter = () => {
+                if (current < target) {
+                    current += increment;
+                    if (counter.id === 'uptime') {
+                        counter.textContent = (current / target * 99.9).toFixed(1) + '%';
+                    } else {
+                        counter.textContent = Math.floor(current);
+                    }
+                    requestAnimationFrame(updateCounter);
+                }
+            };
+
+            updateCounter();
+        });
+    }
+
+    function updateThreatCounter() {
+        threatsBlocked += Math.floor(Math.random() * 3);
+        document.getElementById('threats-detected').textContent = threatsBlocked;
+    }
+
+    function addSecurityEvent() {
+        const events = [
+            { type: 'Suspicious Login', source: '203.0.113.' + Math.floor(Math.random() * 255), severity: 'HIGH' },
+            { type: 'Port Scan', source: '192.168.1.' + Math.floor(Math.random() * 255), severity: 'MEDIUM' },
+            { type: 'Malware Blocked', source: 'Email Gateway', severity: 'CRITICAL' },
+            { type: 'Policy Violation', source: 'Endpoint-' + Math.floor(Math.random() * 100), severity: 'LOW' }
+        ];
+
+        const randomEvent = events[Math.floor(Math.random() * events.length)];
+        const eventsContainer = document.getElementById('securityEvents');
+
+        const newEvent = document.createElement('div');
+        newEvent.className = 'flex items-center justify-between p-3 bg-cyber-dark-tertiary rounded fade-in';
+        newEvent.innerHTML = `
+            <div>
+                <div class="text-white font-medium">${randomEvent.type}</div>
+                <div class="text-sm text-cyber-text">${randomEvent.source}</div>
+            </div>
+            <span class="severity-${randomEvent.severity.toLowerCase()}">${randomEvent.severity}</span>
+        `;
+
+        eventsContainer.insertBefore(newEvent, eventsContainer.firstChild);
+
+        // Keep only the latest 3 events
+        if (eventsContainer.children.length > 3) {
+            eventsContainer.removeChild(eventsContainer.lastChild);
+        }
+    }
+
+    // Quick action functions
+    function startQuickScan() {
+        showLoading();
+        setTimeout(() => {
+            hideLoading();
+            alert('Quick scan initiated successfully!\nRedirecting to scanner dashboard...');
+            window.location.href = '/dashboard/scanner';
+        }, 2000);
+    }
+
+    function checkThreatFeeds() {
+        showLoading();
+        setTimeout(() => {
+            hideLoading();
+            alert('Threat intelligence feeds updated successfully!\n\n' +
+                  '• 2,547 new IOCs processed\n' +
+                  '• 15 high-priority threats identified\n' +
+                  '• Database updated with latest signatures');
+        }, 2000);
+    }
+
+    function generateReport() {
+        showLoading();
+        setTimeout(() => {
+            hideLoading();
+            const reportData = {
+                vulnerabilities: Math.floor(Math.random() * 50),
+                threats: Math.floor(Math.random() * 20),
+                compliance_score: (85 + Math.random() * 10).toFixed(1)
+            };
+
+            showTerminal(`
+<div class="text-cyber-accent">╔══════════════════════════════════════════════╗</div>
+<div class="text-cyber-accent">║           CYBERSEC SECURITY REPORT          ║</div>
+<div class="text-cyber-accent">╚══════════════════════════════════════════════╝</div>
+
+<div class="text-white">Report Generated: ${new Date().toLocaleString()}</div>
+
+<div class="text-cyber-accent">SECURITY OVERVIEW:</div>
+<div class="text-green-400">✓ Systems Scanned: 12</div>
+<div class="text-green-400">✓ Vulnerabilities Found: ${reportData.vulnerabilities}</div>
+<div class="text-yellow-400">! Threats Detected: ${reportData.threats}</div>
+<div class="text-green-400">✓ Compliance Score: ${reportData.compliance_score}%</div>
+
+<div class="text-cyber-accent">STATUS: </div><span class="text-green-400">SECURE</span>
+            `);
+        }, 1500);
+    }
+
+    function systemDiagnostics() {
+        showLoading();
+        setTimeout(() => {
+            hideLoading();
+            showTerminal(`
+<div class="text-cyber-accent">╔══════════════════════════════════════════════╗</div>
+<div class="text-cyber-accent">║         SYSTEM DIAGNOSTICS REPORT           ║</div>
+<div class="text-cyber-accent">╚══════════════════════════════════════════════╝</div>
+
+<div class="text-green-400">✓ Network Connectivity: OPERATIONAL</div>
+<div class="text-green-400">✓ Database Status: HEALTHY</div>
+<div class="text-green-400">✓ API Endpoints: RESPONDING</div>
+<div class="text-green-400">✓ Threat Intel Feeds: UPDATED</div>
+<div class="text-green-400">✓ Encryption Services: ACTIVE</div>
+<div class="text-green-400">✓ Background Services: RUNNING</div>
+
+<div class="text-cyber-accent">SYSTEM STATUS: </div><span class="text-green-400">OPTIMAL</span>
+            `);
+        }, 2000);
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: cybervault-unified
+    env: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python startup.py"
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: LOG_LEVEL
+        value: INFO
+      - key: API_VERSION
+        value: v2
+      - key: PYTHONPATH
+        value: ".:backend/python"

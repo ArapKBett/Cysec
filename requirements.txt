@@ -1,0 +1,60 @@
+# Core Framework
+flask==3.0.3
+flask-restful==0.3.10
+flask-jwt-extended==4.6.0
+flask-cors==4.0.1
+flask-compress==1.15
+flask-limiter==3.8.0
+flask-caching==2.1.0
+gunicorn==21.2.0
+
+# Security & Cryptography
+cryptography==42.0.5
+pycryptodome==3.20.0
+bcrypt==4.1.3
+passlib==1.7.4
+pyotp==2.9.0
+qrcode==7.4.2
+
+# Network Analysis & Scanning
+python-nmap==0.7.1
+netaddr==1.2.1
+dnspython==2.6.1
+requests==2.31.0
+aiohttp==3.9.5
+httpx==0.27.0
+
+# Threat Intelligence & OSINT
+virustotal-api==1.1.11
+shodan==1.31.0
+python-whois==0.9.4
+greynoise==2.3.0
+
+# Password & Hash Analysis
+zxcvbn==4.4.28
+
+# Database & Storage
+sqlalchemy==2.0.30
+redis==5.0.4
+flask-sqlalchemy==3.1.1
+
+# Monitoring & Logging
+prometheus-client==0.20.0
+structlog==24.1.0
+
+# Data Processing
+pandas==2.2.2
+numpy==1.26.4
+
+# Web Scraping & OSINT
+beautifulsoup4==4.12.3
+
+# Real-time Communication
+flask-socketio==5.3.6
+
+# Configuration & Environment
+python-dotenv==1.0.1
+python-decouple==3.8
+
+# Performance
+gevent==24.2.1

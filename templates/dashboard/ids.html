@@ -1,0 +1,863 @@
+{% extends "base.html" %}
+
+{% block title %}Intrusion Detection System - CyberSec Suite{% endblock %}
+
+{% block content %}
+<div class="cyber-grid-container">
+    <!-- Header Section -->
+    <div class="cyber-header">
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h1 class="text-4xl font-bold mb-2 text-effect-glow">
+                    <i class="fas fa-shield-virus text-cyber-accent mr-4"></i>
+                    Intrusion Detection System
+                </h1>
+                <p class="text-xl text-cyber-text">AI-powered behavioral analysis and real-time threat detection</p>
+            </div>
+            <div class="flex space-x-4">
+                <button class="btn-cyber" onclick="toggleLiveMonitoring()">
+                    <i class="fas fa-play mr-2"></i><span id="monitoringBtn">Start Monitoring</span>
+                </button>
+                <button class="btn-cyber bg-cyber-warning" onclick="generateIDSReport()">
+                    <i class="fas fa-chart-line mr-2"></i>Generate Report
+                </button>
+            </div>
+        </div>
+
+        <!-- Real-time Status Panel -->
+        <div class="grid grid-cols-4 gap-6 mb-8">
+            <div class="cyber-card bg-gradient-to-br from-cyber-success/20 to-transparent">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="text-2xl font-bold text-cyber-success" id="normal-events">12,547</div>
+                        <div class="text-sm text-cyber-text">Normal Events</div>
+                    </div>
+                    <i class="fas fa-check-circle text-3xl text-cyber-success/50"></i>
+                </div>
+            </div>
+            <div class="cyber-card bg-gradient-to-br from-cyber-warning/20 to-transparent">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="text-2xl font-bold text-cyber-warning" id="suspicious-events">47</div>
+                        <div class="text-sm text-cyber-text">Suspicious Events</div>
+                    </div>
+                    <i class="fas fa-exclamation-triangle text-3xl text-cyber-warning/50"></i>
+                </div>
+            </div>
+            <div class="cyber-card bg-gradient-to-br from-cyber-error/20 to-transparent">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="text-2xl font-bold text-cyber-error" id="threats-detected">8</div>
+                        <div class="text-sm text-cyber-text">Threats Detected</div>
+                    </div>
+                    <i class="fas fa-skull-crossbones text-3xl text-cyber-error/50"></i>
+                </div>
+            </div>
+            <div class="cyber-card bg-gradient-to-br from-cyber-blue/20 to-transparent">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="text-2xl font-bold text-cyber-blue" id="blocked-attacks">152</div>
+                        <div class="text-sm text-cyber-text">Blocked Attacks</div>
+                    </div>
+                    <i class="fas fa-shield-alt text-3xl text-cyber-blue/50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main IDS Interface -->
+    <div class="grid grid-cols-12 gap-6">
+        <!-- Control Panel -->
+        <div class="col-span-4 space-y-6">
+            <!-- Detection Configuration -->
+            <div class="cyber-card">
+                <h3 class="text-xl font-bold mb-6 text-cyber-accent">
+                    <i class="fas fa-cogs mr-2"></i>Detection Configuration
+                </h3>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-cyber-text mb-2">Detection Sensitivity</label>
+                        <select class="cyber-input" id="sensitivity" onchange="updateSensitivity()">
+                            <option value="low">Low (Fewer false positives)</option>
+                            <option value="medium" selected>Medium (Balanced)</option>
+                            <option value="high">High (Aggressive detection)</option>
+                            <option value="custom">Custom (Advanced users)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-cyber-text mb-2">Network Interfaces</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="form-checkbox text-cyber-accent" checked>
+                                <span class="ml-2 text-sm">eth0 (192.168.1.100)</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="form-checkbox text-cyber-accent">
+                                <span class="ml-2 text-sm">wlan0 (192.168.0.50)</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="form-checkbox text-cyber-accent" checked>
+                                <span class="ml-2 text-sm">lo (127.0.0.1)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-cyber-text mb-2">Detection Methods</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="form-checkbox text-cyber-accent" checked>
+                                <span class="ml-2 text-sm">Signature-based Detection</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="form-checkbox text-cyber-accent" checked>
+                                <span class="ml-2 text-sm">Behavioral Analysis</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="form-checkbox text-cyber-accent" checked>
+                                <span class="ml-2 text-sm">Machine Learning</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="form-checkbox text-cyber-accent">
+                                <span class="ml-2 text-sm">Anomaly Detection</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="form-checkbox text-cyber-accent" checked>
+                                <span class="ml-2 text-sm">Threat Hunting</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alert Configuration -->
+            <div class="cyber-card">
+                <h3 class="text-xl font-bold mb-6 text-cyber-accent">
+                    <i class="fas fa-bell mr-2"></i>Alert Configuration
+                </h3>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-cyber-text mb-2">Alert Threshold</label>
+                        <input type="range" min="1" max="10" value="5" class="w-full" id="alertThreshold" onchange="updateAlertThreshold()">
+                        <div class="text-xs text-cyber-text mt-1">Current: <span id="thresholdValue">5</span>/10</div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-cyber-text mb-2">Notification Methods</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="form-checkbox text-cyber-accent" checked>
+                                <span class="ml-2 text-sm">Dashboard Alerts</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="form-checkbox text-cyber-accent">
+                                <span class="ml-2 text-sm">Email Notifications</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="form-checkbox text-cyber-accent" checked>
+                                <span class="ml-2 text-sm">SIEM Integration</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="form-checkbox text-cyber-accent">
+                                <span class="ml-2 text-sm">Mobile Push</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button class="btn-cyber w-full" onclick="testNotifications()">
+                        <i class="fas fa-test-tube mr-2"></i>Test Notifications
+                    </button>
+                </div>
+            </div>
+
+            <!-- ML Model Status -->
+            <div class="cyber-card">
+                <h3 class="text-xl font-bold mb-6 text-cyber-accent">
+                    <i class="fas fa-brain mr-2"></i>ML Model Status
+                </h3>
+
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center">
+                        <span class="text-cyber-text">Behavioral Model</span>
+                        <span class="text-cyber-success">Active</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-cyber-text">Anomaly Detection</span>
+                        <span class="text-cyber-success">Training</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-cyber-text">Threat Classification</span>
+                        <span class="text-cyber-success">Ready</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-cyber-text">Pattern Recognition</span>
+                        <span class="text-cyber-warning">Updating</span>
+                    </div>
+
+                    <div class="mt-4">
+                        <div class="text-sm text-cyber-text mb-2">Model Accuracy</div>
+                        <div class="progress-cyber">
+                            <div class="progress-bar-cyber" style="width: 94.7%"></div>
+                        </div>
+                        <div class="text-xs text-cyber-text mt-1">94.7% (Excellent)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Real-time Monitoring Display -->
+        <div class="col-span-8">
+            <!-- Live Event Stream -->
+            <div class="cyber-card mb-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold text-cyber-accent">
+                        <i class="fas fa-stream mr-2"></i>Live Event Stream
+                    </h3>
+                    <div class="flex items-center space-x-4">
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 bg-cyber-success rounded-full animate-pulse mr-2"></div>
+                            <span class="text-sm text-cyber-success font-mono" id="liveStatus">MONITORING</span>
+                        </div>
+                        <button class="btn-cyber btn-sm" onclick="clearEvents()">
+                            <i class="fas fa-trash mr-1"></i>Clear
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-cyber-dark border border-cyber-accent/30 rounded-lg p-4 h-96 overflow-y-auto font-mono text-sm" id="eventStream">
+                    <div class="text-cyber-accent">[2026-05-24 18:45:32] IDS ENGINE INITIALIZED</div>
+                    <div class="text-cyber-success">[2026-05-24 18:45:33] Behavioral models loaded successfully</div>
+                    <div class="text-cyber-blue">[2026-05-24 18:45:34] Network monitoring active on 3 interfaces</div>
+                    <div class="text-cyber-warning">[2026-05-24 18:45:35] Suspicious activity pattern detected: 192.168.1.247</div>
+                    <div class="text-cyber-error">[2026-05-24 18:45:36] THREAT DETECTED: Port scan from 203.0.113.42</div>
+                    <div class="text-cyber-success">[2026-05-24 18:45:37] Auto-mitigation applied: IP blocked</div>
+                </div>
+            </div>
+
+            <!-- Threat Analysis Dashboard -->
+            <div class="grid grid-cols-2 gap-6">
+                <div class="cyber-card">
+                    <h3 class="text-lg font-bold mb-4 text-cyber-accent">
+                        <i class="fas fa-chart-area mr-2"></i>Attack Patterns
+                    </h3>
+                    <canvas id="attackPatternsChart" width="400" height="200"></canvas>
+                </div>
+
+                <div class="cyber-card">
+                    <h3 class="text-lg font-bold mb-4 text-cyber-accent">
+                        <i class="fas fa-globe mr-2"></i>Geographic Threats
+                    </h3>
+                    <canvas id="geoThreatsChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+
+            <!-- Detailed Alert Log -->
+            <div class="cyber-card mt-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold text-cyber-accent">
+                        <i class="fas fa-list-alt mr-2"></i>Detailed Alert Log
+                    </h3>
+                    <div class="flex space-x-2">
+                        <select class="cyber-input text-sm" onchange="filterAlerts(this.value)">
+                            <option value="all">All Alerts</option>
+                            <option value="critical">Critical Only</option>
+                            <option value="high">High Priority</option>
+                            <option value="medium">Medium Priority</option>
+                            <option value="low">Low Priority</option>
+                        </select>
+                        <button class="btn-cyber btn-sm" onclick="exportAlerts()">
+                            <i class="fas fa-download mr-1"></i>Export
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="border-b border-cyber-accent/30">
+                                <th class="text-left py-3 px-4 text-cyber-accent">Timestamp</th>
+                                <th class="text-left py-3 px-4 text-cyber-accent">Source IP</th>
+                                <th class="text-left py-3 px-4 text-cyber-accent">Alert Type</th>
+                                <th class="text-left py-3 px-4 text-cyber-accent">Severity</th>
+                                <th class="text-left py-3 px-4 text-cyber-accent">Status</th>
+                                <th class="text-left py-3 px-4 text-cyber-accent">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="alertsTable">
+                            <tr class="border-b border-cyber-dark-tertiary hover:bg-cyber-dark-tertiary/50">
+                                <td class="py-3 px-4 font-mono">18:45:36.247</td>
+                                <td class="py-3 px-4 font-mono">203.0.113.42</td>
+                                <td class="py-3 px-4">Port Scan Attack</td>
+                                <td class="py-3 px-4">
+                                    <span class="severity-critical">CRITICAL</span>
+                                </td>
+                                <td class="py-3 px-4 text-cyber-success">Blocked</td>
+                                <td class="py-3 px-4">
+                                    <button class="btn-cyber btn-sm" onclick="investigateAlert(1)">
+                                        <i class="fas fa-search mr-1"></i>Investigate
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr class="border-b border-cyber-dark-tertiary hover:bg-cyber-dark-tertiary/50">
+                                <td class="py-3 px-4 font-mono">18:44:15.891</td>
+                                <td class="py-3 px-4 font-mono">192.168.1.247</td>
+                                <td class="py-3 px-4">Suspicious Behavior</td>
+                                <td class="py-3 px-4">
+                                    <span class="severity-high">HIGH</span>
+                                </td>
+                                <td class="py-3 px-4 text-cyber-warning">Monitoring</td>
+                                <td class="py-3 px-4">
+                                    <button class="btn-cyber btn-sm" onclick="investigateAlert(2)">
+                                        <i class="fas fa-search mr-1"></i>Investigate
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr class="border-b border-cyber-dark-tertiary hover:bg-cyber-dark-tertiary/50">
+                                <td class="py-3 px-4 font-mono">18:43:22.156</td>
+                                <td class="py-3 px-4 font-mono">10.0.0.15</td>
+                                <td class="py-3 px-4">Brute Force Login</td>
+                                <td class="py-3 px-4">
+                                    <span class="severity-high">HIGH</span>
+                                </td>
+                                <td class="py-3 px-4 text-cyber-error">Active</td>
+                                <td class="py-3 px-4">
+                                    <button class="btn-cyber btn-sm" onclick="investigateAlert(3)">
+                                        <i class="fas fa-search mr-1"></i>Investigate
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Advanced Analytics Panel -->
+    <div class="grid grid-cols-3 gap-6 mt-8">
+        <div class="cyber-card">
+            <h3 class="text-lg font-bold mb-4 text-cyber-accent">
+                <i class="fas fa-crosshairs mr-2"></i>Threat Hunting
+            </h3>
+            <div class="space-y-4">
+                <input type="text" class="cyber-input" placeholder="Search IOCs, patterns, signatures..." id="huntingQuery">
+                <div class="flex space-x-2">
+                    <button class="btn-cyber flex-1" onclick="startThreatHunt()">
+                        <i class="fas fa-search mr-2"></i>Hunt
+                    </button>
+                    <button class="btn-cyber bg-cyber-warning" onclick="showAdvancedHunting()">
+                        <i class="fas fa-cogs mr-2"></i>Advanced
+                    </button>
+                </div>
+                <div class="text-sm text-cyber-text">
+                    <div class="mb-2 font-medium">Recent Hunts:</div>
+                    <div class="space-y-1">
+                        <div>• Lateral movement patterns</div>
+                        <div>• PowerShell encoded commands</div>
+                        <div>• DNS exfiltration attempts</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="cyber-card">
+            <h3 class="text-lg font-bold mb-4 text-cyber-accent">
+                <i class="fas fa-robot mr-2"></i>ML Insights
+            </h3>
+            <div class="space-y-4">
+                <div class="text-sm">
+                    <div class="text-cyber-text mb-2">Model Performance</div>
+                    <div class="progress-cyber mb-2">
+                        <div class="progress-bar-cyber" style="width: 94%"></div>
+                    </div>
+                    <div class="text-xs text-cyber-text">Accuracy: 94.7%</div>
+                </div>
+
+                <div class="text-sm">
+                    <div class="text-cyber-text mb-2">False Positive Rate</div>
+                    <div class="progress-cyber mb-2">
+                        <div class="progress-bar-cyber bg-cyber-success" style="width: 8%"></div>
+                    </div>
+                    <div class="text-xs text-cyber-text">0.8% (Excellent)</div>
+                </div>
+
+                <button class="btn-cyber w-full" onclick="retrainModel()">
+                    <i class="fas fa-sync mr-2"></i>Retrain Model
+                </button>
+            </div>
+        </div>
+
+        <div class="cyber-card">
+            <h3 class="text-lg font-bold mb-4 text-cyber-accent">
+                <i class="fas fa-shield-alt mr-2"></i>Auto-Response
+            </h3>
+            <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                    <span class="text-cyber-text text-sm">Auto IP Blocking</span>
+                    <label class="switch">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-cyber-text text-sm">Quarantine Files</span>
+                    <label class="switch">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-cyber-text text-sm">Kill Processes</span>
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-cyber-text text-sm">Network Isolation</span>
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <button class="btn-cyber w-full bg-cyber-warning" onclick="configureResponse()">
+                    <i class="fas fa-cog mr-2"></i>Configure Rules
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Investigation Modal -->
+<div id="investigationModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden z-50">
+    <div class="flex items-center justify-center h-full">
+        <div class="cyber-card max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-2xl font-bold text-cyber-accent">
+                    <i class="fas fa-search mr-2"></i>Alert Investigation
+                </h3>
+                <button class="text-cyber-accent hover:text-white" onclick="closeInvestigation()">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+
+            <div id="investigationContent">
+                <!-- Investigation details will be populated here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block styles %}
+<style>
+    /* Custom styles for IDS interface */
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 24px;
+    }
+
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #1a1a2e;
+        transition: .4s;
+        border-radius: 24px;
+        border: 1px solid #00d9ff;
+    }
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 2px;
+        bottom: 2px;
+        background-color: #00d9ff;
+        transition: .4s;
+        border-radius: 50%;
+    }
+
+    input:checked + .slider {
+        background-color: #00d9ff;
+    }
+
+    input:checked + .slider:before {
+        transform: translateX(26px);
+        background-color: white;
+    }
+
+    .severity-critical {
+        @apply bg-red-600 text-white px-2 py-1 rounded text-xs font-bold;
+    }
+
+    .severity-high {
+        @apply bg-orange-600 text-white px-2 py-1 rounded text-xs font-bold;
+    }
+
+    .severity-medium {
+        @apply bg-yellow-600 text-white px-2 py-1 rounded text-xs font-bold;
+    }
+
+    .severity-low {
+        @apply bg-blue-600 text-white px-2 py-1 rounded text-xs font-bold;
+    }
+
+    #eventStream {
+        scrollbar-width: thin;
+        scrollbar-color: #00d9ff #1a1a2e;
+    }
+
+    #eventStream::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    #eventStream::-webkit-scrollbar-track {
+        background: #1a1a2e;
+    }
+
+    #eventStream::-webkit-scrollbar-thumb {
+        background: #00d9ff;
+        border-radius: 4px;
+    }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    let isMonitoring = false;
+    let eventStreamInterval;
+    let attackPatternsChart, geoThreatsChart;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeCharts();
+        console.log('🛡️ IDS System initialized');
+    });
+
+    function toggleLiveMonitoring() {
+        isMonitoring = !isMonitoring;
+        const btn = document.getElementById('monitoringBtn');
+        const status = document.getElementById('liveStatus');
+
+        if (isMonitoring) {
+            btn.textContent = 'Stop Monitoring';
+            btn.className = 'btn-cyber bg-cyber-error';
+            status.textContent = 'LIVE MONITORING';
+            status.className = 'text-sm text-cyber-success font-mono animate-pulse';
+            startEventStream();
+            showNotification('Live monitoring started', 'success');
+        } else {
+            btn.textContent = 'Start Monitoring';
+            btn.className = 'btn-cyber';
+            status.textContent = 'STOPPED';
+            status.className = 'text-sm text-cyber-error font-mono';
+            stopEventStream();
+            showNotification('Live monitoring stopped', 'warning');
+        }
+    }
+
+    function startEventStream() {
+        eventStreamInterval = setInterval(() => {
+            addEventToStream();
+            updateCounters();
+        }, 2000);
+    }
+
+    function stopEventStream() {
+        if (eventStreamInterval) {
+            clearInterval(eventStreamInterval);
+        }
+    }
+
+    function addEventToStream() {
+        const events = [
+            { type: 'info', message: 'Network packet analysis completed', color: 'cyber-blue' },
+            { type: 'warning', message: 'Unusual traffic pattern detected: 192.168.1.' + Math.floor(Math.random() * 255), color: 'cyber-warning' },
+            { type: 'success', message: 'ML model prediction: Normal behavior', color: 'cyber-success' },
+            { type: 'error', message: 'Potential intrusion attempt blocked', color: 'cyber-error' },
+            { type: 'info', message: 'Behavioral analysis complete: User profile updated', color: 'cyber-accent' }
+        ];
+
+        const randomEvent = events[Math.floor(Math.random() * events.length)];
+        const timestamp = new Date().toLocaleTimeString();
+        const stream = document.getElementById('eventStream');
+
+        const eventDiv = document.createElement('div');
+        eventDiv.className = `text-${randomEvent.color} animate-slide-in`;
+        eventDiv.textContent = `[${timestamp}] ${randomEvent.message}`;
+
+        stream.appendChild(eventDiv);
+        stream.scrollTop = stream.scrollHeight;
+
+        // Keep only the last 50 events
+        while (stream.children.length > 50) {
+            stream.removeChild(stream.firstChild);
+        }
+    }
+
+    function updateCounters() {
+        // Simulate real-time counter updates
+        const normalEvents = document.getElementById('normal-events');
+        const suspiciousEvents = document.getElementById('suspicious-events');
+        const threatsDetected = document.getElementById('threats-detected');
+        const blockedAttacks = document.getElementById('blocked-attacks');
+
+        normalEvents.textContent = (parseInt(normalEvents.textContent.replace(/,/g, '')) + Math.floor(Math.random() * 5)).toLocaleString();
+
+        if (Math.random() > 0.7) {
+            suspiciousEvents.textContent = parseInt(suspiciousEvents.textContent) + 1;
+        }
+
+        if (Math.random() > 0.9) {
+            threatsDetected.textContent = parseInt(threatsDetected.textContent) + 1;
+            blockedAttacks.textContent = parseInt(blockedAttacks.textContent) + 1;
+        }
+    }
+
+    function initializeCharts() {
+        // Attack Patterns Chart
+        const ctx1 = document.getElementById('attackPatternsChart').getContext('2d');
+        attackPatternsChart = new Chart(ctx1, {
+            type: 'doughnut',
+            data: {
+                labels: ['Port Scans', 'Brute Force', 'Malware', 'DDoS', 'Phishing'],
+                datasets: [{
+                    data: [35, 25, 20, 15, 5],
+                    backgroundColor: ['#00d9ff', '#ff6b6b', '#4ecdc4', '#45b7d1', '#f39c12'],
+                    borderWidth: 2,
+                    borderColor: '#1a1a2e'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { color: '#8892b0', font: { size: 11 } }
+                    }
+                }
+            }
+        });
+
+        // Geographic Threats Chart
+        const ctx2 = document.getElementById('geoThreatsChart').getContext('2d');
+        geoThreatsChart = new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: ['US', 'CN', 'RU', 'BR', 'IN'],
+                datasets: [{
+                    label: 'Threat Origins',
+                    data: [45, 38, 22, 15, 12],
+                    backgroundColor: '#00d9ff',
+                    borderColor: '#0099cc',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { ticks: { color: '#8892b0' } },
+                    y: { ticks: { color: '#8892b0' } }
+                },
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+    }
+
+    function updateSensitivity() {
+        const sensitivity = document.getElementById('sensitivity').value;
+        showNotification(`Detection sensitivity updated: ${sensitivity.toUpperCase()}`, 'success');
+    }
+
+    function updateAlertThreshold() {
+        const threshold = document.getElementById('alertThreshold').value;
+        document.getElementById('thresholdValue').textContent = threshold;
+        showNotification(`Alert threshold updated: ${threshold}/10`, 'info');
+    }
+
+    function testNotifications() {
+        showNotification('Test notification sent successfully!', 'success');
+    }
+
+    function clearEvents() {
+        document.getElementById('eventStream').innerHTML = '<div class="text-cyber-accent">[' + new Date().toLocaleTimeString() + '] Event stream cleared</div>';
+    }
+
+    function investigateAlert(alertId) {
+        const investigations = {
+            1: {
+                title: 'Port Scan Attack Investigation',
+                ip: '203.0.113.42',
+                details: `
+                    <div class="grid grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-bold text-cyber-accent mb-3">Attack Details</h4>
+                            <div class="space-y-2 text-sm">
+                                <div><span class="text-cyber-text">Source IP:</span> 203.0.113.42</div>
+                                <div><span class="text-cyber-text">Ports Scanned:</span> 1-65535</div>
+                                <div><span class="text-cyber-text">Duration:</span> 45 seconds</div>
+                                <div><span class="text-cyber-text">Packets:</span> 65,535</div>
+                                <div><span class="text-cyber-text">Protocol:</span> TCP SYN</div>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-cyber-accent mb-3">Threat Intelligence</h4>
+                            <div class="space-y-2 text-sm">
+                                <div><span class="text-cyber-error">Blacklisted:</span> Yes (3 sources)</div>
+                                <div><span class="text-cyber-text">Country:</span> Unknown (TOR)</div>
+                                <div><span class="text-cyber-text">ASN:</span> AS64512</div>
+                                <div><span class="text-cyber-text">Risk Score:</span> 9.2/10</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-6">
+                        <h4 class="font-bold text-cyber-accent mb-3">Response Actions</h4>
+                        <div class="flex space-x-2">
+                            <button class="btn-cyber btn-sm bg-cyber-error">Block IP Permanently</button>
+                            <button class="btn-cyber btn-sm bg-cyber-warning">Add to Watchlist</button>
+                            <button class="btn-cyber btn-sm">Generate Report</button>
+                        </div>
+                    </div>
+                `
+            },
+            2: {
+                title: 'Suspicious Behavior Analysis',
+                ip: '192.168.1.247',
+                details: `
+                    <div class="space-y-4">
+                        <div>
+                            <h4 class="font-bold text-cyber-accent mb-3">Behavioral Anomalies Detected</h4>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between">
+                                    <span>Unusual login times</span>
+                                    <span class="text-cyber-warning">Medium Risk</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Excessive file access</span>
+                                    <span class="text-cyber-error">High Risk</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Unknown application usage</span>
+                                    <span class="text-cyber-warning">Medium Risk</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-cyber-accent mb-3">ML Analysis</h4>
+                            <p class="text-sm text-cyber-text">Confidence: 78% - User behavior deviates significantly from established baseline profile.</p>
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        const investigation = investigations[alertId];
+        if (investigation) {
+            document.getElementById('investigationContent').innerHTML = `
+                <h4 class="text-xl font-bold mb-4">${investigation.title}</h4>
+                ${investigation.details}
+            `;
+            document.getElementById('investigationModal').classList.remove('hidden');
+        }
+    }
+
+    function closeInvestigation() {
+        document.getElementById('investigationModal').classList.add('hidden');
+    }
+
+    function generateIDSReport() {
+        showLoading();
+        setTimeout(() => {
+            hideLoading();
+            showTerminal(`
+<div class="text-cyber-accent">╔══════════════════════════════════════════════╗</div>
+<div class="text-cyber-accent">║       INTRUSION DETECTION SYSTEM REPORT     ║</div>
+<div class="text-cyber-accent">╚══════════════════════════════════════════════╝</div>
+
+<div class="text-white">Report Generated: ${new Date().toLocaleString()}</div>
+<div class="text-white">Monitoring Period: Last 24 Hours</div>
+
+<div class="text-cyber-accent mt-4">THREAT SUMMARY:</div>
+<div class="text-cyber-success">✓ Events Processed: 12,547</div>
+<div class="text-cyber-warning">! Suspicious Activities: 47</div>
+<div class="text-cyber-error">⚠ Critical Threats: 8</div>
+<div class="text-cyber-success">✓ Attacks Blocked: 152</div>
+
+<div class="text-cyber-accent mt-4">TOP THREAT TYPES:</div>
+<div class="text-white">1. Port Scanning (35%)</div>
+<div class="text-white">2. Brute Force Attacks (25%)</div>
+<div class="text-white">3. Malware Downloads (20%)</div>
+<div class="text-white">4. DDoS Attempts (15%)</div>
+<div class="text-white">5. Phishing (5%)</div>
+
+<div class="text-cyber-accent mt-4">SYSTEM STATUS:</div>
+<div class="text-cyber-success">✓ IDS Engine: OPERATIONAL</div>
+<div class="text-cyber-success">✓ ML Models: 94.7% Accuracy</div>
+<div class="text-cyber-success">✓ Auto-Response: ACTIVE</div>
+
+<div class="text-cyber-accent mt-4">OVERALL STATUS: </div><span class="text-cyber-success">SECURE</span>
+            `);
+        }, 2000);
+    }
+
+    function startThreatHunt() {
+        const query = document.getElementById('huntingQuery').value;
+        if (!query) {
+            showNotification('Please enter a search query', 'warning');
+            return;
+        }
+
+        showLoading();
+        setTimeout(() => {
+            hideLoading();
+            showNotification(`Threat hunt initiated: "${query}"`, 'success');
+        }, 1500);
+    }
+
+    function showAdvancedHunting() {
+        showNotification('Advanced hunting interface coming soon...', 'info');
+    }
+
+    function retrainModel() {
+        showLoading();
+        setTimeout(() => {
+            hideLoading();
+            showNotification('ML model retraining initiated - this may take several hours', 'success');
+        }, 2000);
+    }
+
+    function configureResponse() {
+        showNotification('Auto-response configuration panel opened', 'info');
+    }
+
+    function filterAlerts(severity) {
+        showNotification(`Filtering alerts by: ${severity}`, 'info');
+    }
+
+    function exportAlerts() {
+        showNotification('Alert log exported successfully', 'success');
+    }
+</script>
+{% endblock %}

@@ -1,12 +1,14 @@
-# 🛡️ CyberVault Security Platform v2.0
+# 🛡️ CyberVault Unified Security Platform v2.1
 
 <div align="center">
 
-![CyberVault Logo](https://img.shields.io/badge/CyberVault-v2.0-00d4ff?style=for-the-badge&logo=shield&logoColor=white)
+![CyberVault Logo](https://img.shields.io/badge/CyberVault-v2.1-00d4ff?style=for-the-badge&logo=shield&logoColor=white)
 ![Security](https://img.shields.io/badge/Security-Operations-00ff88?style=for-the-badge&logo=security&logoColor=white)
-![Platform](https://img.shields.io/badge/Platform-Multiplatform-ff6b00?style=for-the-badge&logo=windows&logoColor=white)
+![Platform](https://img.shields.io/badge/Platform-Unified-ff6b00?style=for-the-badge&logo=windows&logoColor=white)
+![Python](https://img.shields.io/badge/Python-Flask-3776ab?style=for-the-badge&logo=python&logoColor=white)
+![C++](https://img.shields.io/badge/C++-Native-00599c?style=for-the-badge&logo=c%2B%2B&logoColor=white)
 
-**Industrial-Grade Cybersecurity Operations Terminal with Advanced File Management**
+**Enterprise Cybersecurity Platform - Python Backend + Native C/C++ Performance**
 
 [🚀 Live Demo](https://cybervault.onrender.com) | [📖 Local Setup](LOCAL_DEVELOPMENT.md) | [🐛 Issues](https://github.com/arapbett/cybervault/issues)
 
@@ -14,37 +16,35 @@
 
 ---
 
-## 🌟 **Features**
+## 🌟 **Unified Platform Features**
 
-### 🔒 **Advanced Encryption System**
-- **AES-256-CBC** encryption with PBKDF2 key derivation (10,000 iterations)
-- **Multiple file selection** methods:
-  - 📁 **Interactive file browser** with visual navigation
-  - 📤 **Local file upload** with drag-drop support
-  - ⌨️ **Manual path entry** with quick suggestions
-- **Secure memory clearing** and random salt/IV generation
+### 🔒 **Dual-Layer Encryption System**
+- **Native C Implementation**: High-performance AES-256-CBC with PBKDF2 (10,000 iterations)
+- **Python Advanced Crypto**: Quantum-resistant encryption algorithms
+- **Multiple interfaces**: REST API, Web UI, and direct binary access
+- **Enterprise key management** with secure derivation and storage
 - **Real-time validation** and comprehensive error handling
 
-### 🌐 **Network Security Scanner**
-- **Real-time packet analysis** (TCP/UDP/ICMP classification)
-- **Auto-interface detection** across all platforms (Linux/macOS/Windows)
-- **Traffic monitoring** with source/destination IP tracking
-- **Port analysis** and comprehensive network statistics
-- **JSON-structured output** for API integration
+### 🌐 **Multi-Mode Network Analysis**
+- **Native C++ Sniffer**: Real-time packet capture and analysis
+- **Python Advanced Scanner**: Comprehensive network reconnaissance
+- **Threat Intelligence**: Integration with VirusTotal, Shodan, GreyNoise
+- **Vulnerability Assessment**: Automated security testing
+- **OSINT Capabilities**: Open-source intelligence gathering
 
-### 📁 **Professional File Management**
-- **Server-side file browser** with security validation
-- **Directory traversal protection** and path sanitization
-- **Visual file/folder navigation** with metadata display
-- **Common path shortcuts** (/tmp, /home, /var, etc.)
-- **Permission checking** and file type detection
+### 🛡️ **Enterprise Security Suite**
+- **Advanced Scanning**: Port scanning, service detection, OS fingerprinting
+- **Malware Analysis**: Static and dynamic analysis capabilities
+- **Incident Response**: Security event correlation and response
+- **Compliance Monitoring**: SOC2, GDPR, HIPAA compliance tracking
+- **Real-time Dashboards**: Professional SOC-inspired interfaces
 
-### 🎨 **Cyberpunk Interface**
-- **Dark robotics theme** with neon cyber accents
-- **Real-time system monitoring** and status displays
-- **Professional SOC-inspired** navigation and layouts
-- **Responsive design** optimized for security operations
-- **Animated cyber effects** and visual feedback
+### 🚀 **Performance & Architecture**
+- **Hybrid Backend**: Python Flask + Native C/C++ binaries
+- **Microservices Ready**: Containerized deployment support
+- **Cloud-Native**: Optimized for Render, AWS, GCP, Azure
+- **High Availability**: Load balancing and failover capabilities
+- **API-First Design**: RESTful APIs with comprehensive documentation
 
 ---
 

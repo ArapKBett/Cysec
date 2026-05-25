@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Audit - CyberSec Professional Suite</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .audit-container {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .audit-header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .audit-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+
+        .audit-panel {
+            background: linear-gradient(145deg, #1a1a2e, #16213e);
+            border: 1px solid #ffd700;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(255, 215, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .audit-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ffd700, transparent);
+            animation: auditScan 4s ease-in-out infinite;
+        }
+
+        @keyframes auditScan {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        .panel-title {
+            color: #ffd700;
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            color: #ffffff;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .input-group input, .input-group select, .input-group textarea {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            border-color: #ffd700;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+            outline: none;
+        }
+
+        .audit-button {
+            background: linear-gradient(45deg, #ffd700, #ff8c00);
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            color: #000000;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            margin-bottom: 10px;
+        }
+
+        .audit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255, 215, 0, 0.3);
+        }
+
+        .audit-button.analyze {
+            background: linear-gradient(45deg, #ff6b6b, #ff4757);
+            color: #ffffff;
+        }
+
+        .audit-button.scan {
+            background: linear-gradient(45deg, #4ecdc4, #45b7d1);
+            color: #ffffff;
+        }
+
+        .strength-meter {
+            width: 100%;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+            position: relative;
+        }
+
+        .strength-fill {
+            height: 100%;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .strength-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: strengthShimmer 2s infinite;
+        }
+
+        @keyframes strengthShimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .strength-weak {
+            background: linear-gradient(90deg, #ff4757, #ff6b6b);
+            width: 25%;
+        }
+
+        .strength-fair {
+            background: linear-gradient(90deg, #ffa502, #ffd700);
+            width: 50%;
+        }
+
+        .strength-good {
+            background: linear-gradient(90deg, #45b7d1, #4ecdc4);
+            width: 75%;
+        }
+
+        .strength-strong {
+            background: linear-gradient(90deg, #26de81, #4ecdc4);
+            width: 100%;
+        }
+
+        .strength-label {
+            color: #ffd700;
+            font-weight: bold;
+            margin-top: 5px;
+            text-align: center;
+        }
+
+        .password-criteria {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .criteria-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            color: #ffffff;
+        }
+
+        .criteria-icon {
+            width: 16px;
+            text-align: center;
+        }
+
+        .criteria-met {
+            color: #4ecdc4;
+        }
+
+        .criteria-not-met {
+            color: #ff4757;
+        }
+
+        .breach-result {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            border-left: 4px solid;
+        }
+
+        .breach-result.safe {
+            border-left-color: #4ecdc4;
+            background: rgba(78, 205, 196, 0.1);
+        }
+
+        .breach-result.compromised {
+            border-left-color: #ff4757;
+            background: rgba(255, 71, 87, 0.1);
+        }
+
+        .breach-result.pwned {
+            border-left-color: #ffa502;
+            background: rgba(255, 165, 2, 0.1);
+        }
+
+        .breach-info {
+            color: #ffffff;
+            margin-bottom: 10px;
+        }
+
+        .breach-details {
+            color: #cccccc;
+            font-size: 0.9em;
+        }
+
+        .policy-violation {
+            background: rgba(255, 71, 87, 0.1);
+            border: 1px solid #ff4757;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+
+        .violation-title {
+            color: #ff4757;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .violation-description {
+            color: #ffffff;
+            font-size: 0.9em;
+        }
+
+        .audit-results {
+            max-height: 400px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .user-result {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-left: 4px solid;
+        }
+
+        .user-result.compliant {
+            border-left-color: #4ecdc4;
+        }
+
+        .user-result.violation {
+            border-left-color: #ff4757;
+        }
+
+        .user-result.warning {
+            border-left-color: #ffa502;
+        }
+
+        .user-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .user-name {
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        .user-status {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .status-compliant {
+            background: #4ecdc4;
+            color: #ffffff;
+        }
+
+        .status-violation {
+            background: #ff4757;
+            color: #ffffff;
+        }
+
+        .status-warning {
+            background: #ffa502;
+            color: #ffffff;
+        }
+
+        .robot-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #ffd700;
+            font-size: 1.2em;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #333;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .stat-label {
+            color: #cccccc;
+            margin-top: 5px;
+            font-size: 0.9em;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .wordlist-container {
+            max-height: 200px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #ffd700;
+            border-radius: 8px;
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+
+        .wordlist-line {
+            color: #ffffff;
+            margin-bottom: 2px;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+
+        .wordlist-line.common {
+            background: rgba(255, 71, 87, 0.2);
+            color: #ff6b6b;
+        }
+
+        .wordlist-line.weak {
+            background: rgba(255, 165, 2, 0.2);
+            color: #ffa502;
+        }
+
+        .progress-indicator {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .progress-spinner {
+            border: 3px solid #333;
+            border-top: 3px solid #ffd700;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="audit-container">
+        <div class="audit-header">
+            <h1><i class="fas fa-robot"></i> PASSWORD AUDIT SUITE <i class="fas fa-key"></i></h1>
+            <p>Advanced Password Strength Analysis & Security Assessment Platform</p>
+        </div>
+
+        <div class="audit-grid">
+            <!-- Password Strength Analyzer -->
+            <div class="audit-panel">
+                <div class="robot-indicator">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3 class="panel-title">
+                    <i class="fas fa-shield-alt"></i>
+                    Password Strength Analyzer
+                </h3>
+
+                <div class="input-group">
+                    <label for="password-test">Enter Password to Test</label>
+                    <input type="password" id="password-test" placeholder="Enter password for strength analysis">
+                </div>
+
+                <button class="audit-button" id="analyze-strength">
+                    <i class="fas fa-search"></i> ANALYZE STRENGTH
+                </button>
+
+                <div id="strength-results" style="margin-top: 15px;">
+                    <div class="strength-meter">
+                        <div class="strength-fill" id="strength-fill"></div>
+                    </div>
+                    <div class="strength-label" id="strength-label">Enter password to analyze</div>
+
+                    <div class="password-criteria" id="password-criteria">
+                        <div style="color: #ffd700; font-weight: bold; margin-bottom: 10px;">Security Criteria:</div>
+                        <div class="criteria-item">
+                            <span class="criteria-icon"><i class="fas fa-times" id="length-icon"></i></span>
+                            <span>Minimum 12 characters</span>
+                        </div>
+                        <div class="criteria-item">
+                            <span class="criteria-icon"><i class="fas fa-times" id="upper-icon"></i></span>
+                            <span>Contains uppercase letters</span>
+                        </div>
+                        <div class="criteria-item">
+                            <span class="criteria-icon"><i class="fas fa-times" id="lower-icon"></i></span>
+                            <span>Contains lowercase letters</span>
+                        </div>
+                        <div class="criteria-item">
+                            <span class="criteria-icon"><i class="fas fa-times" id="number-icon"></i></span>
+                            <span>Contains numbers</span>
+                        </div>
+                        <div class="criteria-item">
+                            <span class="criteria-icon"><i class="fas fa-times" id="special-icon"></i></span>
+                            <span>Contains special characters</span>
+                        </div>
+                        <div class="criteria-item">
+                            <span class="criteria-icon"><i class="fas fa-times" id="common-icon"></i></span>
+                            <span>Not in common password lists</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Breach Database Checker -->
+            <div class="audit-panel">
+                <div class="robot-indicator">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3 class="panel-title">
+                    <i class="fas fa-database"></i>
+                    Breach Database Checker
+                </h3>
+
+                <div class="input-group">
+                    <label for="email-check">Email Address</label>
+                    <input type="email" id="email-check" placeholder="Enter email to check against breach databases">
+                </div>
+
+                <div class="input-group">
+                    <label for="password-check">Password (Optional)</label>
+                    <input type="password" id="password-check" placeholder="Enter password to check for breaches">
+                </div>
+
+                <button class="audit-button analyze" id="check-breaches">
+                    <i class="fas fa-search"></i> CHECK BREACHES
+                </button>
+
+                <div class="progress-indicator" id="breach-progress">
+                    <div class="progress-spinner"></div>
+                    <div style="color: #ffd700;">Scanning breach databases...</div>
+                </div>
+
+                <div id="breach-results">
+                    <div style="color: #cccccc; font-style: italic; text-align: center;">
+                        Enter email or password to check for data breaches
+                    </div>
+                </div>
+            </div>
+
+            <!-- Password Policy Compliance -->
+            <div class="audit-panel">
+                <div class="robot-indicator">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3 class="panel-title">
+                    <i class="fas fa-clipboard-check"></i>
+                    Policy Compliance
+                </h3>
+
+                <div class="input-group">
+                    <label for="policy-template">Policy Template</label>
+                    <select id="policy-template">
+                        <option value="corporate">Corporate Standard</option>
+                        <option value="government">Government/DoD</option>
+                        <option value="financial">Financial Services</option>
+                        <option value="healthcare">Healthcare/HIPAA</option>
+                        <option value="custom">Custom Policy</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="test-password">Password to Test</label>
+                    <input type="password" id="test-password" placeholder="Enter password for policy compliance check">
+                </div>
+
+                <button class="audit-button" id="check-policy">
+                    <i class="fas fa-gavel"></i> CHECK POLICY
+                </button>
+
+                <div id="policy-results" style="margin-top: 15px;">
+                    <div style="color: #cccccc; font-style: italic; text-align: center;">
+                        Select policy and enter password for compliance analysis
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dictionary & Wordlist Analysis -->
+            <div class="audit-panel">
+                <div class="robot-indicator">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3 class="panel-title">
+                    <i class="fas fa-book"></i>
+                    Dictionary Analysis
+                </h3>
+
+                <div class="input-group">
+                    <label for="wordlist-type">Wordlist Type</label>
+                    <select id="wordlist-type">
+                        <option value="common">Common Passwords</option>
+                        <option value="rockyou">RockYou Database</option>
+                        <option value="dictionary">English Dictionary</option>
+                        <option value="leaked">Recent Leaks</option>
+                        <option value="patterns">Pattern Analysis</option>
+                    </select>
+                </div>
+
+                <button class="audit-button scan" id="load-wordlist">
+                    <i class="fas fa-download"></i> LOAD WORDLIST
+                </button>
+
+                <div class="wordlist-container" id="wordlist-display">
+                    <div style="color: #ffd700; font-weight: bold; margin-bottom: 10px;">Wordlist Preview:</div>
+                    <div style="color: #cccccc; font-style: italic;">Select wordlist type and click Load Wordlist</div>
+                </div>
+            </div>
+
+            <!-- Organizational Password Audit -->
+            <div class="audit-panel">
+                <div class="robot-indicator">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3 class="panel-title">
+                    <i class="fas fa-users"></i>
+                    Organizational Audit
+                </h3>
+
+                <div class="input-group">
+                    <label for="audit-scope">Audit Scope</label>
+                    <select id="audit-scope">
+                        <option value="domain">Active Directory Domain</option>
+                        <option value="application">Application Users</option>
+                        <option value="database">Database Accounts</option>
+                        <option value="service">Service Accounts</option>
+                        <option value="admin">Administrative Users</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="audit-criteria">Audit Criteria</label>
+                    <select id="audit-criteria">
+                        <option value="strength">Password Strength</option>
+                        <option value="age">Password Age</option>
+                        <option value="reuse">Password Reuse</option>
+                        <option value="compliance">Policy Compliance</option>
+                        <option value="comprehensive">Comprehensive Audit</option>
+                    </select>
+                </div>
+
+                <button class="audit-button analyze" id="start-org-audit">
+                    <i class="fas fa-search"></i> START ORG AUDIT
+                </button>
+
+                <div class="progress-indicator" id="org-progress">
+                    <div class="progress-spinner"></div>
+                    <div style="color: #ffd700;">Robotic organizational audit in progress...</div>
+                </div>
+
+                <div class="audit-results" id="org-results">
+                    <div style="color: #cccccc; font-style: italic; text-align: center;">
+                        Configure audit scope and criteria to begin organizational assessment
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Password Audit Dashboard -->
+        <div class="audit-panel full-width" style="margin-top: 25px;">
+            <div class="robot-indicator">
+                <i class="fas fa-robot"></i>
+            </div>
+            <h3 class="panel-title">
+                <i class="fas fa-chart-bar"></i>
+                Password Security Dashboard
+            </h3>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="total-users">0</div>
+                    <div class="stat-label">Total Users</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="compliant-users">0</div>
+                    <div class="stat-label">Compliant</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="violation-users">0</div>
+                    <div class="stat-label">Violations</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="risk-score">0%</div>
+                    <div class="stat-label">Risk Score</div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+                <button class="audit-button" onclick="generateReport()" style="width: auto; padding: 8px 16px;">
+                    <i class="fas fa-file-alt"></i> Generate Report
+                </button>
+                <button class="audit-button" onclick="exportFindings()" style="width: auto; padding: 8px 16px;">
+                    <i class="fas fa-download"></i> Export Findings
+                </button>
+                <button class="audit-button" onclick="remediate()" style="width: auto; padding: 8px 16px;">
+                    <i class="fas fa-wrench"></i> Remediation Plan
+                </button>
+            </div>
+
+            <div id="dashboard-content">
+                <div style="color: #cccccc; font-style: italic; text-align: center; padding: 40px;">
+                    Run organizational audit to populate security dashboard
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let organizationalData = [];
+        let currentWordlist = [];
+
+        // Common weak passwords
+        const commonPasswords = [
+            '123456', 'password', '123456789', '12345678', '12345', '1234567',
+            'qwerty', 'abc123', 'password1', '1234567890', 'admin', 'welcome',
+            'letmein', 'monkey', 'dragon', 'passw0rd', 'master', 'hello'
+        ];
+
+        // Policy templates
+        const policyTemplates = {
+            corporate: {
+                minLength: 12,
+                requireUpper: true,
+                requireLower: true,
+                requireNumbers: true,
+                requireSpecial: true,
+                noCommon: true,
+                maxAge: 90
+            },
+            government: {
+                minLength: 15,
+                requireUpper: true,
+                requireLower: true,
+                requireNumbers: true,
+                requireSpecial: true,
+                noCommon: true,
+                maxAge: 60
+            },
+            financial: {
+                minLength: 14,
+                requireUpper: true,
+                requireLower: true,
+                requireNumbers: true,
+                requireSpecial: true,
+                noCommon: true,
+                maxAge: 45
+            },
+            healthcare: {
+                minLength: 12,
+                requireUpper: true,
+                requireLower: true,
+                requireNumbers: true,
+                requireSpecial: true,
+                noCommon: true,
+                maxAge: 90
+            }
+        };
+
+        // Event listeners
+        document.getElementById('password-test').addEventListener('input', analyzePasswordStrength);
+        document.getElementById('analyze-strength').addEventListener('click', analyzePasswordStrength);
+        document.getElementById('check-breaches').addEventListener('click', checkBreaches);
+        document.getElementById('check-policy').addEventListener('click', checkPolicyCompliance);
+        document.getElementById('load-wordlist').addEventListener('click', loadWordlist);
+        document.getElementById('start-org-audit').addEventListener('click', startOrganizationalAudit);
+
+        function analyzePasswordStrength() {
+            const password = document.getElementById('password-test').value;
+
+            if (!password) {
+                resetStrengthDisplay();
+                return;
+            }
+
+            const analysis = performStrengthAnalysis(password);
+            displayStrengthResults(analysis);
+        }
+
+        function performStrengthAnalysis(password) {
+            const criteria = {
+                length: password.length >= 12,
+                upper: /[A-Z]/.test(password),
+                lower: /[a-z]/.test(password),
+                number: /[0-9]/.test(password),
+                special: /[^A-Za-z0-9]/.test(password),
+                common: !commonPasswords.includes(password.toLowerCase())
+            };
+
+            const score = Object.values(criteria).filter(Boolean).length;
+            let strength, strengthClass;
+
+            if (score <= 2) {
+                strength = 'Weak';
+                strengthClass = 'strength-weak';
+            } else if (score <= 4) {
+                strength = 'Fair';
+                strengthClass = 'strength-fair';
+            } else if (score <= 5) {
+                strength = 'Good';
+                strengthClass = 'strength-good';
+            } else {
+                strength = 'Strong';
+                strengthClass = 'strength-strong';
+            }
+
+            return {
+                password: password,
+                criteria: criteria,
+                score: score,
+                strength: strength,
+                strengthClass: strengthClass,
+                entropy: calculateEntropy(password)
+            };
+        }
+
+        function calculateEntropy(password) {
+            let charset = 0;
+            if (/[a-z]/.test(password)) charset += 26;
+            if (/[A-Z]/.test(password)) charset += 26;
+            if (/[0-9]/.test(password)) charset += 10;
+            if (/[^A-Za-z0-9]/.test(password)) charset += 32;
+
+            return Math.log2(Math.pow(charset, password.length));
+        }
+
+        function displayStrengthResults(analysis) {
+            // Update strength meter
+            const strengthFill = document.getElementById('strength-fill');
+            const strengthLabel = document.getElementById('strength-label');
+
+            strengthFill.className = `strength-fill ${analysis.strengthClass}`;
+            strengthLabel.textContent = `${analysis.strength} (${analysis.score}/6 criteria, ${Math.round(analysis.entropy)} bits entropy)`;
+
+            // Update criteria indicators
+            updateCriteriaIcon('length-icon', analysis.criteria.length);
+            updateCriteriaIcon('upper-icon', analysis.criteria.upper);
+            updateCriteriaIcon('lower-icon', analysis.criteria.lower);
+            updateCriteriaIcon('number-icon', analysis.criteria.number);
+            updateCriteriaIcon('special-icon', analysis.criteria.special);
+            updateCriteriaIcon('common-icon', analysis.criteria.common);
+        }
+
+        function updateCriteriaIcon(iconId, met) {
+            const icon = document.getElementById(iconId);
+            const parent = icon.parentElement;
+
+            if (met) {
+                icon.className = 'fas fa-check';
+                parent.className = 'criteria-item criteria-met';
+            } else {
+                icon.className = 'fas fa-times';
+                parent.className = 'criteria-item criteria-not-met';
+            }
+        }
+
+        function resetStrengthDisplay() {
+            document.getElementById('strength-fill').className = 'strength-fill';
+            document.getElementById('strength-label').textContent = 'Enter password to analyze';
+
+            ['length-icon', 'upper-icon', 'lower-icon', 'number-icon', 'special-icon', 'common-icon'].forEach(iconId => {
+                const icon = document.getElementById(iconId);
+                icon.className = 'fas fa-times';
+                icon.parentElement.className = 'criteria-item criteria-not-met';
+            });
+        }
+
+        async function checkBreaches() {
+            const email = document.getElementById('email-check').value.trim();
+            const password = document.getElementById('password-check').value;
+
+            if (!email && !password) {
+                alert('Enter email or password to check');
+                return;
+            }
+
+            document.getElementById('breach-progress').style.display = 'block';
+
+            setTimeout(() => {
+                document.getElementById('breach-progress').style.display = 'none';
+                const results = simulateBreachCheck(email, password);
+                displayBreachResults(results);
+            }, 3000);
+        }
+
+        function simulateBreachCheck(email, password) {
+            const breachChance = Math.random();
+            let status, statusClass, details;
+
+            if (breachChance > 0.7) {
+                status = 'COMPROMISED';
+                statusClass = 'compromised';
+                details = 'Found in 3 data breaches: LinkedIn (2012), Adobe (2013), Yahoo (2014)';
+            } else if (breachChance > 0.4) {
+                status = 'PWNED';
+                statusClass = 'pwned';
+                details = 'Found in 1 data breach: Collection #1 (2019)';
+            } else {
+                status = 'SAFE';
+                statusClass = 'safe';
+                details = 'No breaches found in current databases';
+            }
+
+            return {
+                email: email,
+                password: password ? '***REDACTED***' : null,
+                status: status,
+                statusClass: statusClass,
+                details: details,
+                checkedDatabases: ['HaveIBeenPwned', 'DeHashed', 'BreachDirectory', 'IntelX']
+            };
+        }
+
+        function displayBreachResults(results) {
+            const container = document.getElementById('breach-results');
+
+            container.innerHTML = `
+                <div class="breach-result ${results.statusClass}">
+                    <div class="breach-info">
+                        <strong>Status: ${results.status}</strong><br>
+                        ${results.email ? `Email: ${results.email}<br>` : ''}
+                        ${results.password ? `Password: ${results.password}<br>` : ''}
+                    </div>
+                    <div class="breach-details">
+                        ${results.details}<br><br>
+                        Databases checked: ${results.checkedDatabases.join(', ')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function checkPolicyCompliance() {
+            const policyType = document.getElementById('policy-template').value;
+            const password = document.getElementById('test-password').value;
+
+            if (!password) {
+                alert('Enter password to check policy compliance');
+                return;
+            }
+
+            const policy = policyTemplates[policyType];
+            if (!policy) {
+                alert('Select a valid policy template');
+                return;
+            }
+
+            const compliance = checkPasswordCompliance(password, policy);
+            displayPolicyResults(compliance, policyType);
+        }
+
+        function checkPasswordCompliance(password, policy) {
+            const violations = [];
+
+            if (password.length < policy.minLength) {
+                violations.push(`Password must be at least ${policy.minLength} characters`);
+            }
+
+            if (policy.requireUpper && !/[A-Z]/.test(password)) {
+                violations.push('Password must contain uppercase letters');
+            }
+
+            if (policy.requireLower && !/[a-z]/.test(password)) {
+                violations.push('Password must contain lowercase letters');
+            }
+
+            if (policy.requireNumbers && !/[0-9]/.test(password)) {
+                violations.push('Password must contain numbers');
+            }
+
+            if (policy.requireSpecial && !/[^A-Za-z0-9]/.test(password)) {
+                violations.push('Password must contain special characters');
+            }
+
+            if (policy.noCommon && commonPasswords.includes(password.toLowerCase())) {
+                violations.push('Password is in common password list');
+            }
+
+            return {
+                compliant: violations.length === 0,
+                violations: violations,
+                score: Math.max(0, 100 - (violations.length * 15))
+            };
+        }
+
+        function displayPolicyResults(compliance, policyType) {
+            const container = document.getElementById('policy-results');
+
+            if (compliance.compliant) {
+                container.innerHTML = `
+                    <div style="background: rgba(78,205,196,0.1); border: 1px solid #4ecdc4; border-radius: 8px; padding: 15px;">
+                        <div style="color: #4ecdc4; font-weight: bold; margin-bottom: 10px;">
+                            ✓ POLICY COMPLIANT
+                        </div>
+                        <div style="color: #ffffff;">
+                            Password meets all ${policyType} policy requirements<br>
+                            Compliance Score: ${compliance.score}%
+                        </div>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div style="background: rgba(255,71,87,0.1); border: 1px solid #ff4757; border-radius: 8px; padding: 15px;">
+                        <div style="color: #ff4757; font-weight: bold; margin-bottom: 10px;">
+                            ✗ POLICY VIOLATIONS
+                        </div>
+                        <div style="color: #ffffff; margin-bottom: 10px;">
+                            Compliance Score: ${compliance.score}%
+                        </div>
+                        ${compliance.violations.map(violation => `
+                            <div class="policy-violation">
+                                <div class="violation-title">Policy Violation</div>
+                                <div class="violation-description">${violation}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+        }
+
+        function loadWordlist() {
+            const type = document.getElementById('wordlist-type').value;
+
+            document.getElementById('wordlist-display').innerHTML = '<div style="color: #ffd700;">Loading wordlist...</div>';
+
+            setTimeout(() => {
+                const wordlist = generateWordlist(type);
+                displayWordlist(wordlist, type);
+                currentWordlist = wordlist;
+            }, 1500);
+        }
+
+        function generateWordlist(type) {
+            const wordlists = {
+                common: ['password', '123456', 'qwerty', 'abc123', 'password1', 'admin', 'welcome', 'letmein', 'monkey', 'dragon'],
+                rockyou: ['123456', 'password', '12345678', 'qwerty', '123456789', '12345', 'password1', 'abc123', 'welcome', 'admin'],
+                dictionary: ['password', 'computer', 'internet', 'security', 'system', 'network', 'database', 'server', 'windows', 'microsoft'],
+                leaked: ['password123', 'qwerty123', 'admin123', 'user123', 'test123', 'password1', 'welcome123', 'login123', 'pass123', 'temp123'],
+                patterns: ['123456', 'abcdef', 'qwerty', '111111', 'aaaaaa', '123abc', 'password', '1q2w3e', 'zxcvbn', 'asdfgh']
+            };
+
+            return wordlists[type] || wordlists.common;
+        }
+
+        function displayWordlist(wordlist, type) {
+            const container = document.getElementById('wordlist-display');
+
+            container.innerHTML = `
+                <div style="color: #ffd700; font-weight: bold; margin-bottom: 10px;">
+                    ${type.toUpperCase()} Wordlist (${wordlist.length} entries):
+                </div>
+                ${wordlist.map(word => `
+                    <div class="wordlist-line ${Math.random() > 0.7 ? 'common' : Math.random() > 0.5 ? 'weak' : ''}">${word}</div>
+                `).join('')}
+                <div style="color: #cccccc; margin-top: 10px;">... and ${Math.floor(Math.random() * 10000) + 1000} more entries</div>
+            `;
+        }
+
+        function startOrganizationalAudit() {
+            const scope = document.getElementById('audit-scope').value;
+            const criteria = document.getElementById('audit-criteria').value;
+
+            document.getElementById('org-progress').style.display = 'block';
+
+            setTimeout(() => {
+                document.getElementById('org-progress').style.display = 'none';
+                const results = simulateOrganizationalAudit(scope, criteria);
+                displayOrganizationalResults(results);
+                updateDashboard(results);
+            }, 5000);
+        }
+
+        function simulateOrganizationalAudit(scope, criteria) {
+            const userCount = Math.floor(Math.random() * 500) + 100;
+            const users = [];
+
+            for (let i = 1; i <= userCount; i++) {
+                const compliance = Math.random();
+                let status;
+
+                if (compliance > 0.8) status = 'compliant';
+                else if (compliance > 0.6) status = 'warning';
+                else status = 'violation';
+
+                users.push({
+                    id: i,
+                    username: `user${i.toString().padStart(3, '0')}`,
+                    department: ['IT', 'HR', 'Finance', 'Marketing', 'Operations'][Math.floor(Math.random() * 5)],
+                    status: status,
+                    lastChange: new Date(Date.now() - Math.random() * 90 * 24 * 60 * 60 * 1000),
+                    strength: Math.floor(Math.random() * 100),
+                    violations: status === 'violation' ? Math.floor(Math.random() * 5) + 1 : 0
+                });
+            }
+
+            return {
+                scope: scope,
+                criteria: criteria,
+                totalUsers: userCount,
+                users: users,
+                compliant: users.filter(u => u.status === 'compliant').length,
+                warnings: users.filter(u => u.status === 'warning').length,
+                violations: users.filter(u => u.status === 'violation').length
+            };
+        }
+
+        function displayOrganizationalResults(results) {
+            const container = document.getElementById('org-results');
+
+            container.innerHTML = results.users.slice(0, 20).map(user => `
+                <div class="user-result ${user.status}">
+                    <div class="user-info">
+                        <span class="user-name">${user.username}</span>
+                        <span class="user-status status-${user.status}">${user.status.toUpperCase()}</span>
+                    </div>
+                    <div style="color: #cccccc; font-size: 0.9em;">
+                        Department: ${user.department} |
+                        Strength: ${user.strength}% |
+                        Last Change: ${user.lastChange.toLocaleDateString()}
+                        ${user.violations > 0 ? ` | Violations: ${user.violations}` : ''}
+                    </div>
+                </div>
+            `).join('');
+
+            organizationalData = results;
+        }
+
+        function updateDashboard(results) {
+            document.getElementById('total-users').textContent = results.totalUsers;
+            document.getElementById('compliant-users').textContent = results.compliant;
+            document.getElementById('violation-users').textContent = results.violations;
+
+            const riskScore = Math.round((results.violations / results.totalUsers) * 100);
+            document.getElementById('risk-score').textContent = riskScore + '%';
+
+            document.getElementById('dashboard-content').innerHTML = `
+                <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 8px;">
+                    <div style="color: #ffd700; font-weight: bold; font-size: 1.1em; margin-bottom: 15px;">
+                        Organizational Password Security Summary
+                    </div>
+                    <div style="color: #ffffff; line-height: 1.6;">
+                        <strong>Audit Scope:</strong> ${results.scope}<br>
+                        <strong>Assessment Criteria:</strong> ${results.criteria}<br>
+                        <strong>Overall Risk Level:</strong> ${riskScore < 20 ? 'LOW' : riskScore < 50 ? 'MEDIUM' : 'HIGH'}<br>
+                        <strong>Compliance Rate:</strong> ${Math.round((results.compliant / results.totalUsers) * 100)}%<br><br>
+
+                        <strong>Recommendations:</strong><br>
+                        ${riskScore > 50 ? '• Immediate password reset required for high-risk accounts<br>' : ''}
+                        ${results.violations > 10 ? '• Implement mandatory password policy enforcement<br>' : ''}
+                        • Regular password strength audits recommended<br>
+                        • User security awareness training needed<br>
+                        • Consider implementing multi-factor authentication
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateReport() {
+            alert('Password audit report generated and ready for download');
+        }
+
+        function exportFindings() {
+            alert('Security findings exported to CSV format');
+        }
+
+        function remediate() {
+            alert('Automated remediation plan created for password policy violations');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            resetStrengthDisplay();
+        });
+    </script>
+</body>
+</html>

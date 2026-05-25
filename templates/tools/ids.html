@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Intrusion Detection{% endblock %}
+
+{% block content %}
+<div class="tool-interface">
+    <h2 class="mb-4"><i class="fas fa-shield-alt me-2"></i>Intrusion Detection System</h2>
+    
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">System Controls</h5>
+                    <div class="d-grid gap-2">
+                        <button id="startMonitoring" class="btn btn-success">
+                            <i class="fas fa-play me-2"></i>Start Monitoring
+                        </button>
+                        <button id="stopMonitoring" class="btn btn-danger" disabled>
+                            <i class="fas fa-stop me-2"></i>Stop Monitoring
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Detection Statistics</h5>
+                    <div id="idsStats">
+                        <div class="mb-3">
+                            <span class="fw-bold">Total Alerts:</span>
+                            <span id="totalAlerts">0</span>
+                        </div>
+                        <div class="mb-3">
+                            <span class="fw-bold">Last Alert:</span>
+                            <span id="lastAlert">Never</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Security Alerts</h5>
+                    <div id="alertList" class="alert-list">
+                        <div class="list-group" style="max-height: 600px; overflow-y: auto;">
+                            <!-- Alerts will be added here dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const startBtn = document.getElementById('startMonitoring');
+    const stopBtn = document.getElementById('stopMonitoring');
+    const alertList = document.querySelector('#alertList .list-group');
+    const totalAlerts = document.getElementById('totalAlerts');
+    const lastAlert = document.getElementById('lastAlert');
+    let eventSource = null;
+    let alertCount = 0;
+
+    startBtn.addEventListener('click', () => {
+        startBtn.disabled = true;
+        stopBtn.disabled = false;
+        alertCount = 0;
+        totalAlerts.textContent = '0';
+        lastAlert.textContent = 'Never';
+        alertList.innerHTML = '';
+
+        eventSource = new EventSource('/ids/stream');
+        
+        eventSource.onmessage = (event) => {
+            const alert = JSON.parse(event.data);
+            alertCount++;
+            
+            // Update stats
+            totalAlerts.textContent = alertCount;
+            lastAlert.textContent = new Date().toLocaleString();
+            
+            // Add alert to list
+            const alertElement = document.createElement('div');
+            alertElement.className = 'list-group-item list-group-item-danger';
+            alertElement.innerHTML = `
+                <div class="d-flex justify-content-between">
+                    <strong>${alert.description}</strong>
+                    <small>${alert.timestamp}</small>
+                </div>
+                <small class="text-muted">${alert.log_entry}</small>
+            `;
+            alertList.prepend(alertElement);
+        };
+    });
+
+    stopBtn.addEventListener('click', () => {
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+        if(eventSource) eventSource.close();
+    });
+});
+</script>
+{% endblock %}
+{% endblock %}
