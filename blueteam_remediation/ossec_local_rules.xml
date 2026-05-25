@@ -1,0 +1,27 @@
+<!-- Custom OSSEC Rules -->
+<group name="vulnerability_monitoring">
+
+  <!-- SSH brute force detection -->
+  <rule id="100001" level="10">
+    <if_matched_sid>5716</if_matched_sid>
+    <description>SSH brute force attack detected</description>
+    <group>authentication_failures,</group>
+  </rule>
+
+  <!-- Web application attacks -->
+  <rule id="100002" level="12">
+    <decoded_as>web-accesslog</decoded_as>
+    <regex>sql|union|select|drop|insert|update|delete</regex>
+    <description>SQL injection attempt detected</description>
+    <group>web,attack,</group>
+  </rule>
+
+  <!-- Administrative interface access -->
+  <rule id="100003" level="8">
+    <decoded_as>web-accesslog</decoded_as>
+    <url>/admin|/administrator|/wp-admin</url>
+    <description>Administrative interface access attempt</description>
+    <group>web,</group>
+  </rule>
+
+</group>

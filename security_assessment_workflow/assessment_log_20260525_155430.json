@@ -1,0 +1,80 @@
+[
+  {
+    "timestamp": "2026-05-25T15:49:05.392743",
+    "phase": "WORKFLOW",
+    "message": "Starting comprehensive security assessment",
+    "status": "INFO"
+  },
+  {
+    "timestamp": "2026-05-25T15:49:05.392793",
+    "phase": "RECONNAISSANCE",
+    "message": "Starting initial network reconnaissance",
+    "status": "INFO"
+  },
+  {
+    "timestamp": "2026-05-25T15:49:05.439882",
+    "phase": "RECONNAISSANCE",
+    "message": "Network scan completed successfully",
+    "status": "SUCCESS"
+  },
+  {
+    "timestamp": "2026-05-25T15:49:07.440028",
+    "phase": "VULNERABILITY_TESTING",
+    "message": "Starting vulnerability exploitation tests",
+    "status": "INFO"
+  },
+  {
+    "timestamp": "2026-05-25T15:54:26.605421",
+    "phase": "VULNERABILITY_TESTING",
+    "message": "Vulnerability testing completed",
+    "status": "SUCCESS"
+  },
+  {
+    "timestamp": "2026-05-25T15:54:26.606004",
+    "phase": "VULNERABILITY_TESTING",
+    "message": "Report generated: exploit_evidence/redteam_exploit_report_20260525_155426.json",
+    "status": "SUCCESS"
+  },
+  {
+    "timestamp": "2026-05-25T15:54:28.606139",
+    "phase": "REMEDIATION",
+    "message": "Starting automated vulnerability remediation",
+    "status": "INFO"
+  },
+  {
+    "timestamp": "2026-05-25T15:54:28.754403",
+    "phase": "REMEDIATION",
+    "message": "Remediation scripts generated successfully",
+    "status": "SUCCESS"
+  },
+  {
+    "timestamp": "2026-05-25T15:54:28.754804",
+    "phase": "REMEDIATION",
+    "message": "Generated 1 remediation scripts",
+    "status": "SUCCESS"
+  },
+  {
+    "timestamp": "2026-05-25T15:54:30.755022",
+    "phase": "WORKFLOW",
+    "message": "Generating comprehensive reports",
+    "status": "INFO"
+  },
+  {
+    "timestamp": "2026-05-25T15:54:30.755198",
+    "phase": "REPORTING",
+    "message": "Generating executive security dashboard",
+    "status": "INFO"
+  },
+  {
+    "timestamp": "2026-05-25T15:54:30.757771",
+    "phase": "REPORTING",
+    "message": "Executive dashboard created: security_assessment_workflow/security_dashboard_20260525_155430.html",
+    "status": "SUCCESS"
+  },
+  {
+    "timestamp": "2026-05-25T15:54:30.760887",
+    "phase": "REPORTING",
+    "message": "Technical report created: security_assessment_workflow/technical_report_20260525_155430.json",
+    "status": "SUCCESS"
+  }
+]
