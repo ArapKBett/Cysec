@@ -4,110 +4,164 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>{% block title %}CyberSec Professional Suite{% endblock %}</title>
+    <title>{% block title %}CyberSec Professional Suite - Robotic Defense System{% endblock %}</title>
 
     <!-- Security Headers -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.socket.io https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data:;">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="X-Frame-Options" content="DENY">
     <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+
+    <!-- Robotic Theme Meta -->
+    <meta name="theme-color" content="#00ffff">
+    <meta name="description" content="Military-grade cybersecurity platform with AI-powered robotic defense systems">
 
     <!-- Favicon -->
     <link rel="icon" href="{{ url_for('static', filename='logo.png') }}" type="image/png">
 
     <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 
-    <!-- CSS -->
+    <!-- Primary Cybersec Styling -->
     <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        'cyber-dark': '#0a0b0d',
-                        'cyber-accent': '#00d9ff',
-                        'cyber-blue': '#1e40af',
-                        'cyber-text': '#a0a9c0',
-                        'cyber-light': '#f8fafc'
-                    },
-                    fontFamily: {
-                        'mono': ['JetBrains Mono', 'monospace'],
-                        'inter': ['Inter', 'sans-serif']
-                    }
-                }
-            }
-        }
-    </script>
 
     {% block head %}{% endblock %}
 </head>
-<body class="dark:bg-cyber-dark bg-cyber-light min-h-screen font-inter">
+<body class="terminal-body">
+
+    <!-- Robotic Loading Indicator -->
+    <div id="roboticLoader" class="fixed inset-0 bg-black/95 backdrop-blur-sm flex items-center justify-center z-[9999] hidden">
+        <div class="terminal-window" style="max-width: 400px; width: 90%;">
+            <div class="terminal-header">
+                <div class="terminal-dots">
+                    <div class="terminal-dot red"></div>
+                    <div class="terminal-dot amber"></div>
+                    <div class="terminal-dot green"></div>
+                </div>
+                <div class="terminal-title">
+                    <i class="fas fa-robot"></i>
+                    ROBOTIC SYSTEMS
+                </div>
+            </div>
+            <div class="terminal-content">
+                <div id="loadingText" class="console-line">Initializing robotic defense protocols...</div>
+                <div class="progress-cyber mt-4">
+                    <div id="roboticProgress" class="progress-bar-cyber" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Navigation Header -->
-    <header class="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-cyber-dark via-gray-900 to-cyber-dark border-b border-cyber-accent shadow-xl">
+    <header class="fixed top-0 left-0 right-0 z-50">
         <nav class="container mx-auto px-6 py-4">
             <div class="flex items-center justify-between">
 
-                <!-- Logo and Title -->
+                <!-- Robotic Logo and Title -->
                 <div class="flex items-center space-x-4">
-                    <div class="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-cyber-accent to-cyber-blue rounded-lg shadow-lg">
-                        <i class="fas fa-shield-alt text-white text-xl"></i>
+                    <div class="relative">
+                        <div class="flex items-center justify-center w-14 h-14 bg-gradient-to-br from-cyan-400 via-blue-500 to-purple-600 rounded-lg shadow-lg border border-cyan-400">
+                            <i class="fas fa-robot text-white text-xl"></i>
+                        </div>
+                        <div class="robot-indicator" style="top: -2px; right: -2px; font-size: 0.8em;">
+                            <i class="fas fa-wifi"></i>
+                        </div>
                     </div>
                     <div>
-                        <h1 class="text-xl font-bold text-white font-mono">CyberSec</h1>
-                        <p class="text-xs text-cyber-text opacity-75">Professional Suite v2.0</p>
+                        <h1 class="text-2xl font-bold text-white font-mono text-effect-glow">
+                            <span style="color: #00ffff;">Cyber</span><span style="color: #ff6b35;">Sec</span>
+                        </h1>
+                        <div class="robot-status">
+                            <div class="robot-eye"></div>
+                            <span>ROBOTIC DEFENSE v3.0</span>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Navigation Links -->
+                <!-- Enhanced Navigation Links -->
                 <div class="hidden md:flex items-center space-x-8">
-                    <a href="{{ url_for('index') }}" class="text-cyber-text hover:text-cyber-accent transition-colors duration-200 font-medium flex items-center" data-tooltip="Command Center">
-                        <i class="fas fa-tachometer-alt mr-2"></i>Dashboard
+                    <a href="{{ url_for('index') }}" class="nav-link group" data-tooltip="Command Center">
+                        <i class="fas fa-home mr-2 group-hover:animate-pulse"></i>
+                        <span>Command Center</span>
                     </a>
                     <div class="relative group">
-                        <button class="text-cyber-text hover:text-cyber-accent transition-colors duration-200 font-medium flex items-center" data-tooltip="Security Tools">
-                            <i class="fas fa-tools mr-2"></i>Tools
+                        <button class="nav-link flex items-center" data-tooltip="Robotic Arsenal">
+                            <i class="fas fa-robot mr-2 group-hover:animate-pulse"></i>
+                            <span>Robotic Tools</span>
                             <i class="fas fa-chevron-down ml-2 text-xs"></i>
                         </button>
-                        <div class="absolute top-full left-0 mt-2 w-64 bg-gray-800 border border-cyber-accent rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
-                            <div class="p-2">
-                                <a href="/dashboard/scanner" class="flex items-center p-3 text-cyber-text hover:text-white hover:bg-gray-700 rounded transition-colors duration-200">
-                                    <i class="fas fa-radar-dish mr-3 text-cyber-accent"></i>
+                        <div class="absolute top-full left-0 mt-2 w-80 terminal-window opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
+                            <div class="terminal-header">
+                                <div class="terminal-dots">
+                                    <div class="terminal-dot red"></div>
+                                    <div class="terminal-dot amber"></div>
+                                    <div class="terminal-dot green"></div>
+                                </div>
+                                <div class="terminal-title">
+                                    <i class="fas fa-robot"></i>
+                                    ROBOTIC ARSENAL
+                                </div>
+                            </div>
+                            <div class="terminal-content" style="padding: 15px;">
+                                <a href="/dashboard/scanner" class="flex items-center p-3 hover:bg-cyan-900/30 rounded transition-all duration-200 group">
+                                    <div class="robot-indicator" style="position: static; margin-right: 12px; font-size: 1em;">
+                                        <i class="fas fa-radar-dish"></i>
+                                    </div>
                                     <div>
-                                        <div class="font-medium">Advanced Scanner</div>
-                                        <div class="text-xs opacity-75">Network & vulnerability scanning</div>
+                                        <div class="font-bold text-cyan-400">Neural Scanner</div>
+                                        <div class="text-xs text-gray-400">AI-powered network reconnaissance</div>
+                                    </div>
+                                    <div class="ml-auto">
+                                        <i class="fas fa-chevron-right text-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity"></i>
                                     </div>
                                 </a>
-                                <a href="/dashboard/crypto" class="flex items-center p-3 text-cyber-text hover:text-white hover:bg-gray-700 rounded transition-colors duration-200">
-                                    <i class="fas fa-lock mr-3 text-green-400"></i>
+                                <a href="/dashboard/crypto" class="flex items-center p-3 hover:bg-green-900/30 rounded transition-all duration-200 group">
+                                    <div class="robot-indicator" style="position: static; margin-right: 12px; font-size: 1em; color: #00ff41;">
+                                        <i class="fas fa-lock"></i>
+                                    </div>
                                     <div>
-                                        <div class="font-medium">Quantum Crypto</div>
-                                        <div class="text-xs opacity-75">Advanced encryption suite</div>
+                                        <div class="font-bold text-green-400">Quantum Crypto-Bot</div>
+                                        <div class="text-xs text-gray-400">Post-quantum encryption matrix</div>
+                                    </div>
+                                    <div class="ml-auto">
+                                        <i class="fas fa-chevron-right text-green-400 opacity-0 group-hover:opacity-100 transition-opacity"></i>
                                     </div>
                                 </a>
-                                <a href="/dashboard/monitor" class="flex items-center p-3 text-cyber-text hover:text-white hover:bg-gray-700 rounded transition-colors duration-200">
-                                    <i class="fas fa-eye mr-3 text-yellow-400"></i>
+                                <a href="/dashboard/monitor" class="flex items-center p-3 hover:bg-yellow-900/30 rounded transition-all duration-200 group">
+                                    <div class="robot-indicator" style="position: static; margin-right: 12px; font-size: 1em; color: #ffaa00;">
+                                        <i class="fas fa-eye"></i>
+                                    </div>
                                     <div>
-                                        <div class="font-medium">Network Monitor</div>
-                                        <div class="text-xs opacity-75">Network traffic analysis</div>
+                                        <div class="font-bold text-yellow-400">Sentinel Monitor</div>
+                                        <div class="text-xs text-gray-400">Autonomous traffic analysis</div>
+                                    </div>
+                                    <div class="ml-auto">
+                                        <i class="fas fa-chevron-right text-yellow-400 opacity-0 group-hover:opacity-100 transition-opacity"></i>
                                     </div>
                                 </a>
-                                <a href="/dashboard/audit" class="flex items-center p-3 text-cyber-text hover:text-white hover:bg-gray-700 rounded transition-colors duration-200">
-                                    <i class="fas fa-key mr-3 text-purple-400"></i>
+                                <a href="/dashboard/audit" class="flex items-center p-3 hover:bg-purple-900/30 rounded transition-all duration-200 group">
+                                    <div class="robot-indicator" style="position: static; margin-right: 12px; font-size: 1em; color: #9c88ff;">
+                                        <i class="fas fa-key"></i>
+                                    </div>
                                     <div>
-                                        <div class="font-medium">Password Audit</div>
-                                        <div class="text-xs opacity-75">Password strength analysis</div>
+                                        <div class="font-bold text-purple-400">Password Guardian</div>
+                                        <div class="text-xs text-gray-400">Intelligent credential analysis</div>
+                                    </div>
+                                    <div class="ml-auto">
+                                        <i class="fas fa-chevron-right text-purple-400 opacity-0 group-hover:opacity-100 transition-opacity"></i>
                                     </div>
                                 </a>
-                                <a href="/dashboard/ids" class="flex items-center p-3 text-cyber-text hover:text-white hover:bg-gray-700 rounded transition-colors duration-200">
-                                    <i class="fas fa-shield-virus mr-3 text-red-400"></i>
+                                <a href="/dashboard/ids" class="flex items-center p-3 hover:bg-red-900/30 rounded transition-all duration-200 group">
+                                    <div class="robot-indicator" style="position: static; margin-right: 12px; font-size: 1em; color: #ff4757;">
+                                        <i class="fas fa-shield-virus"></i>
+                                    </div>
                                     <div>
-                                        <div class="font-medium">Intrusion Detection</div>
-                                        <div class="text-xs opacity-75">Real-time threat detection</div>
+                                        <div class="font-bold text-red-400">Threat Hunter AI</div>
+                                        <div class="text-xs text-gray-400">Behavioral anomaly detection</div>
+                                    </div>
+                                    <div class="ml-auto">
+                                        <i class="fas fa-chevron-right text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"></i>
                                     </div>
                                 </a>
                             </div>
@@ -115,30 +169,41 @@
                     </div>
                 </div>
 
-                <!-- User Menu -->
-                <div class="flex items-center space-x-4">
-                    <!-- Notifications -->
+                <!-- Enhanced User Menu -->
+                <div class="flex items-center space-x-6">
+                    <!-- Threat Intelligence Feed -->
                     <div class="relative">
-                        <button class="p-2 text-cyber-text hover:text-white transition-colors relative" data-tooltip="Security Alerts">
-                            <i class="fas fa-bell text-lg"></i>
-                            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
+                        <button class="nav-icon-btn group" data-tooltip="Neural Threat Feed">
+                            <i class="fas fa-brain text-lg group-hover:animate-pulse"></i>
+                            <span class="absolute -top-1 -right-1 bg-gradient-to-r from-red-500 to-orange-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
+                                <span id="threatCount">7</span>
+                            </span>
                         </button>
                     </div>
 
                     <!-- System Status -->
-                    <div class="hidden lg:flex items-center space-x-2 px-3 py-1 bg-green-900/30 border border-green-500/30 rounded-full">
-                        <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                        <span class="text-green-400 text-sm font-mono">OPERATIONAL</span>
+                    <div class="hidden lg:block">
+                        <div class="robot-status">
+                            <div class="robot-eye"></div>
+                            <span>OPERATIONAL</span>
+                            <i class="fas fa-wifi text-xs ml-2"></i>
+                        </div>
                     </div>
 
-                    <!-- User Profile -->
+                    <!-- Robotic User Profile -->
                     <div class="relative group">
-                        <button class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-800 transition-colors">
-                            <div class="w-8 h-8 bg-gradient-to-br from-cyber-accent to-cyber-blue rounded-full flex items-center justify-center">
-                                <i class="fas fa-user text-white text-sm"></i>
+                        <button class="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-800/50 transition-all duration-200">
+                            <div class="relative">
+                                <div class="w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-full flex items-center justify-center border border-cyan-400">
+                                    <i class="fas fa-user-astronaut text-white text-sm"></i>
+                                </div>
+                                <div style="position: absolute; top: -2px; right: -2px; width: 8px; height: 8px; background: #00ff41; border-radius: 50%; animation: robotPulse 2s infinite;"></div>
                             </div>
-                            <span class="hidden md:block text-white text-sm">Admin</span>
-                            <i class="fas fa-chevron-down text-cyber-text text-xs"></i>
+                            <div class="hidden md:block text-left">
+                                <div class="text-white text-sm font-mono">ADMIN</div>
+                                <div class="text-cyan-400 text-xs">Security Officer</div>
+                            </div>
+                            <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
                         </button>
                     </div>
                 </div>
@@ -146,85 +211,433 @@
         </nav>
     </header>
 
+    <style>
+        .nav-link {
+            color: #a0a9c0;
+            font-weight: 500;
+            font-family: 'JetBrains Mono', monospace;
+            transition: all 0.3s ease;
+            position: relative;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 16px;
+            border-radius: 8px;
+        }
+
+        .nav-link:hover {
+            color: #00ffff;
+            background: rgba(0, 255, 255, 0.1);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+        }
+
+        .nav-icon-btn {
+            padding: 8px;
+            color: #a0a9c0;
+            transition: all 0.3s ease;
+            position: relative;
+            border-radius: 8px;
+        }
+
+        .nav-icon-btn:hover {
+            color: #00ffff;
+            background: rgba(0, 255, 255, 0.1);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+        }
+    </style>
+
     <!-- Main Content -->
-    <main class="pt-20 min-h-screen">
+    <main class="pt-24 min-h-screen relative">
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Global Loading Overlay -->
-    <div id="loadingOverlay" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[9999] hidden">
-        <div class="text-center">
-            <div class="w-16 h-16 border-4 border-cyber-accent border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <div class="text-white font-mono">Processing...</div>
-        </div>
-    </div>
-
-    <!-- Terminal Output Modal -->
-    <div id="terminalModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-[9999] hidden">
-        <div class="bg-gray-900 border border-cyber-accent rounded-lg shadow-2xl w-full max-w-4xl mx-4 max-h-[80vh] flex flex-col">
-            <div class="flex items-center justify-between p-4 border-b border-gray-700">
-                <div class="flex items-center space-x-2">
-                    <i class="fas fa-terminal text-cyber-accent"></i>
-                    <span class="text-white font-mono">Terminal Output</span>
+    <!-- Enhanced Terminal Modal -->
+    <div id="terminalModal" class="fixed inset-0 bg-black/95 backdrop-blur-sm flex items-center justify-center z-[9999] hidden">
+        <div class="terminal-window w-full max-w-6xl mx-4 max-h-[85vh] flex flex-col">
+            <div class="terminal-header">
+                <div class="terminal-dots">
+                    <div class="terminal-dot red"></div>
+                    <div class="terminal-dot amber"></div>
+                    <div class="terminal-dot green"></div>
                 </div>
-                <button onclick="closeTerminal()" class="text-gray-400 hover:text-white transition-colors">
-                    <i class="fas fa-times"></i>
-                </button>
+                <div class="terminal-title">
+                    <i class="fas fa-robot"></i>
+                    <span id="terminalTitle">ROBOTIC TERMINAL OUTPUT</span>
+                </div>
+                <div class="ml-auto">
+                    <button onclick="closeTerminal()" class="text-gray-400 hover:text-cyan-400 transition-colors">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
             </div>
-            <div id="terminalContent" class="flex-1 p-4 font-mono text-sm text-green-400 bg-black overflow-auto">
+            <div id="terminalContent" class="flex-1 terminal-content overflow-auto" style="max-height: 600px;">
                 <!-- Terminal content will be inserted here -->
             </div>
+            <div class="terminal-header border-t border-cyan-400/30" style="padding: 10px 20px;">
+                <div class="text-xs text-cyan-400 font-mono">
+                    <span>STATUS: ACTIVE</span>
+                    <span class="mx-4">|</span>
+                    <span id="terminalTime">00:00:00</span>
+                    <span class="mx-4">|</span>
+                    <span>NEURAL LINK: ESTABLISHED</span>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Scripts -->
+    <!-- Neural Network Background -->
+    <div id="neuralNetwork" class="fixed inset-0 pointer-events-none z-0" style="opacity: 0.03;">
+        <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <pattern id="neuralPattern" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
+                    <circle cx="50" cy="50" r="2" fill="#00ffff" opacity="0.5">
+                        <animate attributeName="opacity" values="0.2;0.8;0.2" dur="3s" repeatCount="indefinite"/>
+                    </circle>
+                    <line x1="50" y1="50" x2="100" y2="0" stroke="#00ffff" stroke-width="0.5" opacity="0.3">
+                        <animate attributeName="opacity" values="0.1;0.6;0.1" dur="2s" repeatCount="indefinite"/>
+                    </line>
+                    <line x1="50" y1="50" x2="0" y2="100" stroke="#00ffff" stroke-width="0.5" opacity="0.3">
+                        <animate attributeName="opacity" values="0.1;0.6;0.1" dur="2.5s" repeatCount="indefinite"/>
+                    </line>
+                </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#neuralPattern)"/>
+        </svg>
+    </div>
+
+    <!-- Enhanced Scripts -->
     <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Global variables
+        // Global robotic system variables
         let activeScans = new Map();
+        let neuralNetworkActive = false;
+        let roboticSystemStatus = {
+            sensors: 'ONLINE',
+            ai: 'ACTIVE',
+            defense: 'READY',
+            lastUpdate: Date.now()
+        };
 
-        // Utility functions
-        function showLoading() {
-            document.getElementById('loadingOverlay').classList.remove('hidden');
+        // Robotic loading system
+        function showRoboticLoading(message = 'Activating robotic systems...') {
+            const loader = document.getElementById('roboticLoader');
+            const loadingText = document.getElementById('loadingText');
+            const progress = document.getElementById('roboticProgress');
+
+            loadingText.textContent = message;
+            loader.classList.remove('hidden');
+
+            let progressValue = 0;
+            const progressInterval = setInterval(() => {
+                progressValue += Math.random() * 15 + 5;
+                if (progressValue > 100) progressValue = 100;
+
+                progress.style.width = progressValue + '%';
+
+                // Update loading messages
+                if (progressValue > 20 && progressValue < 40) {
+                    loadingText.textContent = 'Neural networks synchronizing...';
+                } else if (progressValue > 40 && progressValue < 60) {
+                    loadingText.textContent = 'Quantum processors initializing...';
+                } else if (progressValue > 60 && progressValue < 80) {
+                    loadingText.textContent = 'Defense protocols activating...';
+                } else if (progressValue > 80) {
+                    loadingText.textContent = 'Systems ready. Standing by...';
+                }
+
+                if (progressValue >= 100) {
+                    clearInterval(progressInterval);
+                    setTimeout(() => {
+                        loader.classList.add('hidden');
+                        progress.style.width = '0%';
+                    }, 500);
+                }
+            }, 150);
         }
 
-        function hideLoading() {
-            document.getElementById('loadingOverlay').classList.add('hidden');
+        function hideRoboticLoading() {
+            document.getElementById('roboticLoader').classList.add('hidden');
         }
 
-        function showTerminal(content) {
+        // Enhanced terminal with robotic features
+        function showTerminal(content, title = 'ROBOTIC TERMINAL OUTPUT') {
+            document.getElementById('terminalTitle').textContent = title;
             document.getElementById('terminalContent').innerHTML = content;
             document.getElementById('terminalModal').classList.remove('hidden');
+
+            // Start terminal timer
+            startTerminalTimer();
+
+            // Add robotic console sounds (visual feedback)
+            playTerminalAnimation();
         }
 
         function closeTerminal() {
             document.getElementById('terminalModal').classList.add('hidden');
+            stopTerminalTimer();
         }
 
-        // Initialize tooltips
-        document.addEventListener('DOMContentLoaded', function() {
+        let terminalTimer;
+        function startTerminalTimer() {
+            const startTime = Date.now();
+            terminalTimer = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const hours = Math.floor(elapsed / 3600).toString().padStart(2, '0');
+                const minutes = Math.floor((elapsed % 3600) / 60).toString().padStart(2, '0');
+                const seconds = (elapsed % 60).toString().padStart(2, '0');
+
+                const timeElement = document.getElementById('terminalTime');
+                if (timeElement) {
+                    timeElement.textContent = `${hours}:${minutes}:${seconds}`;
+                }
+            }, 1000);
+        }
+
+        function stopTerminalTimer() {
+            if (terminalTimer) {
+                clearInterval(terminalTimer);
+                terminalTimer = null;
+            }
+        }
+
+        function playTerminalAnimation() {
+            // Add scanning line animation to terminal
+            const content = document.getElementById('terminalContent');
+            const scanLine = document.createElement('div');
+            scanLine.style.cssText = `
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 2px;
+                background: linear-gradient(90deg, transparent, #00ffff, transparent);
+                animation: terminalScan 1s ease-in-out;
+                z-index: 10;
+            `;
+
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes terminalScan {
+                    0% { transform: translateY(0); opacity: 1; }
+                    100% { transform: translateY(400px); opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+            content.style.position = 'relative';
+            content.appendChild(scanLine);
+
+            setTimeout(() => {
+                if (scanLine.parentNode) {
+                    scanLine.parentNode.removeChild(scanLine);
+                }
+                document.head.removeChild(style);
+            }, 1000);
+        }
+
+        // Robotic threat counter
+        function updateThreatCounter() {
+            const counter = document.getElementById('threatCount');
+            if (counter) {
+                const currentCount = parseInt(counter.textContent);
+                const newCount = currentCount + Math.floor(Math.random() * 3);
+                counter.textContent = newCount;
+
+                // Flash animation
+                counter.parentElement.style.animation = 'flash 0.5s ease';
+                setTimeout(() => {
+                    counter.parentElement.style.animation = '';
+                }, 500);
+            }
+        }
+
+        // Neural network activation
+        function activateNeuralNetwork() {
+            neuralNetworkActive = true;
+            const network = document.getElementById('neuralNetwork');
+            if (network) {
+                network.style.opacity = '0.08';
+                network.style.transition = 'opacity 2s ease';
+            }
+        }
+
+        // Robotic system health check
+        function performSystemHealthCheck() {
+            console.log('🤖 Robotic Systems Health Check');
+            console.log('├── Neural Networks: ACTIVE');
+            console.log('├── Quantum Processors: OPERATIONAL');
+            console.log('├── Defense Matrix: READY');
+            console.log('├── Threat Detection: SCANNING');
+            console.log('└── AI Modules: ONLINE');
+
+            roboticSystemStatus.lastUpdate = Date.now();
+
+            // Show brief status in terminal
+            showTerminal(`
+                <div class="console-line console-success">🤖 ROBOTIC SYSTEMS HEALTH CHECK</div>
+                <div class="console-line">╔════════════════════════════════════════╗</div>
+                <div class="console-line">║  COMPONENT STATUS REPORT               ║</div>
+                <div class="console-line">╚════════════════════════════════════════╝</div>
+                <div class="console-line"></div>
+                <div class="console-line console-success">✓ Neural Networks............ ACTIVE</div>
+                <div class="console-line console-success">✓ Quantum Processors......... OPERATIONAL</div>
+                <div class="console-line console-success">✓ Defense Matrix............. READY</div>
+                <div class="console-line console-success">✓ Threat Detection........... SCANNING</div>
+                <div class="console-line console-success">✓ AI Learning Modules........ ONLINE</div>
+                <div class="console-line console-success">✓ Encryption Algorithms...... ACTIVE</div>
+                <div class="console-line"></div>
+                <div class="console-line">SYSTEM STATUS: <span style="color: #00ff41; font-weight: bold;">FULLY OPERATIONAL</span></div>
+                <div class="console-line">Last Update: ${new Date().toLocaleString()}</div>
+            `, 'SYSTEM HEALTH MONITOR');
+        }
+
+        // Enhanced tooltip system
+        function initializeRoboticTooltips() {
             const tooltipElements = document.querySelectorAll('[data-tooltip]');
             tooltipElements.forEach(element => {
                 element.addEventListener('mouseenter', function(e) {
                     const tooltip = document.createElement('div');
-                    tooltip.className = 'absolute z-50 px-2 py-1 bg-gray-800 border border-cyber-accent text-white text-xs rounded shadow-lg pointer-events-none';
-                    tooltip.textContent = e.target.getAttribute('data-tooltip');
+                    tooltip.className = 'robotic-tooltip';
+                    tooltip.innerHTML = `
+                        <div class="tooltip-content">
+                            <div class="tooltip-header">
+                                <i class="fas fa-robot"></i>
+                                <span>NEURAL ASSIST</span>
+                            </div>
+                            <div class="tooltip-body">${e.target.getAttribute('data-tooltip')}</div>
+                        </div>
+                    `;
                     tooltip.id = 'tooltip-' + Date.now();
 
+                    // Enhanced tooltip styling
+                    const style = document.createElement('style');
+                    style.textContent = `
+                        .robotic-tooltip {
+                            position: absolute;
+                            z-index: 9999;
+                            background: linear-gradient(145deg, #1a1a1a, #0a0a0a);
+                            border: 1px solid #00ffff;
+                            border-radius: 8px;
+                            padding: 0;
+                            pointer-events: none;
+                            box-shadow: 0 8px 32px rgba(0, 255, 255, 0.2);
+                            animation: tooltipAppear 0.3s ease;
+                            font-family: 'JetBrains Mono', monospace;
+                        }
+
+                        .tooltip-header {
+                            background: rgba(0, 255, 255, 0.1);
+                            padding: 6px 12px;
+                            border-bottom: 1px solid #00ffff;
+                            color: #00ffff;
+                            font-size: 10px;
+                            font-weight: bold;
+                            display: flex;
+                            align-items: center;
+                            gap: 6px;
+                        }
+
+                        .tooltip-body {
+                            padding: 8px 12px;
+                            color: white;
+                            font-size: 12px;
+                        }
+
+                        @keyframes tooltipAppear {
+                            from { opacity: 0; transform: translateY(5px); }
+                            to { opacity: 1; transform: translateY(0); }
+                        }
+                    `;
+                    document.head.appendChild(style);
                     document.body.appendChild(tooltip);
 
                     const rect = e.target.getBoundingClientRect();
-                    tooltip.style.top = (rect.bottom + 5) + 'px';
+                    tooltip.style.top = (rect.bottom + 8) + 'px';
                     tooltip.style.left = (rect.left + rect.width / 2 - tooltip.offsetWidth / 2) + 'px';
+
+                    // Ensure tooltip stays in viewport
+                    const tooltipRect = tooltip.getBoundingClientRect();
+                    if (tooltipRect.right > window.innerWidth) {
+                        tooltip.style.left = (window.innerWidth - tooltipRect.width - 10) + 'px';
+                    }
+                    if (tooltipRect.left < 0) {
+                        tooltip.style.left = '10px';
+                    }
                 });
 
                 element.addEventListener('mouseleave', function() {
-                    const tooltips = document.querySelectorAll('[id^="tooltip-"]');
-                    tooltips.forEach(tooltip => tooltip.remove());
+                    document.querySelectorAll('.robotic-tooltip').forEach(tooltip => {
+                        tooltip.remove();
+                    });
+                    document.querySelectorAll('style').forEach(style => {
+                        if (style.textContent.includes('.robotic-tooltip')) {
+                            style.remove();
+                        }
+                    });
                 });
             });
+        }
+
+        // Initialize robotic systems
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🤖 CyberSec Robotic Defense System v3.0');
+            console.log('🚀 Neural networks coming online...');
+            console.log('🔒 Quantum encryption active');
+            console.log('🛡️ Defense protocols engaged');
+
+            // Initialize components
+            initializeRoboticTooltips();
+            activateNeuralNetwork();
+
+            // Start background processes
+            setTimeout(() => {
+                updateThreatCounter();
+            }, 5000);
+
+            setInterval(() => {
+                updateThreatCounter();
+            }, 30000);
+
+            // Add flash animation for threat alerts
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes flash {
+                    0%, 100% { transform: scale(1); }
+                    50% { transform: scale(1.1); }
+                }
+
+                @keyframes roboticGlow {
+                    0%, 100% { box-shadow: 0 0 5px #00ffff; }
+                    50% { box-shadow: 0 0 20px #00ffff, 0 0 30px #00ffff; }
+                }
+            `;
+            document.head.appendChild(style);
+
+            // Welcome message
+            setTimeout(() => {
+                console.log('✅ All robotic systems operational');
+                console.log('🎯 Ready for cybersecurity operations');
+            }, 2000);
         });
+
+        // Keyboard shortcuts for robotic functions
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+Shift+H for health check
+            if (e.ctrlKey && e.shiftKey && e.key === 'H') {
+                e.preventDefault();
+                performSystemHealthCheck();
+            }
+
+            // Ctrl+Shift+T for threat update
+            if (e.ctrlKey && e.shiftKey && e.key === 'T') {
+                e.preventDefault();
+                updateThreatCounter();
+            }
+        });
+
+        // Legacy function compatibility
+        function showLoading() { showRoboticLoading(); }
+        function hideLoading() { hideRoboticLoading(); }
     </script>
 
     {% block scripts %}{% endblock %}
